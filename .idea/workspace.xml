@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e27c50bf-7952-4639-92f3-e11e3a6c9568" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/FloorHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/FloorHolder.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/MapHolder.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,7 +39,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/michal-pc/WebstormProjects/test-new",
+    "last_opened_file_path": "/home/michal-pc/WebstormProjects/vut-maps",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
@@ -83,7 +84,7 @@
       <workItem from="1700917412138" duration="73000" />
       <workItem from="1700917493041" duration="20872000" />
       <workItem from="1701007072245" duration="2943000" />
-      <workItem from="1701010030750" duration="7442000" />
+      <workItem from="1701010030750" duration="12743000" />
     </task>
     <servers />
   </component>

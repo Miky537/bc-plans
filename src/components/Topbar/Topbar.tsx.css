@@ -1,0 +1,16 @@
+.Topbar {
+     align-items: center;
+     background-color: #262626;
+     color: #fff;
+     display: flex;
+     font-family: Roboto, serif;
+     font-size: 20px;
+     font-weight: 500;
+     height: 2em;
+     flex-shrink: 0;
+     justify-content: center;
+     overflow: hidden;
+     text-transform: capitalize;
+     width: 100%;
+     position: relative;
+}

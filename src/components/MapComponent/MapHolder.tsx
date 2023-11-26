@@ -1,28 +1,27 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import MapComponent from './MapComponent';
-import DrawerComponent from './DrawerComponent';
-import Box from '@mui/material/Box';
+import FloorHolder from './FloorHolder';
 
+const MapHolder = () => {
+	const [selectedFloor, setSelectedFloor] = useState('2');
+	const [floors, setFloors] = useState([]);
 
-const MainComponent = () => {
-	const [roomData, setRoomData] = useState<string | null>("Not set yet");
-	const [selectedFloor, setSelectedFloor] = useState('2'); // Replace '2' with your initial floor
-
-	const handleRoomClick = useCallback((data: any) => {
-		console.log(data.číslo_podlaží);
-		if (data.číslo_podlaží === selectedFloor) {
-			setRoomData(data);
-		} else {
-			setRoomData(null);
-		}
-	}, [selectedFloor]);
+	const changeFloor = (newFloor: any) => {
+		setSelectedFloor(newFloor); // Update the selected floor
+	};
 
 	return (
-		<Box>
-			<MapComponent />
-			{ roomData && <DrawerComponent roomData={ roomData } /> }
-		</Box>
+		<div>
+			<FloorHolder
+				floors={floors}
+				onFloorChange={changeFloor}
+			/>
+			<MapComponent
+				selectedFloor={selectedFloor}
+				setFloors={setFloors}
+			/>
+		</div>
 	);
 };
 
-export default MainComponent;
+export default MapHolder;

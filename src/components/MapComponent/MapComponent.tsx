@@ -8,7 +8,8 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
-const MapComponent = () => {
+const MapComponent = ({ selectedFloor, setFloors }: any) => {
+
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayerRef = useRef<FeatureLayer | null>(null);
@@ -17,12 +18,12 @@ const MapComponent = () => {
 		if (!mapDiv.current) return;
 
 		const webMap = new WebMap({
-			portalItem: {id: 'f8374035877545c9916d19faed8d39f7'} // Replace with your Web Map ID
+			portalItem: { id: 'f8374035877545c9916d19faed8d39f7' }
 		});
 
 		mapViewRef.current = new MapView({
 			container: mapDiv.current,
-			map: webMap,
+			map: webMap
 		});
 
 		mapViewRef.current?.when(() => {
@@ -30,6 +31,7 @@ const MapComponent = () => {
 				webMap.layers.forEach(layer => {
 					if (layer instanceof FeatureLayer) {
 						featureLayerRef.current = layer;
+						queryUniqueFloors(layer); // Query unique floors first
 					}
 				});
 			});
@@ -38,18 +40,30 @@ const MapComponent = () => {
 		return () => mapViewRef.current!.destroy();
 	}, []);
 
-	const changeFloor = (newFloor: number) => {
+	useEffect(() => {
+		// Update the definitionExpression after fetching unique floors
 		if (featureLayerRef.current) {
-			featureLayerRef.current!.definitionExpression = `číslo_podlaží = ${ newFloor }`;
+			featureLayerRef.current!.definitionExpression = `číslo_podlaží = ${selectedFloor}`;
 		}
+	}, [selectedFloor]);
+
+	const queryUniqueFloors = (layer: any) => {
+		const query = layer.createQuery();
+		query.returnDistinctValues = true;
+		query.outFields = ["číslo_podlaží"];
+
+		layer.queryFeatures(query).then((results: any) => {
+			const floors = results.features.map((feature: any) => feature.attributes["číslo_podlaží"]);
+			const uniqueFloors = Array.from(new Set(floors));
+			console.log("Unique Floors:", uniqueFloors);
+			setFloors(uniqueFloors);
+		}).catch((err: Error) => {
+			console.error("Query error:", err);
+		});
 	};
 
 	return (
-		<div>
-			<button onClick={ () => changeFloor(0) }>Show Floor 2</button>
-			<button onClick={ () => changeFloor(3) }>Show Floor 3</button>
-			<div ref={ mapDiv } className="map-container" style={ {height: "90vh", width: '100%'} } />
-		</div>
+		<div ref={mapDiv} className="map-container" style={{ height: "100vh", width: '100%' }} />
 	);
 };
 

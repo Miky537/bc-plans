@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MapComponent from './MapComponent';
 import FloorHolder from './FloorHolder';
 
@@ -15,6 +15,7 @@ const MapHolder = () => {
 			<FloorHolder
 				floors={floors}
 				onFloorChange={changeFloor}
+				selectedFloor={ selectedFloor }
 			/>
 			<MapComponent
 				selectedFloor={selectedFloor}

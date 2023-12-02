@@ -9,7 +9,13 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';  // Replace with your actual API key
 
-const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: any) => {
+interface MapComponentProps {
+	selectedFloor: string;
+	setFloors: (floors: any) => void;
+	onRoomSelection: (SelectedRoom: any) => void;
+}
+
+const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayerRef = useRef<FeatureLayer | null>(null);

@@ -1,7 +1,7 @@
 import React from 'react';
-// import MapComponent from "./components/MapComponent/MapComponent";
+// import MapComponents from "./components/MapComponents/MapComponents";
 import Main from "./components/Main/Main";
-import MapHolder from "./components/MapComponent/MapHolder";
+import MapHolder from "./components/MapComponents/MapHolder";
 
 function App() {
   return (

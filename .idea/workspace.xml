@@ -5,10 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e27c50bf-7952-4639-92f3-e11e3a6c9568" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/components/MapComponents/Drawer/RoomInfoDrawer.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponent/MapHolder.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/DrawerComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/DrawerComponent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/FloorHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/FloorHolder.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapComponent.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapComponent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapHolder.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,25 +37,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/michal-pc/WebstormProjects/vut-maps",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "/home/michal-pc/WebstormProjects/itu-projekt/backend/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/michal-pc/WebstormProjects/bc-plans&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/michal-pc/WebstormProjects/itu-projekt/backend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/components/Topbar" />
@@ -84,7 +88,11 @@
       <workItem from="1700917412138" duration="73000" />
       <workItem from="1700917493041" duration="20872000" />
       <workItem from="1701007072245" duration="2943000" />
-      <workItem from="1701010030750" duration="12743000" />
+      <workItem from="1701010030750" duration="12944000" />
+      <workItem from="1701077141373" duration="3724000" />
+      <workItem from="1701428665699" duration="2322000" />
+      <workItem from="1701524301377" duration="235000" />
+      <workItem from="1701524552518" duration="1208000" />
     </task>
     <servers />
   </component>

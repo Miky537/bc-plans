@@ -19,6 +19,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayerRef = useRef<FeatureLayer | null>(null);
+	const floorAttribute = "číslo_podlaží";
 
 	useEffect(() => {
 		if (!mapDiv.current) return;
@@ -36,6 +37,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 			webMap.load().then(() => {
 				webMap.layers.forEach(layer => {
 					if (layer instanceof FeatureLayer) {
+						layer.popupEnabled = false;
 						featureLayerRef.current = layer;
 						queryUniqueFloors(layer);
 					}
@@ -50,7 +52,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 
 	useEffect(() => {
 		if (featureLayerRef.current) {
-			featureLayerRef.current!.definitionExpression = `číslo_podlaží = ${selectedFloor}`;
+			featureLayerRef.current!.definitionExpression = `${floorAttribute} = ${selectedFloor}`;
 		}
 	}, [selectedFloor]);
 
@@ -88,10 +90,10 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 	const queryUniqueFloors = (layer: any) => {
 		const query = layer.createQuery();
 		query.returnDistinctValues = true;
-		query.outFields = ["číslo_podlaží"];
+		query.outFields = [floorAttribute];
 
 		layer.queryFeatures(query).then((results: any) => {
-			const floors = results.features.map((feature: any) => feature.attributes["číslo_podlaží"]);
+			const floors = results.features.map((feature: any) => feature.attributes[floorAttribute]);
 			const uniqueFloors = Array.from(new Set(floors));
 			setFloors(uniqueFloors);
 		}).catch((err: Error) => {

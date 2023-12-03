@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e27c50bf-7952-4639-92f3-e11e3a6c9568" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/components/MapComponents/Drawer/RoomInfoDrawer.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/DrawerComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/DrawerComponent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/FloorHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/FloorHolder.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapComponent.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapComponent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/MapComponent/MapHolder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapHolder.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MapComponents/MapComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/MapComponents/MapComponent.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

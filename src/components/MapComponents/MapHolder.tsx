@@ -3,6 +3,7 @@ import MapComponent from './MapComponent';
 import FloorHolder from './FloorHolder';
 import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
 
+
 const MapHolder = () => {
 	const [selectedFloor, setSelectedFloor] = useState('2');
 	const [floors, setFloors] = useState([]);

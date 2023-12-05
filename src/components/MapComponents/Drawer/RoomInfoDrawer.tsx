@@ -1,5 +1,6 @@
 import React from 'react';
 import Box from '@mui/material/Box';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 const RoomInfoDrawer = ({roomInfo, onClose}: any) => {
 
@@ -13,6 +14,7 @@ const RoomInfoDrawer = ({roomInfo, onClose}: any) => {
 		     bgcolor="#DBDBDB">
 			yoyoyo
 			<button onClick={onClose}>Close</button>
+
 		</Box>
 	);
 };

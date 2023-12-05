@@ -1,108 +1,86 @@
 import React, { useEffect, useRef } from 'react';
 import MapView from '@arcgis/core/views/MapView';
-import WebMap from '@arcgis/core/WebMap';
-import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import Map from '@arcgis/core/Map';
 import esriConfig from '@arcgis/core/config';
 import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
-
+import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer';
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';  // Replace with your actual API key
+
 
 interface MapComponentProps {
 	selectedFloor: string;
 	setFloors: (floors: any) => void;
-	onRoomSelection: (SelectedRoom: any) => void;
+	onRoomSelection: (selectedRoom: any) => void;
 }
 
 const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentProps) => {
-	const mapDiv = useRef<HTMLDivElement | null>(null);
-	const mapViewRef = useRef<MapView | null>(null);
-	const featureLayerRef = useRef<FeatureLayer | null>(null);
-	const floorAttribute = "číslo_podlaží";
+	const mapDiv = useRef<any>(null);
+	const geoJsonUrl = "https://gist.githubusercontent.com/Miky537/cb568efc11c1833a5cd54ba87e583db5/raw/5a32a29cc63a8a017de7e134150ee74b2f7779ac/rektorat-mistnosti.geojson";
+	const smallGeoJsonUrl = "https://gist.githubusercontent.com/Miky537/60edaac3927c035cd92d064ea90f84ac/raw/816494619fd025dc647bcbda74d52dadacc1cb6c/small-rektorat.geojson";
+	const bigFile = "https://gist.githubusercontent.com/Miky537/a9e6492c6657ef53f212b700826c8df7/raw/48a9cebdd82474b56ba1957374ecb3e789c4a7e9/bigFile.geojson";
+
 
 	useEffect(() => {
 		if (!mapDiv.current) return;
 
-		const webMap = new WebMap({
-			portalItem: { id: 'f8374035877545c9916d19faed8d39f7' }
-		});
-
-		mapViewRef.current = new MapView({
-			container: mapDiv.current,
-			map: webMap
-		});
-
-		mapViewRef.current?.when(() => {
-			webMap.load().then(() => {
-				webMap.layers.forEach(layer => {
-					if (layer instanceof FeatureLayer) {
-						layer.popupEnabled = false;
-						featureLayerRef.current = layer;
-						queryUniqueFloors(layer);
-					}
+		const initializeMap = async() => {
+			try {
+				const featureLayer = new FeatureLayer({
+					url: smallGeoJsonUrl
 				});
-			});
-		});
+				const geoJsonLayer = new GeoJSONLayer({
+					url: geoJsonUrl,
+					outFields: ["*"],
+				});
+				const smallGeoJsonLayer = new GeoJSONLayer({
+					url: smallGeoJsonUrl
+				});
+				const bigFileLayer = new GeoJSONLayer({
+					url: bigFile,
+					outFields: ["*"],
+				});
 
-		return () => {
-			mapViewRef.current!.destroy();
+				const map = new Map({
+					basemap: 'dark-gray-vector',
+					layers: [geoJsonLayer],
+				});
+
+				const mapView = new MapView({
+					container: mapDiv.current,
+					map: map,
+					center: [16.603375432788052, 49.20174147400288],
+					zoom: 18,
+				});
+
+				mapView.on("click", (event) => {
+					mapView.hitTest(event).then(({ results }) => {
+						if (results.length > 0 && results[0]) {
+							const attributes = results[0];
+							console.log(attributes);
+							//console.log("Found features:", attributes.graphic.layer);
+							onRoomSelection(attributes);
+						} else {
+							console.log("No features found at click location");
+						}
+					}).catch(error => {
+						console.error("Error in hitTest:", error);
+					});
+				});
+
+				return () => mapView && mapView.destroy();
+			} catch (error) {
+				console.error("Error creating map:", error);
+			}
 		};
+
+		initializeMap();
 	}, []);
 
-	useEffect(() => {
-		if (featureLayerRef.current) {
-			featureLayerRef.current!.definitionExpression = `${floorAttribute} = ${selectedFloor}`;
-		}
-	}, [selectedFloor]);
-
-	useEffect(() => {
-		let clickHandle: any;
-
-		if (mapViewRef.current) {
-			clickHandle = mapViewRef.current!.on("click", async(event) => {
-				const layer = featureLayerRef.current;
-				if (!layer) return;
-
-				const query = layer.createQuery();
-				query.geometry = event.mapPoint;
-				query.spatialRelationship = "intersects";
-				query.returnGeometry = false;
-				query.outFields = ["*"];
-
-				try {
-					const results = await layer.queryFeatures(query);
-					if (results.features.length > 0) {
-						const roomData = results.features[0].attributes;
-						onRoomSelection(roomData);
-					}
-				} catch (err: any) {
-					console.error("Query error:", err);
-				}
-			});
-		}
-
-		return () => {
-			clickHandle?.remove();
-		};
-	}, [onRoomSelection]);
-
-	const queryUniqueFloors = (layer: any) => {
-		const query = layer.createQuery();
-		query.returnDistinctValues = true;
-		query.outFields = [floorAttribute];
-
-		layer.queryFeatures(query).then((results: any) => {
-			const floors = results.features.map((feature: any) => feature.attributes[floorAttribute]);
-			const uniqueFloors = Array.from(new Set(floors));
-			setFloors(uniqueFloors);
-		}).catch((err: Error) => {
-			console.error("Query error:", err);
-		});
-	};
-
 	return (
-		<div ref={mapDiv} className="map-container" style={{ height: "100vh", width: '100%' }} />
+		<div ref={ mapDiv } className="map-container" style={ {height: "900px", width: '100%'} } />
 	);
 };
 

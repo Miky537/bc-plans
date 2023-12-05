@@ -4671,7 +4671,7 @@ __metadata:
     "@types/node": "npm:^16.7.13"
     "@types/react": "npm:^18.0.0"
     "@types/react-dom": "npm:^18.0.0"
-    esri-loader: "npm:^3.7.0"
+    esri-loader: "npm:^2.14.0"
     loadash: "npm:^1.0.0"
     lodash: "npm:^4.17.21"
     react: "npm:^18.2.0"
@@ -6743,10 +6743,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esri-loader@npm:^3.7.0":
-  version: 3.7.0
-  resolution: "esri-loader@npm:3.7.0"
-  checksum: 56c8febebb8698cb9884b9dd5d6c5800da0f4f3b66a10c0959892564621fbf976d73a3e65c5e940f86f7498897d50dff7354e17862041e9698a92a15efc60f8b
+"esri-loader@npm:^2.14.0":
+  version: 2.16.0
+  resolution: "esri-loader@npm:2.16.0"
+  checksum: c6ee353338402888e50c940b772843509d82a2f54a0ba828217347019f5cd8db833ad0714a8a6086742f1ea3eb93a642452890e3fba6afedae49f75375df406f
   languageName: node
   linkType: hard
 

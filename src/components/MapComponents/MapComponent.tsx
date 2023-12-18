@@ -19,8 +19,10 @@ interface MapComponentProps {
 const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentProps) => {
 	const mapDiv = useRef<any>(null);
 	const geoJsonUrl = "https://gist.githubusercontent.com/Miky537/cb568efc11c1833a5cd54ba87e583db5/raw/5a32a29cc63a8a017de7e134150ee74b2f7779ac/rektorat-mistnosti.geojson";
-	const smallGeoJsonUrl = "https://gist.githubusercontent.com/Miky537/60edaac3927c035cd92d064ea90f84ac/raw/816494619fd025dc647bcbda74d52dadacc1cb6c/small-rektorat.geojson";
+	const smallGeoJsonUrl = "https://gist.githubusercontent.com/Miky537/60edaac3927c035cd92d064ea90f84ac/raw/8399f0c67ad662285c55080cc4b6a752f0a5db06/small-rektorat.geojson";
 	const bigFile = "https://gist.githubusercontent.com/Miky537/a9e6492c6657ef53f212b700826c8df7/raw/48a9cebdd82474b56ba1957374ecb3e789c4a7e9/bigFile.geojson";
+	const ultraShortFile = "https://gist.githubusercontent.com/Miky537/d2cbf6618da88eeb201d352c103cc829/raw/aca56cbb096cf7853a18aa1a21e643213cf4b89b/UltraShort.geojson";
+	const featureLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/re_mistnosti2/FeatureServer";
 
 
 	useEffect(() => {
@@ -28,24 +30,30 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 
 		const initializeMap = async() => {
 			try {
-				const featureLayer = new FeatureLayer({
-					url: smallGeoJsonUrl
-				});
 				const geoJsonLayer = new GeoJSONLayer({
 					url: geoJsonUrl,
 					outFields: ["*"],
 				});
+				const ultraShortLayer = new GeoJSONLayer({
+					url: ultraShortFile,
+					outFields: ["*"],
+				});
 				const smallGeoJsonLayer = new GeoJSONLayer({
-					url: smallGeoJsonUrl
+					url: smallGeoJsonUrl,
+					outFields: ["*"],
 				});
 				const bigFileLayer = new GeoJSONLayer({
 					url: bigFile,
 					outFields: ["*"],
 				});
+				const featureLayer = new FeatureLayer({
+					url: featureLayerUrl,
+					outFields: ["*"],
+				});
 
 				const map = new Map({
 					basemap: 'dark-gray-vector',
-					layers: [geoJsonLayer],
+					layers: [featureLayer],
 				});
 
 				const mapView = new MapView({
@@ -55,18 +63,16 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 					zoom: 18,
 				});
 
-				mapView.on("click", (event) => {
-					mapView.hitTest(event).then(({ results }) => {
-						if (results.length > 0 && results[0]) {
-							const attributes = results[0];
-							console.log(attributes);
-							//console.log("Found features:", attributes.graphic.layer);
-							onRoomSelection(attributes);
-						} else {
-							console.log("No features found at click location");
-						}
-					}).catch(error => {
-						console.error("Error in hitTest:", error);
+				mapView.when(() => {
+					mapView.on("click", (event) => {
+						mapView.hitTest(event).then((response) => {
+							if (response.results.length > 0 && 'graphic' in response.results[0]) {
+								const graphic = response.results[0]!.graphic;
+								onRoomSelection(graphic.attributes.id);
+							}
+						}).catch(error => {
+							console.error("Error in hitTest:", error);
+						});
 					});
 				});
 
@@ -77,7 +83,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 		};
 
 		initializeMap();
-	}, []);
+	}, [onRoomSelection]);
 
 	return (
 		<div ref={ mapDiv } className="map-container" style={ {height: "900px", width: '100%'} } />

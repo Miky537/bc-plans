@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import MapComponent from './MapComponent';
 import FloorHolder from './FloorHolder';
 import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
@@ -10,11 +10,12 @@ const MapHolder = () => {
 	const [roomInfo, setRoomInfo] = useState({});
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-	const handleRoomSelection = (info: any) => {
+	const handleRoomSelection = useCallback((info: any) => {
 		setRoomInfo(info); // Update state with selected room information
 		setIsDrawerOpen(true);
 		console.log("Selected Room Info:", info); // For debugging
-	};
+	}, [setRoomInfo, setIsDrawerOpen]); // Dependencies
+
 	const changeFloor = (newFloor: any) => {
 		setSelectedFloor(newFloor); // Update the selected floor
 	};

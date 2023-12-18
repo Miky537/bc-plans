@@ -63,7 +63,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 					zoom: 18,
 				});
 
-				mapView.when(() => {
+				await mapView.when(() => {
 					mapView.on("click", (event) => {
 						mapView.hitTest(event).then((response) => {
 							if (response.results.length > 0 && 'graphic' in response.results[0]) {

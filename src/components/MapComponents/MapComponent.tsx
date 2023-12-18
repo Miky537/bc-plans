@@ -7,13 +7,14 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 
+
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';  // Replace with your actual API key
 
 
 interface MapComponentProps {
 	selectedFloor: string;
 	setFloors: (floors: any) => void;
-	onRoomSelection: (selectedRoom: any) => void;
+	onRoomSelection: any;
 }
 
 const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentProps) => {
@@ -83,7 +84,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 		};
 
 		initializeMap();
-	}, [onRoomSelection]);
+	}, []);
 
 	return (
 		<div ref={ mapDiv } className="map-container" style={ {height: "900px", width: '100%'} } />

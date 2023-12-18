@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "properties": { "id": 2040 },
+      "properties": { "attributes": { "id": "2040" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -26,11 +26,12 @@
             ]
           ]
         ]
-      }
+      },
+      "id": "YEEEEEEEEEEEEEEEEEEEEEEEEEES"
     },
     {
       "type": "Feature",
-      "properties": { "id": 2041 },
+      "properties": { "attributes": { "id": "2041" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -47,11 +48,12 @@
             ]
           ]
         ]
-      }
+      },
+      "id": "YEEEEEEEEEEEEEEEEEEEEEEEEEES"
     },
     {
       "type": "Feature",
-      "properties": { "id": 2042 },
+      "properties": { "attributes": { "id": "2042" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -65,11 +67,12 @@
             ]
           ]
         ]
-      }
+      },
+      "id": "YEEEEEEEEEEEEEEEEEEEEEEEEEES"
     },
     {
       "type": "Feature",
-      "properties": { "id": 2044 },
+      "properties": { "attributes": { "id": "2044" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -84,11 +87,12 @@
             ]
           ]
         ]
-      }
+      },
+      "id": "YEEEEEEEEEEEEEEEEEEEEEEEEEES"
     },
     {
       "type": "Feature",
-      "properties": { "id": 2045 },
+      "properties": { "attributes": { "id": "2045" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -103,11 +107,12 @@
             ]
           ]
         ]
-      }
+      },
+      "id": "YEEEEEEEEEEEEEEEEEEEEEEEEEES"
     },
     {
       "type": "Feature",
-      "properties": { "id": 2046 },
+      "properties": { "attributes": { "id": "2046" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -137,7 +142,7 @@
     },
     {
       "type": "Feature",
-      "properties": { "id": 2047 },
+      "properties": { "attributes": { "id": "2047" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -157,7 +162,7 @@
     },
     {
       "type": "Feature",
-      "properties": { "id": 2048 },
+      "properties": { "attributes": { "id": "2048" }},
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -174,6 +179,6 @@
         ]
       }
     }
-    // Additional features can be added in the same format
+    // Continue adding more features as needed
   ]
 }

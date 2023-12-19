@@ -1,4 +1,6 @@
 import roomData from '../../jsonFiles/areal-antoninska-mistnosti.json';
+import buildingData from '../../jsonFiles/areal-antoninska-budovy.json';
+import floorData from '../../jsonFiles/areal-antoninska-podlazi.json';
 
 export interface Building {
 	budova_id: number;
@@ -40,6 +42,29 @@ export interface Building {
 	zkratka_prezentacni_en: any,
 	nazev_prezentacni: any,
 	nazev_prezentacni_en: any
+}
+interface Floor {
+	podlazi_id: number;
+	budova_id: number;
+	dokument_id: number | null;
+	nazev: string;
+	nazev_en: string | null;
+	kod: string;
+	cislo: number;
+	popis: string | null;
+	popis_en: string | null;
+	poznamka: string | null;
+	gtfvut3_id: number;
+	upd_ts: string;
+	upd_uid: number;
+	ins_ts: string;
+	ins_uid: number;
+	status: number;
+	platnost_od: string;
+	platnost_do: string | null;
+	aktualni: number;
+	podlazi_typ_id: number;
+	externi: number;
 }
 
 export interface Room {
@@ -102,9 +127,17 @@ export interface Room {
 }
 
 
-export function findBuildingById(id: number): Room | undefined {
+export function findRoomById(id: number): Room | undefined {
 	const foundRoom = roomData.find(room => room.mistnost_id === id);
 	return foundRoom;
+}
+export function findFloorById(id: number): Floor | undefined {
+	const foundFloor = floorData.find(floor => floor.podlazi_id === id);
+	return foundFloor;
+}
+export function findBuildingById(id: number): Building | undefined {
+	const foundBuilding = buildingData.find(building => building.budova_id === id);
+	return foundBuilding;
 }
 
 export function loadJsonData(): Promise<Room[]> {

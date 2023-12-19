@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
 import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
-import { findBuildingById, Room } from "../parser/jsonParser";
+import { findRoomById, Room } from "../parser/jsonParser";
 import FloorHolder from "./FloorHolder";
 
 
@@ -67,7 +67,7 @@ const MapHolder = () => {
 	};
 
 	const [selectedFloor, setSelectedFloor] = useState('2');
-	const [floors, setFloors] = useState([]);
+	const [floors, setFloors] = useState([1,2]);
 	const [selectedRoomId, setSelectedRoomId] = useState(0);
 	const selectedRoomIdRef = useRef(selectedRoomId);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -80,7 +80,7 @@ const MapHolder = () => {
 		}
 		setIsDrawerOpen(true);
 		setSelectedRoomId(roomId); // Update state with selected room information
-		let roomInfo = findBuildingById(roomId);
+		let roomInfo = findRoomById(roomId);
 		if (roomInfo === undefined) {
 			return;
 		} else {

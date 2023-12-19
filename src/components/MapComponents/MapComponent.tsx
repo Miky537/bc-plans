@@ -12,12 +12,11 @@ esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOp
 
 
 interface MapComponentProps {
-	selectedFloor: string;
-	setFloors: (floors: any) => void;
 	onRoomSelection: any;
 }
 
-const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentProps) => {
+const MapComponent = ({onRoomSelection}: MapComponentProps) => {
+	console.log("Rendering MapComponent");
 	const mapDiv = useRef<any>(null);
 	const geoJsonUrl = "https://gist.githubusercontent.com/Miky537/cb568efc11c1833a5cd54ba87e583db5/raw/5a32a29cc63a8a017de7e134150ee74b2f7779ac/rektorat-mistnosti.geojson";
 	const smallGeoJsonUrl = "https://gist.githubusercontent.com/Miky537/60edaac3927c035cd92d064ea90f84ac/raw/8399f0c67ad662285c55080cc4b6a752f0a5db06/small-rektorat.geojson";
@@ -25,11 +24,10 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 	const ultraShortFile = "https://gist.githubusercontent.com/Miky537/d2cbf6618da88eeb201d352c103cc829/raw/aca56cbb096cf7853a18aa1a21e643213cf4b89b/UltraShort.geojson";
 	const featureLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/re_mistnosti2/FeatureServer";
 
-
 	useEffect(() => {
 		if (!mapDiv.current) return;
 
-		const initializeMap = async() => {
+		const initializeMap = () => {
 			try {
 				const geoJsonLayer = new GeoJSONLayer({
 					url: geoJsonUrl,
@@ -64,7 +62,7 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 					zoom: 18,
 				});
 
-				await mapView.when(() => {
+				mapView.when(() => {
 					mapView.on("click", (event) => {
 						mapView.hitTest(event).then((response) => {
 							if (response.results.length > 0 && 'graphic' in response.results[0]) {
@@ -77,7 +75,9 @@ const MapComponent = ({selectedFloor, setFloors, onRoomSelection}: MapComponentP
 					});
 				});
 
-				return () => mapView && mapView.destroy();
+				return () => {
+					mapView && mapView.destroy()
+				};
 			} catch (error) {
 				console.error("Error creating map:", error);
 			}

@@ -1,21 +1,22 @@
-import React from 'react';
-import Box from '@mui/material/Box';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import React, { useEffect } from 'react';
+import { SwipeableDrawerComponent } from "../../SwipeableDrawer/SwipeableDrawerComponent";
 
-const RoomInfoDrawer = ({roomInfo, onClose}: any) => {
+interface RoomInfoDrawerProps {
+	roomInfo: any;
+	onClose: () => void;
+	isDrawerOpen: boolean;
+	onOpen: () => void;
+}
 
+const RoomInfoDrawer = ({roomInfo, onClose, isDrawerOpen, onOpen}: RoomInfoDrawerProps) => {
 
+	useEffect(() => {
+		console.log("RoomInfoDrawer: isDrawerOpen changed to", isDrawerOpen);
+		console.log("RoomInfoDrawer: roomInfo changed to", roomInfo);
+	}, [isDrawerOpen, roomInfo]);
 	return (
-		<Box zIndex="10"
-		     position="absolute"
-		     bottom="3em"
-		     gap="0.2em"
-		     display="flex"
-		     bgcolor="#DBDBDB">
-			yoyoyo
-			<button onClick={onClose}>Close</button>
+		<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen } onOpen={ onOpen } onClose={ onClose } />
 
-		</Box>
 	);
 };
 

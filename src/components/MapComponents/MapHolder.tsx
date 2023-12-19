@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
-import FloorHolder from './FloorHolder';
 import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
 import { findBuildingById } from "../parser/jsonParser";
 
@@ -22,6 +21,13 @@ const MapHolder = () => {
 		let roomInfo = findBuildingById(roomId);
 		console.log("Room Info:", roomInfo);
 	};
+	const handleOpen = useCallback(() => {
+		setIsDrawerOpen(true);
+	}, [setIsDrawerOpen]);
+
+	const handleClose = useCallback(() => {
+		setIsDrawerOpen(false);
+	}, [setIsDrawerOpen]);
 	useEffect(() => {
 		selectedRoomIdRef.current = selectedRoomId;
 	}, [selectedRoomId]);
@@ -32,17 +38,17 @@ const MapHolder = () => {
 
 	return (
 		<div>
-			<FloorHolder
-				floors={floors}
-				onFloorChange={changeFloor}
-				selectedFloor={ selectedFloor }
+			{/*<FloorHolder*/ }
+			{/*	floors={floors}*/ }
+			{/*	onFloorChange={changeFloor}*/ }
+			{/*	selectedFloor={ selectedFloor }*/ }
+			{/*/>*/ }
+			<MapComponent onRoomSelection={ handleRoomSelection }
 			/>
-			<MapComponent
-				selectedFloor={selectedFloor}
-				setFloors={setFloors}
-				onRoomSelection={ handleRoomSelection }
-			/>
-			{isDrawerOpen && <RoomInfoDrawer roomInfo={selectedRoomId} onClose={() => setIsDrawerOpen(false)} />}
+			{/*<RoomInfoDrawer roomInfo={ selectedRoomId }*/}
+			{/*                isDrawerOpen={ isDrawerOpen }*/}
+			{/*                onClose={ handleClose }*/}
+			{/*                onOpen={ handleOpen } />*/}
 		</div>
 	);
 };

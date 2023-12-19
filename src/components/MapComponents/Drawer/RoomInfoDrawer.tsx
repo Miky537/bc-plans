@@ -1,21 +1,23 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SwipeableDrawerComponent } from "../../SwipeableDrawer/SwipeableDrawerComponent";
+import { Room } from "../../parser/jsonParser";
 
 interface RoomInfoDrawerProps {
 	roomInfo: any;
 	onClose: () => void;
-	isDrawerOpen: boolean;
 	onOpen: () => void;
+	isDrawerOpen: boolean;
+	roomData: Room;
 }
 
-const RoomInfoDrawer = ({roomInfo, onClose, isDrawerOpen, onOpen}: RoomInfoDrawerProps) => {
+const RoomInfoDrawer = ({roomInfo, onClose, isDrawerOpen, onOpen, roomData}: RoomInfoDrawerProps) => {
 
-	useEffect(() => {
-		console.log("RoomInfoDrawer: isDrawerOpen changed to", isDrawerOpen);
-		console.log("RoomInfoDrawer: roomInfo changed to", roomInfo);
-	}, [isDrawerOpen, roomInfo]);
 	return (
-		<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen } onOpen={ onOpen } onClose={ onClose } />
+		<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
+		                          onOpen={ onOpen }
+		                          onClose={ onClose }
+		                          roomInfo={ roomInfo }
+		                          roomData={ roomData } />
 
 	);
 };

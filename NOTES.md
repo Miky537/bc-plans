@@ -12,3 +12,7 @@
     though the results
 
 ### - **Map gets re-rendered on touch on mobile devices, on desktop theres no issue**. 
+   - Different basemap - didnt work
+   - Dependencies checked - didnt work
+   - Displaying only map and nothing else - didnt work
+   - Disabled all default behavior - didnt work

@@ -80,6 +80,7 @@ const MapHolder = () => {
 		}
 		setIsDrawerOpen(true);
 		setSelectedRoomId(roomId); // Update state with selected room information
+		// findRoomDetails(roomId);
 		let roomInfo = findRoomById(roomId);
 		if (roomInfo === undefined) {
 			return;

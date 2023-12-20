@@ -71,6 +71,7 @@ const MapComponent = ({onRoomSelection}: MapComponentProps) => {
 
 				const map = new Map({
 					basemap: 'dark-gray-vector',
+					// basemap: 'osm/blueprint',
 					layers: [featureLayer],
 				});
 

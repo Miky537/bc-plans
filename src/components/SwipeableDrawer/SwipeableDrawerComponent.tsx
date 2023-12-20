@@ -36,7 +36,6 @@ export function SwipeableDrawerComponent({
                                          }: SwipeableDrawerComponentProps) {
 	const {nazev, podlazi_id, label} = roomData;
 	const theme = useTheme();
-	// console.log("Rendering roomData", roomData);
 	return (
 		<SwipeableDrawer
 			anchor="bottom"

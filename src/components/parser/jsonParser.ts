@@ -50,7 +50,7 @@ interface Floor {
 	nazev: string;
 	nazev_en: string | null;
 	kod: string;
-	cislo: number;
+	cislo: number; // floor number
 	popis: string | null;
 	popis_en: string | null;
 	poznamka: string | null;
@@ -124,6 +124,22 @@ export interface Room {
 	bezbarierova: number;
 	zkratka: string | null;
 	zkratka_en: string | null;
+}
+
+export function findRoomDetails(roomId: number): {
+	room: Room | undefined,
+	floor: Floor | undefined,
+	building: Building | undefined
+} {
+	const room = roomData.find(r => r.mistnost_id === roomId);
+	if (!room) {
+		return {room: undefined, floor: undefined, building: undefined};
+	}
+
+	const floor = floorData.find(f => f.podlazi_id === room.podlazi_id);
+	const building = floor? buildingData.find(b => b.budova_id === floor.budova_id) : undefined;
+
+	return {room, floor, building};
 }
 
 

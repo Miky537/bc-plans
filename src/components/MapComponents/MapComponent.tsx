@@ -85,28 +85,51 @@ const MapComponent = ({onRoomSelection}: MapComponentProps) => {
 				let highlightGraphic: any;
 
 				mapView.when(() => {
-					mapView.on("click", async(event) => {
-						const response: __esri.HitTestResult = await mapView.hitTest(event);
-						console.log("response", response);
-
-						if (response.results.length > 0) {
-							const firstHit = response.results[0];
-
-							if (firstHit.type === "graphic" && firstHit.graphic) {
-								const clickedGraphic = firstHit.graphic;
-								mapView.graphics.remove(highlightGraphic); // remove previous highlight
-
-								highlightGraphic = new Graphic({
-									geometry: clickedGraphic.geometry,
-									symbol: highlightSymbol
-								});
-								mapView.graphics.add(highlightGraphic);
-
-								// Call the onRoomSelection callback with the clicked graphic's ID
-								onRoomSelection(clickedGraphic.attributes.id);
-							}
-						}
-					});
+					// mapView.on('click', async(event: any) => {
+					// 	const response: __esri.HitTestResult = await mapView.hitTest(event);
+					// 	console.log("response", response);
+					//
+					// 	if (response.results.length > 0) {
+					// 		const firstHit = response.results[0];
+					//
+					// 		if (firstHit.type === "graphic" && firstHit.graphic) {
+					// 			const clickedGraphic = firstHit.graphic;
+					// 			mapView.graphics.remove(highlightGraphic); // remove previous highlight
+					//
+					// 			highlightGraphic = new Graphic({
+					// 				geometry: clickedGraphic.geometry,
+					// 				symbol: highlightSymbol
+					// 			});
+					// 			mapView.graphics.add(highlightGraphic);
+					//
+					// 			// Call the onRoomSelection callback with the clicked graphic's ID
+					// 			onRoomSelection(clickedGraphic.attributes.id);
+					// 		}
+					// 	}
+					// });
+					// mapView.on('double-click', async(event: any) => {
+					// 	console.log("DADADADDADADDADADADDADAD");
+					// 	const response: __esri.HitTestResult = await mapView.hitTest(event);
+					// 	console.log("response", response);
+					//
+					// 	if (response.results.length > 0) {
+					// 		const firstHit = response.results[0];
+					//
+					// 		if (firstHit.type === "graphic" && firstHit.graphic) {
+					// 			const clickedGraphic = firstHit.graphic;
+					// 			mapView.graphics.remove(highlightGraphic); // remove previous highlight
+					//
+					// 			highlightGraphic = new Graphic({
+					// 				geometry: clickedGraphic.geometry,
+					// 				symbol: highlightSymbol
+					// 			});
+					// 			mapView.graphics.add(highlightGraphic);
+					//
+					// 			// Call the onRoomSelection callback with the clicked graphic's ID
+					// 			onRoomSelection(clickedGraphic.attributes.id);
+					// 		}
+					// 	}
+					// });
 				});
 
 				return () => {

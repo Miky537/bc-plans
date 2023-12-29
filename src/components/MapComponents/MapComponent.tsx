@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MapView from '@arcgis/core/views/MapView';
 import Map from '@arcgis/core/Map';
 import esriConfig from '@arcgis/core/config';
@@ -11,21 +11,16 @@ import Graphic from "@arcgis/core/Graphic";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';  // Replace with your actual API key
 
-	interface HitTestResult {
-	results: Array<{
-		graphic: Graphic;
-		// Include other properties of the hit test result that you use
-	}>;
-}
-
-
 interface MapComponentProps {
 	onRoomSelection: (roomId: number) => void;
+	selectedFloor: number;
+	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
 }
 
-const MapComponent = ({onRoomSelection}: MapComponentProps) => {
-	// console.log("Rendering MapComponent");
+const MapComponent = ({onRoomSelection, selectedFloor = 1, setIsDrawerOpen}: MapComponentProps) => {
 	const mapDiv = useRef<any>(null);
+	const mapRef = useRef<Map | null>(null);
+	const featureLayerRef = useRef<FeatureLayer | null>(null);
 
 	const highlightSymbol = {
 		type: "simple-fill", // autocasts as new SimpleFillSymbol()
@@ -44,7 +39,8 @@ const MapComponent = ({onRoomSelection}: MapComponentProps) => {
 	const featureLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/re_mistnosti2/FeatureServer";
 
 	useEffect(() => {
-		if (!mapDiv.current) return;
+		if (!mapDiv.current || mapRef.current) return;
+
 
 		const initializeMap = () => {
 			try {
@@ -68,12 +64,13 @@ const MapComponent = ({onRoomSelection}: MapComponentProps) => {
 					url: featureLayerUrl,
 					outFields: ["*"],
 				});
+				featureLayerRef.current = featureLayer;
 
 				const map = new Map({
 					basemap: 'dark-gray-vector',
-					// basemap: 'osm/blueprint',
 					layers: [featureLayer],
 				});
+				mapRef.current = map;
 
 				const mapView = new MapView({
 					container: mapDiv.current,
@@ -83,53 +80,34 @@ const MapComponent = ({onRoomSelection}: MapComponentProps) => {
 				});
 
 				let highlightGraphic: any;
-
+				console.log("Selected sssssfloor:", selectedFloor);
 				mapView.when(() => {
-					// mapView.on('click', async(event: any) => {
-					// 	const response: __esri.HitTestResult = await mapView.hitTest(event);
-					// 	console.log("response", response);
-					//
-					// 	if (response.results.length > 0) {
-					// 		const firstHit = response.results[0];
-					//
-					// 		if (firstHit.type === "graphic" && firstHit.graphic) {
-					// 			const clickedGraphic = firstHit.graphic;
-					// 			mapView.graphics.remove(highlightGraphic); // remove previous highlight
-					//
-					// 			highlightGraphic = new Graphic({
-					// 				geometry: clickedGraphic.geometry,
-					// 				symbol: highlightSymbol
-					// 			});
-					// 			mapView.graphics.add(highlightGraphic);
-					//
-					// 			// Call the onRoomSelection callback with the clicked graphic's ID
-					// 			onRoomSelection(clickedGraphic.attributes.id);
-					// 		}
-					// 	}
-					// });
-					// mapView.on('double-click', async(event: any) => {
-					// 	console.log("DADADADDADADDADADADDADAD");
-					// 	const response: __esri.HitTestResult = await mapView.hitTest(event);
-					// 	console.log("response", response);
-					//
-					// 	if (response.results.length > 0) {
-					// 		const firstHit = response.results[0];
-					//
-					// 		if (firstHit.type === "graphic" && firstHit.graphic) {
-					// 			const clickedGraphic = firstHit.graphic;
-					// 			mapView.graphics.remove(highlightGraphic); // remove previous highlight
-					//
-					// 			highlightGraphic = new Graphic({
-					// 				geometry: clickedGraphic.geometry,
-					// 				symbol: highlightSymbol
-					// 			});
-					// 			mapView.graphics.add(highlightGraphic);
-					//
-					// 			// Call the onRoomSelection callback with the clicked graphic's ID
-					// 			onRoomSelection(clickedGraphic.attributes.id);
-					// 		}
-					// 	}
-					// });
+					mapView.on('click', async(event: any) => {
+						const response: __esri.HitTestResult = await mapView.hitTest(event);
+
+						if (response.results.length > 0) {
+							const firstHit = response.results[0];
+
+							if (firstHit.type === "graphic" && firstHit.graphic && firstHit.graphic.attributes) {
+								const clickedGraphic = firstHit.graphic;
+								mapView.graphics.remove(highlightGraphic); // remove previous highlight
+
+								if ('id' in clickedGraphic.attributes) {
+									setIsDrawerOpen(true);
+									highlightGraphic = new Graphic({
+										geometry: clickedGraphic.geometry,
+										symbol: highlightSymbol
+									});
+									mapView.graphics.add(highlightGraphic);
+
+									onRoomSelection(clickedGraphic.attributes.id);
+								} else {
+									console.error("Invalid room selection");
+									onRoomSelection(0);
+								}
+							}
+						}
+					});
 				});
 
 				return () => {
@@ -142,6 +120,14 @@ const MapComponent = ({onRoomSelection}: MapComponentProps) => {
 
 		initializeMap();
 	}, []);
+
+	useEffect(() => {
+		if (featureLayerRef.current) {
+			featureLayerRef.current!.definitionExpression = `číslo_podlaží = ${selectedFloor}`;
+			console.log("Selected floor:", selectedFloor);
+		}
+	}, [selectedFloor]);
+
 
 	return (
 		<div ref={ mapDiv } className="map-container" />

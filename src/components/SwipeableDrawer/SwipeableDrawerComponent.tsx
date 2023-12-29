@@ -2,7 +2,7 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import React from "react";
 import { useTheme, SxProps, Theme, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import { Room } from "../parser/jsonParser";
+import { InfoState } from "../MapComponents/MapHolder";
 
 
 interface SwipeableDrawerComponentProps {
@@ -10,10 +10,8 @@ interface SwipeableDrawerComponentProps {
 	onClose: () => void;
 	onOpen: () => void;
 	roomInfo: any;
-	roomData: Room
+	roomData: InfoState;
 }
-
-
 const mergeStylesWithTheme = (theme: Theme): SxProps => {
 	return {
 		"& .MuiDrawer-paper.MuiDrawer-paperAnchorBottom": {
@@ -34,7 +32,11 @@ export function SwipeableDrawerComponent({
 	                                         roomInfo,
 	                                         roomData
                                          }: SwipeableDrawerComponentProps) {
-	const {nazev, podlazi_id, label} = roomData;
+	const {room, floor} = roomData;
+	const nazev = room?.nazev;
+	const podlazi_id = floor?.podlazi_id;
+	const label = room?.label;
+
 	const theme = useTheme();
 	return (
 		<SwipeableDrawer

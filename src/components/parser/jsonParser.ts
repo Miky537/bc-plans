@@ -10,7 +10,7 @@ export function findRoomDetails(roomId: number): {
 	building: Building | undefined
 } {
 	const room = roomData.find(r => r.mistnost_id === roomId);
-	console.log("Roooomis: ", room);
+	console.log("Rooooms: ", room);
 	if (!room) {
 		return {
 			room: undefined,

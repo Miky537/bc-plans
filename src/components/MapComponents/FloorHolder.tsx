@@ -2,7 +2,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import { Divider } from "@mui/material";
 
-const FloorHolder = ({floors, onFloorChange, selectedFloor}: any) => {
+const FloorHolder = ({floors, onFloorChange, selectedFloor = 2}: any) => {
 
 	const handleButtonClick = (floor: any) => {
 		console.log("Selected floor:", floor);
@@ -15,7 +15,7 @@ const FloorHolder = ({floors, onFloorChange, selectedFloor}: any) => {
 		     display="flex"
 		     flexDirection="column"
 		     position="absolute"
-		     top="1em"
+		     top="4em"
 		     right="1em"
 		     bgcolor="#DBDBDB">
 			{floors.map((floor: any, index: number) => (

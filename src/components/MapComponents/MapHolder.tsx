@@ -14,7 +14,7 @@ export interface InfoState {
 
 const MapHolder = () => {
 
-	const [selectedFloor, setSelectedFloor] = useState(0);
+	const [selectedFloor, setSelectedFloor] = useState(2);
 	const [floors, setFloors] = useState(findUniqueFloorNumbers());
 	const [selectedRoomId, setSelectedRoomId] = useState(0);
 	const selectedRoomIdRef = useRef(selectedRoomId);
@@ -27,7 +27,7 @@ const MapHolder = () => {
 		setSelectedRoomId(roomId); // Update state with selected room information
 
 		let roomInfo = findRoomDetails(roomId);
-		console.log("Room info", roomInfo);
+		// console.log("Room info", roomInfo);
 		if (roomInfo.room === undefined) {
 			console.log("Didnt find room!");
 			setRoomData(defaultState);

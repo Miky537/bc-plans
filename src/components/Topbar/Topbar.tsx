@@ -14,7 +14,7 @@ export function Topbar({title}: TopbarProps) {
 			<IconButton sx={{ position: "absolute", left: 0 }}>
 				<WestIcon sx={ {color: "white"} } />
 			</IconButton>
-			<Box>{ title ?? 'Page name' }</Box>
+			<Box>{ title ?? '' }</Box>
 		</div>
 	);
 }

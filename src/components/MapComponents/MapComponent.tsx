@@ -7,6 +7,10 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl } from "./constants";
+import GeoJsonLoader from "./Centroid";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import Point from '@arcgis/core/geometry/Point';
+
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -105,8 +109,35 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		}
 	}, [selectedFloor]);
 
+
+	const handleCentroidsLoaded = (centroids: any) => {
+		const markerSymbol = new SimpleMarkerSymbol({
+			color: [226, 119, 40], // Example color
+			outline: {color: [255, 255, 255], width: 2}
+		});
+
+		centroids.forEach(({longitude, latitude}: any) => {
+			const pointGeometry = new Point({
+				longitude: longitude,
+				latitude: latitude
+			});
+
+			const graphic = new Graphic({
+				geometry: pointGeometry,
+				symbol: markerSymbol
+			});
+
+			if (mapViewRef.current) {
+				mapViewRef.current!.graphics.add(graphic);
+			}
+		});
+	};
+
 	return (
-		<div ref={mapDiv} className="map-container" />
+		<>
+			<div ref={ mapDiv } className="map-container" />
+			<GeoJsonLoader onCentroidsLoaded={ handleCentroidsLoaded } />
+		</>
 	);
 };
 

@@ -6,10 +6,12 @@ import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
-import { featureLayerUrl } from "./constants";
+import { featureLayerUrl, fastLayerUrl } from "./constants";
 import GeoJsonLoader from "./Centroid";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Point from '@arcgis/core/geometry/Point';
+import { getRoomLabelById } from "../parser/jsonParser";
+import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -42,13 +44,20 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		const featureLayer = new FeatureLayer({
 			maxScale: 0, // show polygons no matter how far you zoom in
 			url: featureLayerUrl,
+			// url: fastLayerUrl,
+			outFields: ["*"],
+		});
+		const fastFeatureLayer = new FeatureLayer({
+			maxScale: 0, // show polygons no matter how far you zoom in
+			url: fastLayerUrl,
+			// url: fastLayerUrl,
 			outFields: ["*"],
 		});
 		featureLayerRef.current = featureLayer;
 
 		const map = new Map({
 			basemap: 'dark-gray-vector',
-			layers: [featureLayer],
+			layers: [featureLayer, fastFeatureLayer],
 		});
 
 		const mapView = new MapView({
@@ -100,8 +109,11 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 
 	useEffect(() => {
 		if (mapViewRef.current && highlightGraphicRef.current) {
-			mapViewRef.current.graphics.remove(highlightGraphicRef.current);
-			highlightGraphicRef.current = null;
+			if ("graphics" in mapViewRef.current) {
+				mapViewRef.current.graphics.remove(highlightGraphicRef.current);
+				highlightGraphicRef.current = null;
+			}
+
 		}
 
 		if (featureLayerRef.current) {
@@ -116,22 +128,35 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 			outline: {color: [255, 255, 255], width: 2}
 		});
 
-		centroids.forEach(({longitude, latitude}: any) => {
-			const pointGeometry = new Point({
+		centroids.forEach(({longitude, latitude, id}: any) => {
+			const roomLabel = getRoomLabelById(id, selectedFloor);
+			// console.log("Room label", roomLabel);
+			const labelPoint = new Point({
 				longitude: longitude,
 				latitude: latitude
 			});
 
-			const graphic = new Graphic({
-				geometry: pointGeometry,
-				symbol: markerSymbol
+			const textSymbol = new TextSymbol({
+				text: roomLabel, // The label/name of the room
+				color: "black", // Choose a color that suits your map's style
+				font: { // Example font properties
+					size: 12,
+					family: "Arial"
+				},
+				// Adjust other TextSymbol properties as needed
+			});
+
+			const labelGraphic = new Graphic({
+				geometry: labelPoint,
+				symbol: textSymbol,
 			});
 
 			if (mapViewRef.current) {
-				mapViewRef.current!.graphics.add(graphic);
+				mapViewRef.current!.graphics.add(labelGraphic);
 			}
 		});
 	};
+
 
 	return (
 		<>

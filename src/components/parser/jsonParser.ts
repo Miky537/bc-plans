@@ -10,7 +10,7 @@ export function findRoomDetails(roomId: number): {
 	building: Building | undefined
 } {
 	const room = roomData.find(r => r.mistnost_id === roomId);
-	console.log("Rooooms: ", room);
+	// console.log("Rooooms: ", room);
 	if (!room) {
 		return {
 			room: undefined,
@@ -31,6 +31,22 @@ export function findUniqueFloorNumbers(): number[] {
 	const uniqueFloorNumbers = Array.from(new Set(floorNumbers)); // Remove duplicates
 	return uniqueFloorNumbers.sort((a, b) => a - b); // Sort numerically
 }
+
+export function getRoomLabelById(roomId: number, currentFloorId: number): string | undefined {
+	const room = findRoomById(roomId);
+	if (room === undefined) return undefined;
+	const floor = findFloorById(room.podlazi_id);
+	if (floor === undefined) return undefined;
+	// console.log("Floor: ", floor.cislo);
+
+
+	console.log("cislo, aktualni",floor.cislo, currentFloorId);
+	if (!room || floor?.cislo !== currentFloorId) return undefined;
+	// const roomLabel = `${room.nazev} ${room.cislo}`;
+	const roomLabel = `${room.cislo}`;
+	return roomLabel;
+}
+
 
 
 

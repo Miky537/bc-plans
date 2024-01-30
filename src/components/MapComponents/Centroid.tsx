@@ -1,8 +1,6 @@
 import roomsGeoJson from "./re_mistnosti.json"
 
 import { useEffect, useState } from 'react';
-import * as turf from '@turf/turf';
-import { AllGeoJSON } from "@turf/turf";
 import polylabel from 'polylabel';
 
 type Centroid = {
@@ -11,14 +9,13 @@ type Centroid = {
 	id: number;
 };
 
-const GeoJsonLoader = ({ onCentroidsLoaded }:any) => {
+const GeoJsonLoader = ({onCentroidsLoaded}: any) => {
 	const [centroids, setCentroids] = useState<Centroid[]>([]);
 
 	useEffect(() => {
 		const calculatedCentroids = roomsGeoJson.features.map(feature => {
 			if (feature.geometry.type === "Polygon") {
-				// Directly use the coordinates for Polygons
-				const coordinates = feature.geometry.coordinates;
+				const coordinates = feature.geometry.coordinates as any;
 				const labelPoint = polylabel(coordinates);
 				return {
 					longitude: labelPoint[0],
@@ -28,9 +25,9 @@ const GeoJsonLoader = ({ onCentroidsLoaded }:any) => {
 			} else if (feature.geometry.type === "MultiPolygon") {
 				// For MultiPolygons, use the first polygon
 				const firstPolygonCoordinates = feature.geometry.coordinates[0];
-				// Ensure firstPolygonCoordinates is a number[][][]
 				if (firstPolygonCoordinates.length > 0 && Array.isArray(firstPolygonCoordinates[0])) {
-					const labelPoint = polylabel(firstPolygonCoordinates as number[][][]);
+					// Flatten one level - take the first polygon from MultiPolygon
+					const labelPoint = polylabel(firstPolygonCoordinates);
 					return {
 						longitude: labelPoint[0],
 						latitude: labelPoint[1],

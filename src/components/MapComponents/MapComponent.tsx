@@ -38,7 +38,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 	const minZoomLevel = 17;
 
-	const highlightSymbol = {
+	const highlightSymbol = { // design one selected room
 		type: "simple-fill",
 		color: [255, 0, 0, 0.4],
 		style: "solid",
@@ -48,13 +48,13 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		}
 	};
 
-	const toggleLayersVisibility = (visible) => {
+	const toggleLayersVisibility = (visible: boolean) => {
 		featureLayersRef.current.forEach(layer => {
 			layer.visible = visible;
 		});
 	};
 
-	const debounce = (func: any, wait: number) => {
+	const debounce = (func: Function, wait: number) => {
 		let timeout: NodeJS.Timeout;
 
 		return function executedFunction(...args: any) {
@@ -74,10 +74,12 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 
 		if (zoom <= minZoomLevel) {
 			featureLayersRef.current.forEach(layer => addBoundingBox(layer));
+			toggleLayersVisibility(false);
 		} else {
 			mapViewRef.current?.graphics.removeAll(); // Remove bounding boxes if below threshold
+			toggleLayersVisibility(true);
 		}
-	}, 150); // 250 milliseconds debounce period
+	}, 150); // debounce period
 
 
 	const addBoundingBox = (layer: FeatureLayer) => {
@@ -86,7 +88,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		}
 
 		const query = layer.createQuery();
-		query.where = "1=1";
+		query.where = "1=1"; // return all features
 		query.returnGeometry = true;
 		query.outFields = ["*"];
 
@@ -106,7 +108,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 					ymin: minY,
 					xmax: maxX,
 					ymax: maxY,
-					spatialReference: mapViewRef.current.spatialReference
+					spatialReference: mapViewRef.current?.spatialReference
 				});
 
 				const boundingBox = Polygon.fromExtent(extent);
@@ -114,15 +116,15 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 				const boundingBoxGraphic = new Graphic({
 					geometry: boundingBox,
 					symbol: new SimpleFillSymbol({
-						color: "rgba(0,0,0,0.1)",
+						color: "rgba(255,255,255,0.5)",
 						outline: {
-							color: "black",
+							color: "gray",
 							width: 2
-						}
+						},
 					})
 				});
 
-				mapViewRef.current.graphics.add(boundingBoxGraphic);
+				mapViewRef.current?.graphics.add(boundingBoxGraphic);
 			}
 		}).catch((err): any => {
 			console.error("Failed to query features:", err);
@@ -218,7 +220,6 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 				// Now that the layer is loaded, check if it has the required field
 				if (layer.fields.some(field => field.name === 'číslo_podlaží')) {
 					layer.definitionExpression = `číslo_podlaží = ${ selectedFloor }`;
-					// console.log(`Definition Expression set for ${ layer.title }: číslo_podlaží = ${ selectedFloor }`);
 				}
 			}, (error: any) => {
 				console.error(`Error loading layer ${ layer.title }:`, error);
@@ -226,7 +227,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		});
 	}, [selectedFloor]);
 
-	const handleCentroidsLoaded = (centroids: any) => {
+	const handleCentroidsLoaded = (centroids: CentroidType[]) => {
 		centroids.forEach(({longitude, latitude, id}: CentroidType) => {
 			const roomLabel = getRoomLabelById(id, selectedFloor);
 			const labelPoint = new Point({

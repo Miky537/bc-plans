@@ -3,14 +3,14 @@ import roomsGeoJson from "./re_mistnosti.json"
 import { useEffect, useState } from 'react';
 import polylabel from 'polylabel';
 
-type Centroid = {
+export type CentroidType = {
 	longitude: number;
 	latitude: number;
 	id: number;
 };
 
 const GeoJsonLoader = ({onCentroidsLoaded}: any) => {
-	const [centroids, setCentroids] = useState<Centroid[]>([]);
+	const [centroids, setCentroids] = useState<CentroidType[]>([]);
 
 	useEffect(() => {
 		const calculatedCentroids = roomsGeoJson.features.map(feature => {
@@ -37,7 +37,7 @@ const GeoJsonLoader = ({onCentroidsLoaded}: any) => {
 			}
 
 			return null; // Return null for unsupported types or if coordinates are not as expected
-		}).filter((centroid): centroid is Centroid => centroid !== null);
+		}).filter((centroid): centroid is CentroidType => centroid !== null);
 
 		setCentroids(calculatedCentroids);
 

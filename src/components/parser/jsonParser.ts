@@ -35,14 +35,12 @@ export function findUniqueFloorNumbers(): number[] {
 export function getRoomLabelById(roomId: number, currentFloorId: number): string | undefined {
 	const room = findRoomById(roomId);
 	if (room === undefined) return undefined;
+	// console.log("podlazicko:",room.podlazi_id)    ;
 	const floor = findFloorById(room.podlazi_id);
 	if (floor === undefined) return undefined;
-	// console.log("Floor: ", floor.cislo);
 
-
-	console.log("cislo, aktualni",floor.cislo, currentFloorId);
+	// console.log("cislo, aktualni", floor.cislo, currentFloorId);
 	if (!room || floor?.cislo !== currentFloorId) return undefined;
-	// const roomLabel = `${room.nazev} ${room.cislo}`;
 	const roomLabel = `${room.cislo}`;
 	return roomLabel;
 }
@@ -52,10 +50,12 @@ export function getRoomLabelById(roomId: number, currentFloorId: number): string
 
 export function findRoomById(id: number): Room | undefined {
 	const foundRoom = roomData.find(room => room.mistnost_id === id);
+	if (!foundRoom) return undefined;
 	return foundRoom;
 }
 export function findFloorById(id: number): Floor | undefined {
 	const foundFloor = floorData.find(floor => floor.podlazi_id === id);
+	if (!foundFloor) return undefined;
 	return foundFloor;
 }
 export function findBuildingById(id: number): Building | undefined {

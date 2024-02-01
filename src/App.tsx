@@ -4,13 +4,14 @@ import Main from "./components/Main/Main";
 import MapHolder from "./components/MapComponents/MapHolder";
 import { ThemeProvider } from "@mui/material";
 import { theme } from './Theme/CustomTheme';
-import { Routes, Route } from "react-router-dom";
-import FacultySelection from "./components/FacultySelection";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import FacultySelection from "./components/FacultySelection/FacultySelection";
 
 function App() {
   return (
       <ThemeProvider theme={ theme }>
         <div className="App">
+            <BrowserRouter>
             <Routes>
                 <Route path="/" element={
                     <Main>
@@ -21,6 +22,7 @@ function App() {
                    <FacultySelection /> }
                 />
             </Routes>
+            </BrowserRouter>
         </div>
       </ThemeProvider>
   );

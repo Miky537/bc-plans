@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.esri-ui-inner-container.esri-ui-corner-container .esri-ui-top-left {
+  top: unset !important;
+  bottom: 0 !important;
+  left: 0 !important;
+}

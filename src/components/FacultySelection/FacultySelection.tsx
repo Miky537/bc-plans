@@ -2,10 +2,10 @@ import React from 'react';
 import Main from "../Main/Main";
 import FacultyItem from "./FacultyItem";
 import Box from "@mui/material/Box";
-import { useNavigate } from "react-router-dom";
 
+export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA";
 function FacultySelection() {
-	const navigate = useNavigate();
+
 	return (
 		<Main>
 			<Box display="grid"
@@ -14,7 +14,7 @@ function FacultySelection() {
 			     height="100%"
 			     pt={ 1 } pb={ 4 }>
 				<FacultyItem name="FIT" />
-				<FacultyItem name="FAST"  />
+				<FacultyItem name="FAST" />
 				<FacultyItem name="FSI" />
 				<FacultyItem name="FEKT" />
 				<FacultyItem name="FAVU" />

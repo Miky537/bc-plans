@@ -6,24 +6,74 @@ import { ThemeProvider } from "@mui/material";
 import { theme } from './Theme/CustomTheme';
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import FacultySelection from "./components/FacultySelection/FacultySelection";
+import { MapProvider } from "./components/MapComponents/MapContext";
 
 function App() {
-  return (
+
+
+    return (
       <ThemeProvider theme={ theme }>
-        <div className="App">
-            <BrowserRouter>
-            <Routes>
-                <Route path="/" element={
-                    <Main>
-                        <MapHolder />
-                    </Main> }
-                />
-                <Route path="/faculty" element={
-                   <FacultySelection /> }
-                />
-            </Routes>
-            </BrowserRouter>
-        </div>
+          <MapProvider>
+              <div className="App">
+                  <BrowserRouter>
+                      <Routes>
+                          <Route path="/" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FIT" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FAST" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FSI" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FEKT" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FAVU" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FCH" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/USI" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FP" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/FA" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main> }
+                          />
+                          <Route path="/faculty" element={
+                              <FacultySelection /> }
+                          />
+                      </Routes>
+                  </BrowserRouter>
+              </div>
+          </MapProvider>
       </ThemeProvider>
   );
 }

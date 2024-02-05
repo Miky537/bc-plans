@@ -15,6 +15,7 @@ import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Extent from "@arcgis/core/geometry/Extent";
+import { useMapContext } from "./MapContext";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -31,11 +32,19 @@ const layerConfigs = [
 	// Add more configurations as needed
 ];
 
+export type Coordinates = {
+	lat: number;
+	lng: number;
+};
+
 const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
+
+	const {centerCoordinates} = useMapContext();
+
 	const minZoomLevel = 17;
 
 	const highlightSymbol = { // design one selected room
@@ -159,7 +168,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		const mapView = new MapView({
 			container: mapDiv.current,
 			map: map,
-			center: [16.603375432788052, 49.20174147400288],
+			center: [centerCoordinates.lat, centerCoordinates.lng],
 			zoom: 18
 		});
 
@@ -197,14 +206,29 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 			mapView.watch("zoom", (zoom) => {
 				updateBoundingBoxes();
 			});
-		});
+		}).catch((err): any => console.error("MapView failed to load", err));
 
 		return () => {
 			if (mapView) {
 				mapView.destroy();
+				mapViewRef.current = null;
 			}
+
 		};
-	}, []);
+	}, [centerCoordinates.lat, centerCoordinates.lng]);
+
+	useEffect(() => {
+		// Ensure the mapView is ready before attempting to call goTo
+		mapViewRef.current?.when().then(() => {
+			console.log("Changing to new location: ", centerCoordinates.lat, centerCoordinates.lng)
+			mapViewRef.current?.goTo({
+				target: [centerCoordinates.lat, centerCoordinates.lng],
+				zoom: 18
+			}).catch(err => {
+				console.error("Error re-centering map:", err);
+			});
+		});
+	}, [centerCoordinates.lat, centerCoordinates.lng]);
 
 	useEffect(() => {
 		if (mapViewRef.current && highlightGraphicRef.current) {
@@ -216,7 +240,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 
 		featureLayersRef.current.forEach(layer => {
 			//wait for layer to be fully loaded
-			layer.when(() => {
+			layer.when().then(() => {
 				// Now that the layer is loaded, check if it has the required field
 				if (layer.fields.some(field => field.name === 'číslo_podlaží')) {
 					layer.definitionExpression = `číslo_podlaží = ${ selectedFloor }`;

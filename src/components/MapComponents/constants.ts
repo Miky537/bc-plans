@@ -1,5 +1,5 @@
 import { Room, Floor } from "../parser/types";
-import { InfoState } from "./MapHolder";
+import { RoomDetails } from "./tempFile";
 
 const defaultRoomData: Room = {
 	mistnost_id: 0,
@@ -128,10 +128,34 @@ const defaultBuildingData = {
 	nazev_prezentacni_en: ''
 }
 
-export const defaultState: InfoState = {
-	room: defaultRoomData,  // your existing defaultRoomData
-	floor: defaultFloorData,  // similarly defined
-	building: defaultBuildingData,  // similarly defined
+const defaultArealData = {
+	"areal_id": 0,
+	"lokalita_id": 0,
+	"dokument_id": 0,
+	"nazev": "",
+	"nazev_en": null,
+	"kod": "",
+	"popis": null,
+	"popis_en": null,
+	"poznamka": null,
+	"gtfvut3_id": 0,
+	"upd_ts": "",
+	"upd_uid": 0,
+	"ins_ts": "",
+	"ins_uid": 0,
+	"status": 0,
+	"platnost_od": "",
+	"platnost_do": null,
+	"aktualni": 0,
+	"externi": 0,
+	"nazev_puvodni": ""
+}
+
+export const defaultState: RoomDetails = {
+	room_info: defaultRoomData,  // your existing defaultRoomData
+	floor_info: defaultFloorData,  // similarly defined
+	building_info: defaultBuildingData,  // similarly defined
+	areal_info: defaultArealData,
 };
 
 export const geoJsonUrl = "https://gist.githubusercontent.com/Miky537/cb568efc11c1833a5cd54ba87e583db5/raw/5a32a29cc63a8a017de7e134150ee74b2f7779ac/rektorat-mistnosti.geojson";

@@ -3,6 +3,8 @@ import './Topbar.tsx.css';
 import Box from "@mui/material/Box";
 import WestIcon from '@mui/icons-material/West';
 import IconButton from "@mui/material/IconButton";
+import { useMapContext } from "../MapComponents/MapContext";
+import { Typography } from "@mui/material";
 
 interface TopbarProps {
 	title?: string;
@@ -10,12 +12,13 @@ interface TopbarProps {
 }
 
 export function Topbar({title, goBack}: TopbarProps) {
+	const { selectedFaculty } = useMapContext();
 	return (
-		<div className="Topbar">
+		<div className="Topbar" id="topbar">
 			<IconButton sx={{ position: "absolute", left: 0 }} onClick={goBack}>
 				<WestIcon sx={ {color: "white"} } />
 			</IconButton>
-			<Box>{ title ?? '' }</Box>
+			<Box><Typography variant="h5">{ selectedFaculty }</Typography></Box>
 		</div>
 	);
 }

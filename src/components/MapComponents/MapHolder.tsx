@@ -5,6 +5,7 @@ import { findRoomDetails, findUniqueFloorNumbers } from "../parser/jsonParser";
 import { Room, Floor, Building } from "../parser/types";
 import FloorHolder from "./FloorHolder";
 import { defaultState } from "./constants";
+import { fetchRoomInfo, RoomDetails } from "./tempFile";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -19,16 +20,20 @@ const MapHolder = () => {
 	const [selectedRoomId, setSelectedRoomId] = useState(0);
 	const selectedRoomIdRef = useRef(selectedRoomId);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [roomData, setRoomData] = useState<InfoState>(defaultState);
-	const handleRoomSelection = (roomId?: number) => {
+	const [roomData, setRoomData] = useState<RoomDetails>(defaultState);
+	const handleRoomSelection = async(roomId?: number) => {
 		if (roomId === undefined) {
 			return;
 		}
 		setSelectedRoomId(roomId); // Update state with selected room information
 
-		let roomInfo = findRoomDetails(roomId);
-		// console.log("Room info", roomInfo);
-		if (roomInfo.room === undefined) {
+		let roomInfo: RoomDetails | undefined = await fetchRoomInfo(roomId);
+		if (roomInfo === undefined) {
+			console.log("Didnt find room!");
+			setRoomData(defaultState);
+			return;
+		}
+		if (roomInfo.room_info === undefined) {
 			console.log("Didnt find room!");
 			setRoomData(defaultState);
 			return;

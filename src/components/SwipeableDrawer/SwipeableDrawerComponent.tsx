@@ -2,7 +2,7 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import React from "react";
 import { useTheme, SxProps, Theme, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import { InfoState } from "../MapComponents/MapHolder";
+import { RoomDetails } from "../MapComponents/tempFile";
 
 
 interface SwipeableDrawerComponentProps {
@@ -10,7 +10,7 @@ interface SwipeableDrawerComponentProps {
 	onClose: () => void;
 	onOpen: () => void;
 	roomInfo: any;
-	roomData: InfoState;
+	roomData: RoomDetails;
 }
 const mergeStylesWithTheme = (theme: Theme): SxProps => {
 	return {
@@ -32,10 +32,11 @@ export function SwipeableDrawerComponent({
 	                                         roomInfo,
 	                                         roomData
                                          }: SwipeableDrawerComponentProps) {
-	const {room, floor} = roomData;
-	const nazev = room?.nazev;
-	const podlazi_id = floor?.podlazi_id;
-	const label = room?.label;
+	const {room_info, floor_info, areal_info} = roomData;
+	const nazev = room_info?.nazev;
+	const podlazi_id = floor_info?.podlazi_id;
+	const label = room_info?.label;
+	const areal_name = areal_info?.nazev_puvodni;
 
 	const theme = useTheme();
 	return (
@@ -59,6 +60,8 @@ export function SwipeableDrawerComponent({
 			                                variant="h6">podlazi_id:</Typography><Typography variant="h6">{ podlazi_id }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">label:</Typography><Typography variant="h6">{ label }</Typography></Box>
+			<Box display="flex"><Typography flexGrow="1"
+			                                variant="h6">Areal name:</Typography><Typography variant="h6">{ areal_name }</Typography></Box>
 		</SwipeableDrawer>
 	)
 }

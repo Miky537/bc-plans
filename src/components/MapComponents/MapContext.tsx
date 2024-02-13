@@ -1,10 +1,15 @@
 import React, { createContext, useContext, useState } from 'react';
 import { Coordinates } from "./MapComponent";
+import { FacultyType } from "../FacultySelection/FacultySelection";
 
 
 interface MapContextType {
 	centerCoordinates: Coordinates;
 	setCenterCoordinates: (coordinates: Coordinates) => void;
+	isMapVisible: boolean;
+	setMapVisibility: (visible: boolean) => void; // Function to toggle visibility
+	selectedFaculty: FacultyType;
+	setSelectedFaculty: (faculty: FacultyType) => void;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -23,8 +28,18 @@ export const MapProvider = ({children}: any) => {
 		lng: 49.20174147400288,
 	});
 
+	const [isMapVisible, setMapVisibility] = useState<boolean>(true);
+	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType>("FAST");
+
 	return (
-		<MapContext.Provider value={ {centerCoordinates, setCenterCoordinates} }>
+		<MapContext.Provider value={ {
+			centerCoordinates,
+			setCenterCoordinates,
+			isMapVisible,
+			setMapVisibility,
+			selectedFaculty,
+			setSelectedFaculty
+		} }>
 			{ children }
 		</MapContext.Provider>
 	);

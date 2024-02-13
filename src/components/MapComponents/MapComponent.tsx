@@ -43,7 +43,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 
-	const {centerCoordinates} = useMapContext();
+	const {centerCoordinates, isMapVisible} = useMapContext();
 
 	const minZoomLevel = 17;
 
@@ -179,7 +179,9 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 				const response = await mapView.hitTest(event);
 				if (response.results.length > 0) {
 					const firstHit = response.results[0];
+					console.log("First hit:", firstHit);
 					if (firstHit.type === "graphic" && firstHit.graphic && firstHit.graphic.attributes) {
+
 						if (highlightGraphicRef.current) {
 							mapView.graphics.remove(highlightGraphicRef.current);
 							highlightGraphicRef.current = null;
@@ -187,15 +189,19 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 
 						const clickedGraphic = firstHit.graphic;
 
-						if ('id' in clickedGraphic.attributes) {
+						if ('id' || 'RoomID' in clickedGraphic.attributes) {
 							setIsDrawerOpen(true);
 							highlightGraphicRef.current = new Graphic({
 								geometry: clickedGraphic.geometry,
 								symbol: highlightSymbol
 							});
 							mapView.graphics.add(highlightGraphicRef.current);
-
-							onRoomSelection(clickedGraphic.attributes.id);
+							if ("id" in clickedGraphic.attributes){
+								onRoomSelection(clickedGraphic.attributes.id);
+							} else if ("RoomID" in clickedGraphic.attributes){
+								onRoomSelection(clickedGraphic.attributes.RoomID);
+							}
+							console.log("mam tu id:", clickedGraphic.attributes);
 						} else {
 							console.error("Invalid room selection");
 							onRoomSelection(0);
@@ -279,10 +285,33 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		});
 	};
 
+	const adjustMapHeight = () => {
+		const topBarElement = document.getElementById('topbar'); // Adjust 'topbar' to your topbar's ID
+		const mapContainerElement = document.getElementById('mapDiv'); // Adjust 'mapDiv' to your map container's ID
+
+		if (topBarElement && mapContainerElement) {
+			const topBarHeight = topBarElement.clientHeight;
+			const viewportHeight = window.innerHeight;
+			const mapHeight = `${ viewportHeight - topBarHeight }px`;
+			console.log('Map height:', mapHeight);
+			mapContainerElement.style.height = mapHeight;
+		} else {
+			console.error('Topbar or MapDiv element is not found in the document.');
+		}
+	};
+
+	useEffect(() => {
+		adjustMapHeight(); // Adjust on mount
+		window.addEventListener('resize', adjustMapHeight); // Adjust on window resize
+
+		// Cleanup listener on component unmount
+		return () => window.removeEventListener('resize', adjustMapHeight);
+	}, []); // Empty dependency array ensures this runs once on mount
+
 
 	return (
 		<>
-			<div ref={ mapDiv } className="map-container" />
+			<div ref={ mapDiv } id="mapDiv" />
 			<GeoJsonLoader onCentroidsLoaded={ handleCentroidsLoaded } />
 		</>
 	);

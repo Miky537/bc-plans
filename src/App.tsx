@@ -5,8 +5,8 @@ import MapHolder from "./components/MapComponents/MapHolder";
 import { ThemeProvider } from "@mui/material";
 import { theme } from './Theme/CustomTheme';
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import FacultySelection from "./components/FacultySelection/FacultySelection";
 import { MapProvider } from "./components/MapComponents/MapContext";
+import FacultySelection from "./components/FacultySelection/FacultySelection";
 
 function App() {
 
@@ -65,7 +65,8 @@ function App() {
                           <Route path="/FA" element={
                               <Main>
                                   <MapHolder />
-                              </Main> }
+                              </Main>
+                          }
                           />
                           <Route path="/faculty" element={
                               <FacultySelection /> }

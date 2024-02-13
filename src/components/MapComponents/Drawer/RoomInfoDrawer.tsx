@@ -1,14 +1,13 @@
 import React from 'react';
 import { SwipeableDrawerComponent } from "../../SwipeableDrawer/SwipeableDrawerComponent";
-import { Room } from "../../parser/types";
-import { InfoState } from "../MapHolder";
+import { RoomDetails } from "../tempFile";
 
 interface RoomInfoDrawerProps {
 	roomInfo: any;
 	onClose: () => void;
 	onOpen: () => void;
 	isDrawerOpen: boolean;
-	roomData: InfoState;
+	roomData: RoomDetails;
 }
 
 const RoomInfoDrawer = ({roomInfo, onClose, isDrawerOpen, onOpen, roomData}: RoomInfoDrawerProps) => {

@@ -121,3 +121,26 @@ export interface Room {
 	zkratka: string | null;
 	zkratka_en: string | null;
 }
+
+export interface Areal {
+	areal_id: number;
+	lokalita_id: number;
+	dokument_id: number;
+	nazev: string;
+	nazev_en: string | null;
+	kod: string;
+	popis: string | null;
+	popis_en: string | null;
+	poznamka: string | null;
+	gtfvut3_id: number;
+	upd_ts: string | null;
+	upd_uid: number;
+	ins_ts: string | null;
+	ins_uid: number;
+	status: number;
+	platnost_od: string | null;
+	platnost_do: string | null;
+	aktualni: number;
+	externi: number;
+	nazev_puvodni: string | null;
+}

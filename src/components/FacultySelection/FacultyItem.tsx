@@ -13,7 +13,7 @@ interface FacultyItemProps {
 
 function FacultyItem({name, image}: FacultyItemProps) {
 	const navigate = useNavigate();
-	const {setCenterCoordinates, centerCoordinates} = useMapContext();
+	const {setCenterCoordinates, centerCoordinates, setSelectedFaculty} = useMapContext();
 
 	const getFacultyCoordinates = (name: FacultyType): { lat: number, lng: number } => {
 		if (name === "FIT") return {lat: 16.5960477306341, lng: 49.226545887028706}
@@ -25,7 +25,6 @@ function FacultyItem({name, image}: FacultyItemProps) {
 		else if (name === "USI") return {lat: 16.578578883550467, lng: 49.23125625760177}
 		else if (name === "FP") return {lat: 16.573466531972247, lng: 49.231060330007544}
 		else if (name === "FA") return {lat: 16.59381902575785, lng: 49.186889974169276}
-		//TODO: add the rest of faculties
 		else return {lat: 15, lng: 49}
 	}
 
@@ -33,6 +32,7 @@ function FacultyItem({name, image}: FacultyItemProps) {
 		console.log(coordinates)
 		setCenterCoordinates(coordinates);
 		console.log("center", centerCoordinates)
+		setSelectedFaculty(facultyName);
 		navigate(`/${ facultyName }`)
 	}
 

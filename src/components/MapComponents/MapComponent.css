@@ -1,7 +1,14 @@
 .map-container {
-    height: 90vh;
     width: 100%;
 }
 .esri-view .esri-view-surface--touch-none:focus::after {
     outline: none !important;
+}
+
+:host {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
 }

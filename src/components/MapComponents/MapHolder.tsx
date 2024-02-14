@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
 import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
-import { findRoomDetails, findUniqueFloorNumbers } from "../parser/jsonParser";
+import { findUniqueFloorNumbers } from "../parser/jsonParser";
 import { Room, Floor, Building } from "../parser/types";
 import FloorHolder from "./FloorHolder";
 import { defaultState } from "./constants";
 import { fetchRoomInfo, RoomDetails } from "./tempFile";
+import SearchIcon from '@mui/icons-material/Search';
+import IconButton from "@mui/material/IconButton";
+import { SearchComponent } from "../SearchComponent/SearchComponent";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -60,6 +63,7 @@ const MapHolder = () => {
 
 	return (
 		<div>
+			<SearchComponent />
 			<FloorHolder
 				floors={ floors }
 				onFloorChange={ changeFloor }

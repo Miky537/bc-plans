@@ -9,7 +9,7 @@ export type CentroidType = {
 	id: number;
 };
 
-const GeoJsonLoader = ({onCentroidsLoaded}: any) => {
+const GeoJsonLoader = ({onCentroidsLoaded, mapViewRef, selectedFloor}: any) => {
 	const [centroids, setCentroids] = useState<CentroidType[]>([]);
 
 	useEffect(() => {
@@ -42,7 +42,7 @@ const GeoJsonLoader = ({onCentroidsLoaded}: any) => {
 		setCentroids(calculatedCentroids);
 
 		if (onCentroidsLoaded) {
-			onCentroidsLoaded(calculatedCentroids);
+			onCentroidsLoaded(calculatedCentroids, mapViewRef, selectedFloor);
 		}
 	}, [onCentroidsLoaded]);
 

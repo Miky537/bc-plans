@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { Divider } from "@mui/material";
+import { useMapContext } from "./MapContext";
 
-const FloorHolder = ({floors, onFloorChange, selectedFloor = 2}: any) => {
+const FloorHolder = ({onFloorChange, selectedFloor = 2}: any) => {
+
+	const {selectedFaculty, setFloors, floors} = useMapContext();
 
 	const handleButtonClick = (floor: any) => {
 		console.log("Selected floor:", floor);
 		onFloorChange(floor);
 	}
+
+	useEffect(() => {
+		const fetchFloors = async () => {
+			console.log("fetching floors");
+			if (!selectedFaculty) {
+				setFloors([]);
+				return;
+			}
+			try {
+				const response = await fetch(`http://192.168.0.129:5000/api/floors/${selectedFaculty}`);
+
+				if (!response.ok) throw new Error('Failed to fetch floors');
+				const floors: number[] = await response.json();
+				console.log("flooooooooors:", floors);
+				setFloors(floors);
+			} catch (error) {
+				console.error('Error fetching floors:', error);
+				setFloors([]); // Optionally handle errors more gracefully
+			}
+		};
+
+		fetchFloors();
+	}, [selectedFaculty, setFloors]); // Dependency array
 
 	return (
 		<Box zIndex="10"
@@ -17,7 +43,9 @@ const FloorHolder = ({floors, onFloorChange, selectedFloor = 2}: any) => {
 		     position="absolute"
 		     top="4em"
 		     right="1em"
-		     bgcolor="#DBDBDB">
+		     bgcolor="#DBDBDB"
+			 maxHeight="19.5em"
+		     overflow="scroll">
 			{floors.map((floor: any, index: number) => (
 				<React.Fragment key={floor}>
 					<Box display="flex"

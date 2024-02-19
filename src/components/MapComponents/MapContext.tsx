@@ -10,6 +10,8 @@ interface MapContextType {
 	setMapVisibility: (visible: boolean) => void; // Function to toggle visibility
 	selectedFaculty: FacultyType;
 	setSelectedFaculty: (faculty: FacultyType) => void;
+	floors: number[];
+	setFloors: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -30,6 +32,7 @@ export const MapProvider = ({children}: any) => {
 
 	const [isMapVisible, setMapVisibility] = useState<boolean>(true);
 	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType>("FAST");
+	const [floors, setFloors] = useState<number[]>([]);
 
 	return (
 		<MapContext.Provider value={ {
@@ -38,7 +41,9 @@ export const MapProvider = ({children}: any) => {
 			isMapVisible,
 			setMapVisibility,
 			selectedFaculty,
-			setSelectedFaculty
+			setSelectedFaculty,
+			setFloors,
+			floors
 		} }>
 			{ children }
 		</MapContext.Provider>

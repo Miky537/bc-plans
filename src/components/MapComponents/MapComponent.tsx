@@ -7,15 +7,9 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl, fastLayerUrl } from "./constants";
-import GeoJsonLoader, { CentroidType } from "./Centroid";
-import Point from '@arcgis/core/geometry/Point';
-import { getRoomLabelById } from "../parser/jsonParser";
-import TextSymbol from "@arcgis/core/symbols/TextSymbol";
-
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import Polygon from "@arcgis/core/geometry/Polygon";
-import Extent from "@arcgis/core/geometry/Extent";
+import GeoJsonLoader from "./Centroid";
 import { useMapContext } from "./MapContext";
+import { addBoundingBox, handleCentroidsLoaded, adjustMapHeight, updateBoundingBoxes } from "./MapFunctions";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -63,85 +57,6 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		});
 	};
 
-	const debounce = (func: Function, wait: number) => {
-		let timeout: NodeJS.Timeout;
-
-		return function executedFunction(...args: any) {
-			const later = () => {
-				clearTimeout(timeout);
-				func(...args);
-			};
-
-			clearTimeout(timeout);
-			timeout = setTimeout(later, wait);
-		};
-	};
-
-	const updateBoundingBoxes = debounce(() => {
-		const zoom : number | undefined = mapViewRef.current?.zoom;
-		if (zoom === undefined) return;
-
-		if (zoom <= minZoomLevel) {
-			featureLayersRef.current.forEach(layer => addBoundingBox(layer));
-			toggleLayersVisibility(false);
-		} else {
-			mapViewRef.current?.graphics.removeAll(); // Remove bounding boxes if below threshold
-			toggleLayersVisibility(true);
-		}
-	}, 150); // debounce period
-
-
-	const addBoundingBox = (layer: FeatureLayer) => {
-		if (!mapViewRef.current || mapViewRef.current?.zoom > minZoomLevel) {
-			return;
-		}
-
-		const query = layer.createQuery();
-		query.where = "1=1"; // return all features
-		query.returnGeometry = true;
-		query.outFields = ["*"];
-
-		layer.queryFeatures(query).then(response => {
-			let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
-			response.features.forEach((feature: any) => {
-				const extent = feature.geometry.extent;
-				minX = minX !== undefined? Math.min(minX, extent.xmin) : extent.xmin;
-				minY = minY !== undefined? Math.min(minY, extent.ymin) : extent.ymin;
-				maxX = maxX !== undefined? Math.max(maxX, extent.xmax) : extent.xmax;
-				maxY = maxY !== undefined? Math.max(maxY, extent.ymax) : extent.ymax;
-			});
-
-			if (mapViewRef.current && minX !== undefined && minY !== undefined && maxX !== undefined && maxY !== undefined) {
-				const extent = new Extent({
-					xmin: minX,
-					ymin: minY,
-					xmax: maxX,
-					ymax: maxY,
-					spatialReference: mapViewRef.current?.spatialReference
-				});
-
-				const boundingBox = Polygon.fromExtent(extent);
-
-				const boundingBoxGraphic = new Graphic({
-					geometry: boundingBox,
-					symbol: new SimpleFillSymbol({
-						color: "rgba(255,255,255,0.5)",
-						outline: {
-							color: "gray",
-							width: 2
-						},
-					})
-				});
-
-				mapViewRef.current?.graphics.add(boundingBoxGraphic);
-			}
-		}).catch((err): any => {
-			console.error("Failed to query features:", err);
-		});
-	};
-
-
-
 	useEffect(() => {
 		if (!mapDiv.current) return;
 
@@ -154,7 +69,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 
 			layer.load().then(() => {
 				console.log(`${ config.name } loaded`);
-				addBoundingBox(layer);
+				addBoundingBox(layer, mapViewRef, minZoomLevel);
 			}).catch((err): any => console.error(`${ config.name } failed to load`, err));
 
 			return layer;
@@ -190,7 +105,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 						const clickedGraphic = firstHit.graphic;
 
 						if ('id' || 'RoomID' in clickedGraphic.attributes) {
-							setIsDrawerOpen(true);
+
 							highlightGraphicRef.current = new Graphic({
 								geometry: clickedGraphic.geometry,
 								symbol: highlightSymbol
@@ -198,8 +113,10 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 							mapView.graphics.add(highlightGraphicRef.current);
 							if ("id" in clickedGraphic.attributes){
 								onRoomSelection(clickedGraphic.attributes.id);
+								setIsDrawerOpen(true);
 							} else if ("RoomID" in clickedGraphic.attributes){
 								onRoomSelection(clickedGraphic.attributes.RoomID);
+								setIsDrawerOpen(true);
 							}
 							console.log("mam tu id:", clickedGraphic.attributes);
 						} else {
@@ -210,7 +127,7 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 				}
 			});
 			mapView.watch("zoom", (zoom) => {
-				updateBoundingBoxes();
+				updateBoundingBoxes(mapViewRef, minZoomLevel, featureLayersRef, toggleLayersVisibility);
 			});
 		}).catch((err): any => console.error("MapView failed to load", err));
 
@@ -219,7 +136,6 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 				mapView.destroy();
 				mapViewRef.current = null;
 			}
-
 		};
 	}, [centerCoordinates.lat, centerCoordinates.lng]);
 
@@ -244,6 +160,8 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 			}
 		}
 
+
+
 		featureLayersRef.current.forEach(layer => {
 			//wait for layer to be fully loaded
 			layer.when().then(() => {
@@ -257,49 +175,6 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		});
 	}, [selectedFloor]);
 
-	const handleCentroidsLoaded = (centroids: CentroidType[]) => {
-		centroids.forEach(({longitude, latitude, id}: CentroidType) => {
-			const roomLabel = getRoomLabelById(id, selectedFloor);
-			const labelPoint = new Point({
-				longitude: longitude,
-				latitude: latitude
-			});
-
-			const textSymbol = new TextSymbol({
-				text: roomLabel,
-				color: "black",
-				font: {
-					size: 12,
-					family: "Arial"
-				}
-			});
-
-			const labelGraphic = new Graphic({
-				geometry: labelPoint,
-				symbol: textSymbol
-			});
-
-			if (mapViewRef.current) {
-				mapViewRef.current?.graphics.add(labelGraphic);
-			}
-		});
-	};
-
-	const adjustMapHeight = () => {
-		const topBarElement = document.getElementById('topbar'); // Adjust 'topbar' to your topbar's ID
-		const mapContainerElement = document.getElementById('mapDiv'); // Adjust 'mapDiv' to your map container's ID
-
-		if (topBarElement && mapContainerElement) {
-			const topBarHeight = topBarElement.clientHeight;
-			const viewportHeight = window.innerHeight;
-			const mapHeight = `${ viewportHeight - topBarHeight }px`;
-			console.log('Map height:', mapHeight);
-			mapContainerElement.style.height = mapHeight;
-		} else {
-			console.error('Topbar or MapDiv element is not found in the document.');
-		}
-	};
-
 	useEffect(() => {
 		adjustMapHeight(); // Adjust on mount
 		window.addEventListener('resize', adjustMapHeight); // Adjust on window resize
@@ -309,10 +184,27 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 	}, []); // Empty dependency array ensures this runs once on mount
 
 
+	const fetchRoomsForFloor = async (floorId: number) => {
+		try {
+			const response = await fetch(`/api/rooms/byFloor/${floorId}`);
+			if (!response.ok) {
+				throw new Error('Failed to fetch rooms');
+			}
+			const roomsToDisplay = await response.json();
+			return roomsToDisplay; // Assuming this returns an array of room details
+		} catch (error) {
+			console.error('Error fetching rooms:', error);
+			return []; // Return an empty array in case of error
+		}
+	};
+
+
 	return (
 		<>
 			<div ref={ mapDiv } id="mapDiv" />
-			<GeoJsonLoader onCentroidsLoaded={ handleCentroidsLoaded } />
+			<GeoJsonLoader onCentroidsLoaded={ handleCentroidsLoaded }
+			               mapViewRef={ mapViewRef }
+			               selectedFloor={ selectedFloor } />
 		</>
 	);
 };

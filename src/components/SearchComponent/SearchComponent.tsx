@@ -9,13 +9,15 @@ import Fuse from "fuse.js";
 interface RoomNames {
 	nazev: string;
 	room_id: number;
+	floor_number: number;
 }
 
 interface SearchComponentProps {
 	setSelectedRoom: (roomId: number) => void;
+	setSelectedFloor: (floor: number) => void;
 }
 
-export function SearchComponent({ setSelectedRoom }: SearchComponentProps) {
+export function SearchComponent({ setSelectedRoom, setSelectedFloor }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
 	const [query, setQuery] = useState("");
@@ -24,8 +26,8 @@ export function SearchComponent({ setSelectedRoom }: SearchComponentProps) {
 	useEffect(() => {
 		const fetchRooms = async () => {
 			console.log("fetching rooms");
-			const fetchedRooms = await fetchFacultyRooms("FAST");
-			console.log(fetchedRooms);
+			const fetchedRooms = await fetchFacultyRooms("FAST"); // only for testing, soon change to faculty
+			console.log("fetched rooms",fetchedRooms);
 			if (Array.isArray(fetchedRooms)) {
 				setRooms(fetchedRooms);
 
@@ -63,6 +65,11 @@ export function SearchComponent({ setSelectedRoom }: SearchComponentProps) {
 		setQuery(event.target.value);
 	};
 
+	const handleRoomSearchClick = (room: RoomNames) => {
+		setSelectedRoom(room.room_id);
+		setSelectedFloor(room.floor_number);
+		setIsExpanded(false);
+	}
 
 	return (
 		<Box
@@ -103,8 +110,8 @@ export function SearchComponent({ setSelectedRoom }: SearchComponentProps) {
 						{filteredRooms.map((room, index) => (
 							<Box key={ index }
 							     sx={ { padding: "10px" } }
-							     onClick={ () => setSelectedRoom(room.room_id) }>
-								{room.nazev}
+							     onClick={ () => handleRoomSearchClick(room)}>
+								{room.nazev} : {room.floor_number}
 							</Box>
 						))}
 					</Box>

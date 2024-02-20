@@ -64,7 +64,7 @@ const MapHolder = () => {
 
 	return (
 		<div>
-			<SearchComponent setSelectedRoom={setSelectedRoom}/>
+			<SearchComponent setSelectedRoom={setSelectedRoom} setSelectedFloor={setSelectedFloor}/>
 			<FloorHolder
 				floors={ floors }
 				onFloorChange={ changeFloor }

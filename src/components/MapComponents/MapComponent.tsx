@@ -172,8 +172,8 @@ const MapComponent = ({
 					throw new Error('Failed to fetch rooms');
 				}
 				const rooms = await response.json();
-				const roomIdsString = rooms.join(', ')
-				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+				const roomIdsString = await rooms.join(', ')
+				const selectedLayer = await featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				if (selectedLayer) {
 					selectedLayer.definitionExpression = `RoomID IN (${ roomIdsString })`;
 				} else {
@@ -226,11 +226,6 @@ const MapComponent = ({
 					const result = await facultyLayer.queryFeatures(query);
 					if (result.features.length > 0) {
 						const roomFeature = result.features[0];
-						await mapViewRef.current!.goTo({
-							target: roomFeature.geometry,
-							zoom: 19
-						}, { duration: 1500, easing: "ease-out" });
-
 						const highlightGraphic = new Graphic({
 							geometry: roomFeature.geometry,
 							symbol: highlightSymbol
@@ -238,13 +233,19 @@ const MapComponent = ({
 
 						mapViewRef.current!.graphics.add(highlightGraphic);
 						highlightGraphicRef.current = highlightGraphic;
+						await mapViewRef.current!.goTo({
+							target: roomFeature.geometry,
+							zoom: 19
+						}, { duration: 1500, easing: "ease-out" });
+
+
 					} else {
 						console.error("Room not found in the layer.");
 					}
 				} catch (error) {
 					console.error("Error querying for room location:", error);
 				} finally {
-					setSelectedRoom(undefined); // Consider the implications of resetting this state here, as discussed.
+					setSelectedRoom(undefined);
 				}
 			}).catch((error) => {
 				console.error("Error loading faculty layer:", error);

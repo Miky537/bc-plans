@@ -29,6 +29,7 @@ export const fetchFacultyRooms = async(faculty: FacultyType) => {
 			throw new Error('Network response was not ok');
 		}
 		const data: RoomDetails = await response.json();
+		console.log("Faculty rooms:", data);
 		return data;
 	} catch (error) {
 		console.error('Error:', error);

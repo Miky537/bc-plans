@@ -14,17 +14,14 @@ const FloorHolder = ({onFloorChange, selectedFloor = 2}: any) => {
 
 	useEffect(() => {
 		const fetchFloors = async () => {
-			console.log("fetching floors");
 			if (!selectedFaculty) {
 				setFloors([]);
 				return;
 			}
 			try {
 				const response = await fetch(`http://192.168.0.129:5000/api/floors/${selectedFaculty}`);
-
 				if (!response.ok) throw new Error('Failed to fetch floors');
 				const floors: number[] = await response.json();
-				console.log("flooooooooors:", floors);
 				setFloors(floors);
 			} catch (error) {
 				console.error('Error fetching floors:', error);

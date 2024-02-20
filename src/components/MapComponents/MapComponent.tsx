@@ -11,18 +11,19 @@ import GeoJsonLoader from "./Centroid";
 import { useMapContext } from "./MapContext";
 import { addBoundingBox, handleCentroidsLoaded, adjustMapHeight, updateBoundingBoxes } from "./MapFunctions";
 
-
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
 interface MapComponentProps {
 	onRoomSelection: (roomId: number) => void;
 	selectedFloor: number;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
+	selectedRoom: number | undefined;
+	setSelectedRoom: (roomId: number | undefined) => void;
 }
 
 const layerConfigs = [
-	{url: featureLayerUrl, name: "Feature Layer"},
-	{url: fastLayerUrl, name: "Fast Feature Layer"},
+	{ url: featureLayerUrl, name: "VUT_Rektorat", facultyId: "facultyRectorate" },
+	{ url: fastLayerUrl, name: "FAST", facultyId: "facultyFAST" },
 	// Add more configurations as needed
 ];
 
@@ -31,13 +32,19 @@ export type Coordinates = {
 	lng: number;
 };
 
-const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: MapComponentProps) => {
+const MapComponent = ({
+	                      onRoomSelection,
+	                      selectedFloor = 1,
+	                      setIsDrawerOpen,
+	                      selectedRoom,
+	                      setSelectedRoom
+                      }: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 
-	const {centerCoordinates, isMapVisible} = useMapContext();
+	const { centerCoordinates, isMapVisible, selectedFaculty } = useMapContext();
 
 	const minZoomLevel = 17;
 
@@ -63,12 +70,12 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		featureLayersRef.current = layerConfigs.map(config => {
 			const layer = new FeatureLayer({
 				url: config.url,
-				outFields: ["*"],
-				maxScale: 0
+				outFields: ["*"], // * means all fields
+				maxScale: 0,
+				title: config.name, //used to only affect selected faculty
 			});
 
 			layer.load().then(() => {
-				console.log(`${ config.name } loaded`);
 				addBoundingBox(layer, mapViewRef, minZoomLevel);
 			}).catch((err): any => console.error(`${ config.name } failed to load`, err));
 
@@ -94,7 +101,6 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 				const response = await mapView.hitTest(event);
 				if (response.results.length > 0) {
 					const firstHit = response.results[0];
-					console.log("First hit:", firstHit);
 					if (firstHit.type === "graphic" && firstHit.graphic && firstHit.graphic.attributes) {
 
 						if (highlightGraphicRef.current) {
@@ -118,7 +124,6 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 								onRoomSelection(clickedGraphic.attributes.RoomID);
 								setIsDrawerOpen(true);
 							}
-							console.log("mam tu id:", clickedGraphic.attributes);
 						} else {
 							console.error("Invalid room selection");
 							onRoomSelection(0);
@@ -142,37 +147,49 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 	useEffect(() => {
 		// Ensure the mapView is ready before attempting to call goTo
 		mapViewRef.current?.when().then(() => {
-			console.log("Changing to new location: ", centerCoordinates.lat, centerCoordinates.lng)
 			mapViewRef.current?.goTo({
 				target: [centerCoordinates.lat, centerCoordinates.lng],
 				zoom: 18
-			}).catch(err => {
+			}, { duration: 1000, easing: "ease-in-out" }).catch(err => {
 				console.error("Error re-centering map:", err);
 			});
 		});
 	}, [centerCoordinates.lat, centerCoordinates.lng]);
 
 	useEffect(() => {
-		if (mapViewRef.current && highlightGraphicRef.current) {
-			if ("graphics" in mapViewRef.current) {
-				mapViewRef.current.graphics.remove(highlightGraphicRef.current);
-				highlightGraphicRef.current = null;
-			}
+		// Remove any existing highlight from the map
+		if (mapViewRef.current && highlightGraphicRef.current && "graphics" in mapViewRef.current) {
+			mapViewRef.current.graphics.remove(highlightGraphicRef.current);
+			highlightGraphicRef.current = null;
 		}
 
-
-
-		featureLayersRef.current.forEach(layer => {
-			//wait for layer to be fully loaded
-			layer.when().then(() => {
-				// Now that the layer is loaded, check if it has the required field
-				if (layer.fields.some(field => field.name === 'číslo_podlaží')) {
-					layer.definitionExpression = `číslo_podlaží = ${ selectedFloor }`;
+		const updateLayersWithRooms = async() => {
+			// Fetch room details for the selected floor
+			try {
+				const response = await fetch(
+					`http://192.168.0.129:5000/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
+				if (!response.ok) {
+					throw new Error('Failed to fetch rooms');
 				}
-			}, (error: any) => {
-				console.error(`Error loading layer ${ layer.title }:`, error);
-			});
-		});
+				const rooms = await response.json();
+				const roomIdsString = rooms.join(', ')
+				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+				if (selectedLayer) {
+					selectedLayer.definitionExpression = `RoomID IN (${ roomIdsString })`;
+				} else {
+					console.warn(`No layer found for faculty: ${ selectedFaculty }`);
+				}
+
+			} catch (error) {
+				console.error('Error fetching rooms for floor:', error);
+			}
+		};
+
+		// Call the function to update layers if selectedFloor is defined
+		if (selectedFloor) {
+			updateLayersWithRooms();
+		}
+
 	}, [selectedFloor]);
 
 	useEffect(() => {
@@ -183,20 +200,59 @@ const MapComponent = ({ onRoomSelection, selectedFloor = 1, setIsDrawerOpen }: M
 		return () => window.removeEventListener('resize', adjustMapHeight);
 	}, []); // Empty dependency array ensures this runs once on mount
 
+	useEffect(() => {
+		if (!selectedRoom) return; // Do nothing if no room is selected
 
-	const fetchRoomsForFloor = async (floorId: number) => {
-		try {
-			const response = await fetch(`/api/rooms/byFloor/${floorId}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch rooms');
+		const centerMapOnRoom = async(roomId: number) => {
+			const facultyLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+			if (!facultyLayer) {
+				console.error("Faculty layer not found.");
+				return;
 			}
-			const roomsToDisplay = await response.json();
-			return roomsToDisplay; // Assuming this returns an array of room details
-		} catch (error) {
-			console.error('Error fetching rooms:', error);
-			return []; // Return an empty array in case of error
-		}
-	};
+			await facultyLayer.load().then(async () => {
+				if (highlightGraphicRef.current && mapViewRef.current) {
+					if ("graphics" in mapViewRef.current) {
+						mapViewRef.current.graphics.remove(highlightGraphicRef.current);
+					}
+				}
+
+				const query = facultyLayer.createQuery();
+				console.log("Querying for room location:", roomId);
+				query.where = `RoomID = '${roomId}'`; // Adjust to match your dataset
+				query.returnGeometry = true;
+				query.outSpatialReference = mapViewRef.current!.spatialReference;
+
+				try {
+					const result = await facultyLayer.queryFeatures(query);
+					if (result.features.length > 0) {
+						const roomFeature = result.features[0];
+						await mapViewRef.current!.goTo({
+							target: roomFeature.geometry,
+							zoom: 19
+						}, { duration: 1500, easing: "ease-out" });
+
+						const highlightGraphic = new Graphic({
+							geometry: roomFeature.geometry,
+							symbol: highlightSymbol
+						});
+
+						mapViewRef.current!.graphics.add(highlightGraphic);
+						highlightGraphicRef.current = highlightGraphic;
+					} else {
+						console.error("Room not found in the layer.");
+					}
+				} catch (error) {
+					console.error("Error querying for room location:", error);
+				} finally {
+					setSelectedRoom(undefined); // Consider the implications of resetting this state here, as discussed.
+				}
+			}).catch((error) => {
+				console.error("Error loading faculty layer:", error);
+			});
+		};
+
+		centerMapOnRoom(selectedRoom);
+	}, [selectedRoom, selectedFaculty]);
 
 
 	return (

@@ -42,8 +42,11 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 
 			const boundingBoxGraphic = new Graphic({
 				geometry: boundingBox,
+				attributes: {
+					isBoundingBox: true
+				},
 				symbol: new SimpleFillSymbol({
-					color: "rgba(255,255,255,0.5)",
+					color: "rgba(255,255,255,1)",
 					outline: {
 						color: "gray",
 						width: 2
@@ -117,15 +120,23 @@ const debounce = (func: Function, wait: number) => {
 	};
 };
 
+const removeBoundingBoxes = (mapViewRef: any) => {
+	const graphicsLayer = mapViewRef.current.graphics;
+	const graphicsToRemove = graphicsLayer.toArray().filter((graphic: any) => graphic.attributes && graphic.attributes.isBoundingBox);
+	graphicsToRemove.forEach((graphic: any) => mapViewRef.current.graphics.remove(graphic));
+};
+
 export const updateBoundingBoxes = debounce((mapViewRef: any, minZoomLevel: number, featureLayersRef: any, toggleLayersVisibility: any) => {
 	const zoom: number | undefined = mapViewRef.current?.zoom;
 	if (zoom === undefined) return;
+	console.log("Zoom level:", zoom, minZoomLevel);
 
-	if (zoom <= minZoomLevel) {
+	if (zoom <= 17) {
 		featureLayersRef.current.forEach((layer: any) => addBoundingBox(layer, mapViewRef, minZoomLevel));
 		toggleLayersVisibility(false);
-	} else {
-		mapViewRef.current?.graphics.removeAll(); // Remove bounding boxes if below threshold
+	} else if (zoom > 17) {
+		console.log("Removing bounding boxes");
+		removeBoundingBoxes(mapViewRef);
 		toggleLayersVisibility(true);
 	}
 }, 150); // debounce period

@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
-import { fetchFacultyRooms, RoomDetails } from "../MapComponents/tempFile";
+import { fetchFacultyRooms } from "../MapComponents/tempFile";
 import Fuse from "fuse.js";
 
 interface RoomNames {
@@ -11,7 +11,11 @@ interface RoomNames {
 	room_id: number;
 }
 
-export function SearchComponent() {
+interface SearchComponentProps {
+	setSelectedRoom: (roomId: number) => void;
+}
+
+export function SearchComponent({ setSelectedRoom }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
 	const [query, setQuery] = useState("");
@@ -59,6 +63,7 @@ export function SearchComponent() {
 		setQuery(event.target.value);
 	};
 
+
 	return (
 		<Box
 			sx={{
@@ -96,7 +101,9 @@ export function SearchComponent() {
 					/>
 					<Box sx={{ position: "absolute", top: "100%", width: "100%", bgcolor: "white", color: "black" }}>
 						{filteredRooms.map((room, index) => (
-							<Box key={index} sx={{ padding: "10px" }}>
+							<Box key={ index }
+							     sx={ { padding: "10px" } }
+							     onClick={ () => setSelectedRoom(room.room_id) }>
 								{room.nazev}
 							</Box>
 						))}

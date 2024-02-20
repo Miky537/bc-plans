@@ -34,6 +34,7 @@ export function SwipeableDrawerComponent({
                                          }: SwipeableDrawerComponentProps) {
 	const {room_info, floor_info, areal_info} = roomData;
 	const nazev = room_info?.nazev;
+	const mistnostid = room_info?.mistnost_id;
 	const podlazi_id = floor_info?.podlazi_id;
 	const label = room_info?.label;
 	const areal_name = areal_info?.nazev_puvodni;
@@ -62,6 +63,8 @@ export function SwipeableDrawerComponent({
 			                                variant="h6">label:</Typography><Typography variant="h6">{ label }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">Areal name:</Typography><Typography variant="h6">{ areal_name }</Typography></Box>
+			<Box display="flex"><Typography flexGrow="1"
+			                                variant="h6">Room Id:</Typography><Typography variant="h6">{ mistnostid }</Typography></Box>
 		</SwipeableDrawer>
 	)
 }

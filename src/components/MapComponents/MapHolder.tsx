@@ -24,6 +24,7 @@ const MapHolder = () => {
 	const selectedRoomIdRef = useRef(selectedRoomId);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [roomData, setRoomData] = useState<RoomDetails>(defaultState);
+	const [selectedRoom, setSelectedRoom] = useState<number | undefined>(0);
 	const handleRoomSelection = async(roomId?: number) => {
 		if (roomId === undefined) {
 			return;
@@ -63,7 +64,7 @@ const MapHolder = () => {
 
 	return (
 		<div>
-			<SearchComponent />
+			<SearchComponent setSelectedRoom={setSelectedRoom}/>
 			<FloorHolder
 				floors={ floors }
 				onFloorChange={ changeFloor }
@@ -72,6 +73,8 @@ const MapHolder = () => {
 			<MapComponent onRoomSelection={ handleRoomSelection }
 			              selectedFloor={ selectedFloor }
 			              setIsDrawerOpen={ setIsDrawerOpen }
+			              selectedRoom={selectedRoom}
+			              setSelectedRoom={setSelectedRoom}
 			/>
 			<RoomInfoDrawer roomInfo={ selectedRoomId }
 			                isDrawerOpen={ isDrawerOpen }

@@ -1,0 +1,1 @@
+export const serverAddress = 'https://192.168.100.40:5000';

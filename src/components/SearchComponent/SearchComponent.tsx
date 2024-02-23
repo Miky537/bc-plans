@@ -15,9 +15,11 @@ interface RoomNames {
 interface SearchComponentProps {
 	setSelectedRoom: (roomId: number) => void;
 	setSelectedFloor: (floor: number) => void;
+	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
+	handleRoomSelection: (roomId: number) => void;
 }
 
-export function SearchComponent({ setSelectedRoom, setSelectedFloor }: SearchComponentProps) {
+export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawerOpen, handleRoomSelection }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
 	const [query, setQuery] = useState("");
@@ -27,7 +29,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor }: SearchCom
 		const fetchRooms = async () => {
 			console.log("fetching rooms");
 			const fetchedRooms = await fetchFacultyRooms("FAST"); // only for testing, soon change to faculty
-			console.log("fetched rooms",fetchedRooms);
+			// console.log("fetched rooms",fetchedRooms);
 			if (Array.isArray(fetchedRooms)) {
 				setRooms(fetchedRooms);
 
@@ -61,7 +63,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor }: SearchCom
 	};
 
 	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-		console.log("handling search");
+		// console.log("handling search");
 		setQuery(event.target.value);
 	};
 
@@ -69,6 +71,8 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor }: SearchCom
 		setSelectedRoom(room.room_id);
 		setSelectedFloor(room.floor_number);
 		setIsExpanded(false);
+		handleRoomSelection(room.room_id);
+		setIsDrawerOpen(true);
 	}
 
 	return (
@@ -85,7 +89,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor }: SearchCom
 				position: "absolute",
 				top: "3em",
 				left: "0.5em",
-				zIndex: 2,
+				zIndex: 3,
 			}}
 			onClick={handleExpand}
 		>

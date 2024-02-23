@@ -6,8 +6,6 @@ import { Room, Floor, Building } from "../parser/types";
 import FloorHolder from "./FloorHolder";
 import { defaultState } from "./constants";
 import { fetchRoomInfo, RoomDetails } from "./tempFile";
-import SearchIcon from '@mui/icons-material/Search';
-import IconButton from "@mui/material/IconButton";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
 
 export interface InfoState {
@@ -42,7 +40,7 @@ const MapHolder = () => {
 			setRoomData(defaultState);
 			return;
 		} else {
-			setRoomData(roomInfo);
+			await setRoomData(roomInfo);
 		}
 
 	};
@@ -64,7 +62,10 @@ const MapHolder = () => {
 
 	return (
 		<div>
-			<SearchComponent setSelectedRoom={setSelectedRoom} setSelectedFloor={setSelectedFloor}/>
+			<SearchComponent setSelectedRoom={ setSelectedRoom }
+			                 setSelectedFloor={ setSelectedFloor }
+			                 setIsDrawerOpen={ setIsDrawerOpen }
+			                 handleRoomSelection={handleRoomSelection}/>
 			<FloorHolder
 				floors={ floors }
 				onFloorChange={ changeFloor }

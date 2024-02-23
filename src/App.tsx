@@ -71,6 +71,9 @@ function App() {
                           <Route path="/faculty" element={
                               <FacultySelection /> }
                           />
+                          <Route path="*" element={
+                              <FacultySelection /> }
+                          />
                       </Routes>
                   </BrowserRouter>
               </div>

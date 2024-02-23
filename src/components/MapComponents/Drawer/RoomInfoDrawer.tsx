@@ -11,7 +11,7 @@ interface RoomInfoDrawerProps {
 }
 
 const RoomInfoDrawer = ({roomInfo, onClose, isDrawerOpen, onOpen, roomData}: RoomInfoDrawerProps) => {
-	// console.log("dataasos:", roomData);
+	console.log("dataasos:", roomData);
 	return (
 		<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
 		                          onOpen={ onOpen }

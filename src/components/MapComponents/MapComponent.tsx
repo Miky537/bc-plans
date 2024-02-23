@@ -9,7 +9,18 @@ import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl, fastLayerUrl } from "./constants";
 import GeoJsonLoader from "./Centroid";
 import { useMapContext } from "./MapContext";
-import { addBoundingBox, handleCentroidsLoaded, adjustMapHeight, updateBoundingBoxes } from "./MapFunctions";
+import {
+	addBoundingBox,
+	handleCentroidsLoaded,
+	adjustMapHeight,
+	updateBoundingBoxes,
+	convertPathToFacultyType, getFacultyCoordinates
+} from "./MapFunctions";
+import { useLocation } from "react-router-dom";
+import Locate from "@arcgis/core/widgets/Locate";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import Point from "@arcgis/core/geometry/Point";
+import { serverAddress } from "../../config";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -44,7 +55,14 @@ const MapComponent = ({
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 
-	const { centerCoordinates, isMapVisible, selectedFaculty } = useMapContext();
+	const location = useLocation();
+	const {
+		centerCoordinates,
+		isMapVisible,
+		selectedFaculty,
+		setCenterCoordinates,
+		setSelectedFaculty
+	} = useMapContext();
 
 	const minZoomLevel = 17;
 
@@ -94,6 +112,16 @@ const MapComponent = ({
 			zoom: 18
 		});
 
+		const locateWidget = new Locate({
+			view: mapView,
+			goToOverride: (view, options) => {
+				options.target.scale = 1500; // Override the default behavior of the goTo method
+				return view.goTo(options.target);
+			}
+		});
+
+		mapView.ui.add(locateWidget, `bottom-right` );
+
 		mapViewRef.current = mapView;
 
 		mapView.when(() => {
@@ -104,7 +132,7 @@ const MapComponent = ({
 					if (firstHit.type === "graphic" && firstHit.graphic && firstHit.graphic.attributes) {
 
 						if (highlightGraphicRef.current) {
-							mapView.graphics.remove(highlightGraphicRef.current);
+							mapView.graphics.remove(highlightGraphicRef.current as Graphic);
 							highlightGraphicRef.current = null;
 						}
 
@@ -116,7 +144,7 @@ const MapComponent = ({
 								geometry: clickedGraphic.geometry,
 								symbol: highlightSymbol
 							});
-							mapView.graphics.add(highlightGraphicRef.current);
+							mapView.graphics.add(highlightGraphicRef.current as Graphic);
 							if ("id" in clickedGraphic.attributes){
 								onRoomSelection(clickedGraphic.attributes.id);
 								setIsDrawerOpen(true);
@@ -145,9 +173,10 @@ const MapComponent = ({
 	}, [centerCoordinates.lat, centerCoordinates.lng]);
 
 	useEffect(() => {
+		if (!mapViewRef.current) {return}
 		// Ensure the mapView is ready before attempting to call goTo
 		mapViewRef.current?.when().then(() => {
-			mapViewRef.current?.goTo({
+			mapViewRef.current!.goTo({
 				target: [centerCoordinates.lat, centerCoordinates.lng],
 				zoom: 18
 			}, { duration: 1000, easing: "ease-in-out" }).catch(err => {
@@ -167,7 +196,7 @@ const MapComponent = ({
 			// Fetch room details for the selected floor
 			try {
 				const response = await fetch(
-					`http://192.168.0.129:5000/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
+					`${serverAddress}/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch rooms');
 				}
@@ -246,6 +275,7 @@ const MapComponent = ({
 					console.error("Error querying for room location:", error);
 				} finally {
 					setSelectedRoom(undefined);
+					console.log(selectedRoom)
 				}
 			}).catch((error) => {
 				console.error("Error loading faculty layer:", error);
@@ -254,6 +284,75 @@ const MapComponent = ({
 
 		centerMapOnRoom(selectedRoom);
 	}, [selectedRoom, selectedFaculty]);
+
+
+	useEffect(() => {
+		const pathParts = location.pathname.split('/').filter(Boolean);
+		const facultyName = pathParts[0];
+		const facultyType = convertPathToFacultyType(facultyName);
+
+		if (facultyType) {
+			const facultyCoordinates = getFacultyCoordinates(facultyType);
+			setCenterCoordinates(facultyCoordinates);
+			setSelectedFaculty(facultyType);
+		}
+	}, [location, setCenterCoordinates, setSelectedFaculty]);
+
+	const createDirectionGraphic = (heading: number) => {
+		console.log("Heading and adding symbol:", heading);
+		const point = new Point({
+			longitude: centerCoordinates.lng,
+			latitude: centerCoordinates.lat
+		});
+
+		// Create a symbol for the graphic (an arrow, for example)
+		const symbol = new SimpleMarkerSymbol({
+			path: "M16,4.412l-3.412,3.413L16,11.237l3.412-3.412L16,4.412z M16,0l-8,8l8,8l8-8L16,0z",
+			color: "blue",
+			angle: heading,
+			size: "20px"
+		});
+
+		// Create and return the graphic
+		return new Graphic({
+			geometry: point,
+			symbol: symbol,
+			attributes: { id: 'userDirection' }
+		});
+	};
+
+	const addDirectionIndicator = (heading: number) => {
+		if (!mapViewRef.current) return;
+
+		// Assume you have a function to create a graphic based on the heading
+		// This could be an arrow or line indicating direction
+		const directionGraphic = createDirectionGraphic(heading);
+
+		// Remove the existing direction indicator, if any
+		const existingIndicator = mapViewRef.current!.graphics.find(g => g.attributes && g.attributes.id === 'userDirection');
+		if (existingIndicator) {
+			mapViewRef.current!.graphics.remove(existingIndicator);
+		}
+
+		// Add the new direction indicator
+		mapViewRef.current!.graphics.add(directionGraphic);
+	};
+
+	useEffect(() => {
+		const watchId = navigator.geolocation.watchPosition(
+			(position) => {
+				if (position.coords.heading !== null) {
+					addDirectionIndicator(position.coords.heading);
+				}
+			},
+			(error) => {
+				console.error('Error obtaining location', error);
+			},
+			// { enableHighAccuracy: true }
+		);
+
+		return () => navigator.geolocation.clearWatch(watchId);
+	}, []); // This useEffect depends on no props or state, so it runs once on mount
 
 
 	return (

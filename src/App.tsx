@@ -7,6 +7,10 @@ import { theme } from './Theme/CustomTheme';
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { MapProvider } from "./components/MapComponents/MapContext";
 import FacultySelection from "./components/FacultySelection/FacultySelection";
+import BuildingSelection from "./components/BuildingSelection";
+import FloorSelection from "./components/FloorSelection";
+import RoomSelection from "./components/RoomSelection";
+import { FacultyProvider } from "./components/FacultyContext";
 
 function App() {
 
@@ -16,6 +20,7 @@ function App() {
           <MapProvider>
               <div className="App">
                   <BrowserRouter>
+                      <FacultyProvider>
                       <Routes>
                           <Route path="/" element={
                               <Main>
@@ -71,10 +76,18 @@ function App() {
                           <Route path="/faculty" element={
                               <FacultySelection /> }
                           />
+                          <Route path="/Random" element={
+                              <BuildingSelection /> }
+                          />
+                          <Route path="/:faculty" element={ <BuildingSelection /> } />
+                          <Route path="/:faculty/:building" element={ <FloorSelection /> } />
+                          <Route path="/:faculty/:building/:floor" element={ <RoomSelection /> } />
+                          <Route path="/:faculty/:building/:floor/:room" element={ <Main><MapHolder /></Main> } />
                           <Route path="*" element={
                               <FacultySelection /> }
                           />
                       </Routes>
+                      </FacultyProvider>
                   </BrowserRouter>
               </div>
           </MapProvider>

@@ -14,7 +14,8 @@ import {
 	handleCentroidsLoaded,
 	adjustMapHeight,
 	updateBoundingBoxes,
-	convertPathToFacultyType, getFacultyCoordinates
+	convertPathToFacultyType,
+	getFacultyCoordinates
 } from "./MapFunctions";
 import { useLocation } from "react-router-dom";
 import Locate from "@arcgis/core/widgets/Locate";
@@ -58,7 +59,6 @@ const MapComponent = ({
 	const location = useLocation();
 	const {
 		centerCoordinates,
-		isMapVisible,
 		selectedFaculty,
 		setCenterCoordinates,
 		setSelectedFaculty
@@ -219,7 +219,7 @@ const MapComponent = ({
 			updateLayersWithRooms();
 		}
 
-	}, [selectedFloor]);
+	}, [selectedFloor, selectedFaculty]);
 
 	useEffect(() => {
 		adjustMapHeight(); // Adjust on mount
@@ -299,7 +299,6 @@ const MapComponent = ({
 	}, [location, setCenterCoordinates, setSelectedFaculty]);
 
 	const createDirectionGraphic = (heading: number) => {
-		console.log("Heading and adding symbol:", heading);
 		const point = new Point({
 			longitude: centerCoordinates.lng,
 			latitude: centerCoordinates.lat
@@ -321,11 +320,11 @@ const MapComponent = ({
 		});
 	};
 
-	const addDirectionIndicator = (heading: number) => {
+	const addDirectionIndicator = (heading: number | null) => {
+		console.log("Im here", heading, mapViewRef.current);
 		if (!mapViewRef.current) return;
+		if (heading === null) return;
 
-		// Assume you have a function to create a graphic based on the heading
-		// This could be an arrow or line indicating direction
 		const directionGraphic = createDirectionGraphic(heading);
 
 		// Remove the existing direction indicator, if any
@@ -337,13 +336,12 @@ const MapComponent = ({
 		// Add the new direction indicator
 		mapViewRef.current!.graphics.add(directionGraphic);
 	};
-
 	useEffect(() => {
 		const watchId = navigator.geolocation.watchPosition(
+
 			(position) => {
-				if (position.coords.heading !== null) {
-					addDirectionIndicator(position.coords.heading);
-				}
+				// console.log("Position:", position);
+				addDirectionIndicator(position.coords.heading);
 			},
 			(error) => {
 				console.error('Error obtaining location', error);
@@ -352,7 +350,7 @@ const MapComponent = ({
 		);
 
 		return () => navigator.geolocation.clearWatch(watchId);
-	}, []); // This useEffect depends on no props or state, so it runs once on mount
+	}, []);
 
 
 	return (

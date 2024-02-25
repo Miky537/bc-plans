@@ -17,11 +17,12 @@ import {
 	convertPathToFacultyType,
 	getFacultyCoordinates
 } from "./MapFunctions";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Locate from "@arcgis/core/widgets/Locate";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Point from "@arcgis/core/geometry/Point";
 import { serverAddress } from "../../config";
+import { useFacultyContext } from "../FacultyContext";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -55,6 +56,8 @@ const MapComponent = ({
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
+	const { faculty, building, floor, roomName } = useParams();
+	const {  } = useFacultyContext()
 
 	const location = useLocation();
 	const {
@@ -227,13 +230,14 @@ const MapComponent = ({
 
 		// Cleanup listener on component unmount
 		return () => window.removeEventListener('resize', adjustMapHeight);
-	}, []); // Empty dependency array ensures this runs once on mount
+	}, []);
 
 	useEffect(() => {
 		if (!selectedRoom) return; // Do nothing if no room is selected
 
 		const centerMapOnRoom = async(roomId: number) => {
-			const facultyLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+			setIsDrawerOpen(true);
+			const facultyLayer = await featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 			if (!facultyLayer) {
 				console.error("Faculty layer not found.");
 				return;

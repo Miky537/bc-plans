@@ -9,11 +9,9 @@ import { MapProvider } from "./components/MapComponents/MapContext";
 import FacultySelection from "./components/FacultySelection/FacultySelection";
 import BuildingSelection from "./components/BuildingSelection";
 import FloorSelection from "./components/FloorSelection";
-import RoomSelection from "./components/RoomSelection";
 import { FacultyProvider } from "./components/FacultyContext";
 
 function App() {
-
 
     return (
       <ThemeProvider theme={ theme }>
@@ -81,7 +79,7 @@ function App() {
                           />
                           <Route path="/:faculty" element={ <BuildingSelection /> } />
                           <Route path="/:faculty/:building" element={ <FloorSelection /> } />
-                          <Route path="/:faculty/:building/:floor" element={ <RoomSelection /> } />
+                          <Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
                           <Route path="/:faculty/:building/:floor/:room" element={ <Main><MapHolder /></Main> } />
                           <Route path="*" element={
                               <FacultySelection /> }

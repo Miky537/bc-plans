@@ -18,7 +18,7 @@ function BuildingSelection() {
 	const { selectedBuildingId, setSelectedBuildingId } = useFacultyContext();
 
 	useEffect(() => {
-		const url = `${ serverAddress }/api/buildings/FIT`;
+		const url = `${ serverAddress }/api/buildings/FAST`;
 
 		// Fetch buildings data from the API
 		fetch(url)
@@ -35,9 +35,8 @@ function BuildingSelection() {
 	}, []);
 
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
-		console.log("budovaid", buildingId);
 		setSelectedBuildingId(buildingId);
-		navigate(`/FIT/${ buildingName.replace(/\s/g, "-")}`)
+		navigate(`/FAST/${ buildingName.replace(/\s/g, "_")}`)
 	}
 
 	return (

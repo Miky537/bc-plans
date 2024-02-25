@@ -7,6 +7,7 @@ import FloorHolder from "./FloorHolder";
 import { defaultState } from "./constants";
 import { fetchRoomInfo, RoomDetails } from "./tempFile";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
+import { useFacultyContext } from "../FacultyContext";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -22,7 +23,7 @@ const MapHolder = () => {
 	const selectedRoomIdRef = useRef(selectedRoomId);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [roomData, setRoomData] = useState<RoomDetails>(defaultState);
-	const [selectedRoom, setSelectedRoom] = useState<number | undefined>(0);
+	const { selectedRoom, setSelectedRoom } = useFacultyContext();
 	const handleRoomSelection = async(roomId?: number) => {
 		if (roomId === undefined) {
 			return;

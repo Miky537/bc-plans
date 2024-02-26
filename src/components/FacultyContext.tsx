@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
 import { RoomDetails, fetchRoomInfo } from "./MapComponents/tempFile";
 import { defaultState } from "./MapComponents/constants";
+import { FacultyType } from "./FacultySelection/FacultySelection";
 
-interface FacultyType {
+interface FacultyTypeContext {
 	selectedBuildingId: number | null;
 	setSelectedBuildingId: (id: number | null) => void;
 	selectedRoomId: number | undefined;
@@ -10,9 +11,15 @@ interface FacultyType {
 	roomData: RoomDetails;
 	setRoomData: (roomData: RoomDetails) => void;
 	handleRoomSelection: (roomId?: number) => void;
+	selectedFaculty: FacultyType;
+	setSelectedFaculty: (faculty: FacultyType) => void;
+	selectedBuilding: string | undefined;
+	setSelectedBuilding: (building: string | undefined) => void;
+	selectedFloor: string | undefined;
+	setSelectedFloor: (floor: string | undefined) => void;
 }
 
-const FacultyContext = createContext<FacultyType | undefined>(undefined);
+const FacultyContext = createContext<FacultyTypeContext | undefined>(undefined);
 
 export const useFacultyContext = () => {
 	const context = useContext(FacultyContext);
@@ -23,11 +30,13 @@ export const useFacultyContext = () => {
 }
 
 export const FacultyProvider = ({ children }: { children: React.ReactNode }) => {
-	// Initialize with a number; use 0 or another appropriate default value
+
 	const [selectedBuildingId, setSelectedBuildingId] = useState<number | null>(null);
-	// const [selectedRoom, setSelectedRoom] = useState<number | undefined>(0);
+	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType | undefined>(undefined);
 	const [selectedRoomId, setSelectedRoomId] = useState<number | undefined>(0);
 	const [roomData, setRoomData] = useState<RoomDetails>(defaultState);
+	const [selectedBuilding, setSelectedBuilding] = useState<string | undefined>(undefined);
+	const [selectedFloor, setSelectedFloor] = useState<string | undefined>(undefined);
 
 	const handleRoomSelection = async(roomId?: number) => {
 		if (roomId === undefined) {
@@ -59,6 +68,12 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			roomData,
 			setRoomData,
 			handleRoomSelection,
+			selectedFaculty,
+			setSelectedFaculty,
+			selectedBuilding,
+			setSelectedBuilding,
+			selectedFloor,
+			setSelectedFloor,
 		} }>
 			{children}
 		</FacultyContext.Provider>

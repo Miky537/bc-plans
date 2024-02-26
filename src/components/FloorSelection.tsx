@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography, AccordionSummary, Accordion, AccordionDetails } from "@mui/material";
+import { Typography, AccordionSummary, Accordion, AccordionDetails, Breadcrumbs, Link } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useParams, useNavigate } from "react-router-dom";
@@ -28,19 +28,46 @@ const replaceCzechChars = (str: string) => {
 	return str.split('').map((char: string) => czechCharMap[char] || char).join('');
 };
 
+const accordionStyles = {
+	'& .MuiAccordionSummary-expandIconWrapper': {
+		color: 'white',
+	}
+};
+
 function FloorSelection() {
 	const [floors, setFloors] = useState([]);
 	const { selectedBuildingId, setSelectedBuildingId } = useFacultyContext();
-	const [expanded, setExpanded] = useState(false);
+	const [expanded, setExpanded] = useState<string | false>(false);
+	const [oldSelectedPanel, setOldSelectedPanel] = useState<string | undefined>(undefined);
 	const navigate = useNavigate();
 	const { faculty, building, floor } = useParams();
-	const { selectedRoomId, setSelectedRoomId, handleRoomSelection } = useFacultyContext();
+	const {
+		selectedFaculty,
+		selectedBuilding,
+		selectedFloor,
+		setSelectedFloor,
+		setSelectedRoomId,
+		handleRoomSelection
+	} = useFacultyContext();
 
-	const handleChange = (floorName: string) => () => {
-		const tempString = floorName.replace(/\s/g, "_"); // Replace spaces with dashes globally
-		floorName = replaceCzechChars(tempString)
-		setExpanded(true);
-		navigate(`/${ faculty }/${ building }/${ floorName }`, { replace: true });
+	const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+		if (oldSelectedPanel === panel) {
+			setOldSelectedPanel(undefined);
+			setSelectedFloor(undefined);
+		}
+		if (oldSelectedPanel === undefined) {
+			setOldSelectedPanel(panel);
+			setSelectedFloor(panel);
+		}
+
+		setExpanded(isExpanded ? panel : false);
+		console.log("Tuto:", expanded ? undefined : panel)
+		// setSelectedFloor(expanded ? undefined : panel);
+		if (isExpanded) {
+			const tempString = panel.replace(/\s/g, "_"); // Replace spaces with underscores
+			const floorName = replaceCzechChars(tempString); // Assuming you have a function to replace Czech chars
+			navigate(`/${ faculty }/${ building }/${ floorName }`, { replace: true });
+		}
 	};
 
 
@@ -65,14 +92,19 @@ function FloorSelection() {
 	}, [selectedBuildingId]);
 
 	const handleRoomClick = async(roomName: string, roomId: number) => {
-		await console.log("Tohle to je posrany id", roomId);
 		await setSelectedRoomId(roomId);
 		await handleRoomSelection(roomId);
+		setSelectedFloor(undefined);
 		navigate(`/FAST/${ building }/${floor}/${roomName}`);
 	};
 
 	return (
 		<Main>
+			<Breadcrumbs separator="›">
+				<Link><Typography variant="h5">{ selectedFaculty }</Typography></Link>
+				<Link><Typography variant="h5">{ selectedBuilding }</Typography></Link>
+				<Link><Typography variant="h5">{ selectedFloor }</Typography></Link>
+			</Breadcrumbs>
 			<Box display="flex"
 			     flexDirection="column"
 			     justifyContent="flex-start"
@@ -85,7 +117,10 @@ function FloorSelection() {
 				{ floors.length > 0? (
 					floors.map((floor: FloorSelection, index) => (
 						<Accordion key={ floor.floor_id }
-						           onChange={ handleChange(floor.floor_name) }>
+						           expanded={ expanded === floor.floor_name }
+						           onChange={ handleChange(floor.floor_name) }
+						           sx={accordionStyles}
+						>
 							<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
 								<Typography variant="h5">{ floor.floor_name }</Typography>
 							</AccordionSummary>

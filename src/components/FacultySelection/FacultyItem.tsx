@@ -30,7 +30,7 @@ function FacultyItem({name, image}: FacultyItemProps) {
 		     gap={ 2 }
 		     onClick={ () => handleFacultyClick(name, getFacultyCoordinates(name)) } sx={ {cursor: "pointer"} }>
 			<Box width="7em" height="7em" borderRadius="50%" bgcolor="#CDCDCD"></Box>
-			<Typography>{ name.toString() }</Typography>
+			<Typography>{ name?.toString() }</Typography>
 		</Box>
 	);
 }

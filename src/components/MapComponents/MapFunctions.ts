@@ -103,7 +103,6 @@ export const adjustMapHeight = () => {
 		const topBarHeight = topBarElement.clientHeight;
 		const viewportHeight = window.innerHeight;
 		const mapHeight = `${ viewportHeight - topBarHeight }px`;
-		console.log('Map height:', mapHeight);
 		mapContainerElement.style.height = mapHeight;
 	} else {
 		console.error('Topbar or MapDiv element is not found in the document.');
@@ -143,7 +142,6 @@ export const updateBoundingBoxes = debounce((
 		featureLayersRef.current.forEach((layer: any) => addBoundingBox(layer, mapViewRef, minZoomLevel));
 		toggleLayersVisibility(false);
 	} else if (zoom > 17) {
-		console.log("Removing bounding boxes");
 		removeBoundingBoxes(mapViewRef);
 		toggleLayersVisibility(true);
 	}

@@ -4,11 +4,13 @@ import FacultyItem from "./FacultyItem";
 import Box from "@mui/material/Box";
 import { useMapContext } from "../MapComponents/MapContext";
 import { useNavigate } from "react-router-dom";
+import { useFacultyContext } from "../FacultyContext";
 
-export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA";
+export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | undefined;
 function FacultySelection() {
 
 	const {setMapVisibility} = useMapContext();
+	const {setSelectedFaculty} = useFacultyContext();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -33,7 +35,10 @@ function FacultySelection() {
 				<FacultyItem name="USI" />
 				<FacultyItem name="FP" />
 				<FacultyItem name="FA" />
-				<Box onClick={() => navigate("/Random")}>FAST - choosing</Box>
+				<Box onClick={() => {
+					setSelectedFaculty("FAST");
+					navigate("/Random")
+				}}>FAST - choosing</Box>
 			</Box>
 		</Main>
 	);

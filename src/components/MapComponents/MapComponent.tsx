@@ -57,7 +57,7 @@ const MapComponent = ({
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
-	const { selectedRoomId, setSelectedRoomId } = useFacultyContext()
+	const { setSelectedRoomId, handleRoomSelection } = useFacultyContext()
 
 	const location = useLocation();
 	const {
@@ -66,7 +66,6 @@ const MapComponent = ({
 		setCenterCoordinates,
 		setSelectedFaculty,
 		setIsMapLoaded,
-		isMapLoaded,
 	} = useMapContext();
 
 	const minZoomLevel = 17;
@@ -133,7 +132,6 @@ const MapComponent = ({
 			setIsMapLoaded(true);
 			mapView.on('click', async (event) => {
 				if (highlightGraphicRef.current) {
-					console.log("Map clicked", highlightGraphicRef.current);
 					mapView.graphics.remove(highlightGraphicRef.current as Graphic);
 					highlightGraphicRef.current = null;
 				}
@@ -245,7 +243,6 @@ const MapComponent = ({
 				}
 
 				const query = facultyLayer.createQuery();
-				console.log("Querying for room location:", roomId);
 				query.where = `RoomID = '${roomId}'`; // Adjust to match your dataset
 				query.returnGeometry = true;
 				query.outSpatialReference = mapViewRef.current!.spatialReference;
@@ -261,7 +258,7 @@ const MapComponent = ({
 
 						mapViewRef.current!.graphics.add(highlightGraphic);
 						highlightGraphicRef.current = highlightGraphic;
-						await mapViewRef.current!.goTo({
+						await mapViewRef.current?.goTo({
 							target: roomFeature.geometry,
 							zoom: 19
 						}, { duration: 1500, easing: "ease-out" });
@@ -274,7 +271,6 @@ const MapComponent = ({
 					console.error("Error querying for room location:", error);
 				} finally {
 					setSelectedRoom(undefined);
-					console.log(selectedRoom)
 				}
 			}).catch((error) => {
 				console.error("Error loading faculty layer:", error);
@@ -349,6 +345,29 @@ const MapComponent = ({
 
 		return () => navigator.geolocation.clearWatch(watchId);
 	}, []);
+
+	useEffect(() => {
+
+		if (!faculty || !building || !floor || !roomName) {
+			return
+		}
+		const fetchRoomId = async() => {
+			try {
+				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ building }/${ floor }/${ roomName }`);
+				if (!response.ok) {
+					throw new Error('Failed to fetch room ID');
+				}
+				const data = await response.json();
+				setSelectedRoomId(data.room_id);
+				handleRoomSelection(data.room_id);
+			} catch (error) {
+				console.error('Error fetching room ID:', error);
+				setSelectedRoomId(0);
+			}
+		};
+
+		fetchRoomId();
+	}, [faculty, building, floor, roomName]);
 
 
 	return (

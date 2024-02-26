@@ -9,7 +9,6 @@ const FloorHolder = ({onFloorChange, selectedFloor = 2}: any) => {
 	const {selectedFaculty, setFloors, floors} = useMapContext();
 
 	const handleButtonClick = (floor: any) => {
-		console.log("Selected floor:", floor);
 		onFloorChange(floor);
 	}
 

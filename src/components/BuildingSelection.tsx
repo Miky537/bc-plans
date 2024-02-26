@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography } from "@mui/material";
+import { Typography, Breadcrumbs, Link } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +15,7 @@ export interface BuildingSelection {
 function BuildingSelection() {
 	const [buildings, setBuildings] = useState([]);
 	const navigate = useNavigate();
-	const { selectedBuildingId, setSelectedBuildingId } = useFacultyContext();
+	const { selectedFaculty, setSelectedBuildingId, setSelectedBuilding } = useFacultyContext();
 
 	useEffect(() => {
 		const url = `${ serverAddress }/api/buildings/FAST`;
@@ -35,12 +35,16 @@ function BuildingSelection() {
 	}, []);
 
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
+		setSelectedBuilding(buildingName);
 		setSelectedBuildingId(buildingId);
 		navigate(`/FAST/${ buildingName.replace(/\s/g, "_")}`)
 	}
 
 	return (
 		<Main>
+			<Breadcrumbs separator="›">
+				<Link>{selectedFaculty}</Link>
+			</Breadcrumbs>
 			<Box display="flex" flexDirection="column" justifyContent="flex-start" height="100%" width="100%"
 			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white">
 				{ buildings.length > 0? ( //first sort the buildings by name, then map them to a list

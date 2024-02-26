@@ -27,7 +27,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 
 	useEffect(() => {
 		const fetchRooms = async () => {
-			console.log("fetching rooms");
 			const fetchedRooms = await fetchFacultyRooms("FAST"); // only for testing, soon change to faculty
 			// console.log("fetched rooms",fetchedRooms);
 			if (Array.isArray(fetchedRooms)) {

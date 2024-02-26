@@ -12,6 +12,8 @@ interface MapContextType {
 	setSelectedFaculty: (faculty: FacultyType) => void;
 	floors: number[];
 	setFloors: React.Dispatch<React.SetStateAction<number[]>>;
+	isMapLoaded: boolean;
+	setIsMapLoaded: (loaded: boolean) => void;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -33,6 +35,7 @@ export const MapProvider = ({children}: any) => {
 	const [isMapVisible, setMapVisibility] = useState<boolean>(true);
 	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType>("FAST");
 	const [floors, setFloors] = useState<number[]>([]);
+	const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
 
 	return (
 		<MapContext.Provider value={ {
@@ -43,7 +46,9 @@ export const MapProvider = ({children}: any) => {
 			selectedFaculty,
 			setSelectedFaculty,
 			setFloors,
-			floors
+			floors,
+			isMapLoaded,
+			setIsMapLoaded,
 		} }>
 			{ children }
 		</MapContext.Provider>

@@ -34,7 +34,7 @@ function FloorSelection() {
 	const [expanded, setExpanded] = useState(false);
 	const navigate = useNavigate();
 	const { faculty, building, floor } = useParams();
-	const { selectedRoom, setSelectedRoom } = useFacultyContext();
+	const { selectedRoomId, setSelectedRoomId, handleRoomSelection } = useFacultyContext();
 
 	const handleChange = (floorName: string) => () => {
 		const tempString = floorName.replace(/\s/g, "_"); // Replace spaces with dashes globally
@@ -64,8 +64,10 @@ function FloorSelection() {
 			.catch(error => console.log("Fetching floors failed: ", error));
 	}, [selectedBuildingId]);
 
-	const handleRoomClick = (roomName: string, roomId: number) => {
-		setSelectedRoom(roomId);
+	const handleRoomClick = async(roomName: string, roomId: number) => {
+		await console.log("Tohle to je posrany id", roomId);
+		await setSelectedRoomId(roomId);
+		await handleRoomSelection(roomId);
 		navigate(`/FAST/${ building }/${floor}/${roomName}`);
 	};
 

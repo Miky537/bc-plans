@@ -138,7 +138,6 @@ export const updateBoundingBoxes = debounce((
 ) => {
 	const zoom: number | undefined = mapViewRef.current?.zoom;
 	if (zoom === undefined) return;
-	console.log("Zoom level:", zoom, minZoomLevel);
 
 	if (zoom <= 17) {
 		featureLayersRef.current.forEach((layer: any) => addBoundingBox(layer, mapViewRef, minZoomLevel));

@@ -1,1 +1,2 @@
-export const serverAddress = 'https://192.168.100.40:5000';
+// export const serverAddress = 'https://192.168.100.40:5000';
+export const serverAddress = 'https://192.168.0.129:5000';

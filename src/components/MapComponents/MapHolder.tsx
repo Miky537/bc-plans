@@ -19,32 +19,12 @@ const MapHolder = () => {
 
 	const [selectedFloor, setSelectedFloor] = useState(2);
 	const [floors, setFloors] = useState(findUniqueFloorNumbers());
-	const [selectedRoomId, setSelectedRoomId] = useState(0);
-	const selectedRoomIdRef = useRef(selectedRoomId);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [roomData, setRoomData] = useState<RoomDetails>(defaultState);
-	const { selectedRoom, setSelectedRoom } = useFacultyContext();
-	const handleRoomSelection = async(roomId?: number) => {
-		if (roomId === undefined) {
-			return;
-		}
-		setSelectedRoomId(roomId); // Update state with selected room information
 
-		let roomInfo: RoomDetails | undefined = await fetchRoomInfo(roomId);
-		if (roomInfo === undefined) {
-			console.log("Didnt find room!");
-			setRoomData(defaultState);
-			return;
-		}
-		if (roomInfo.room_info === undefined) {
-			console.log("Didnt find room!");
-			setRoomData(defaultState);
-			return;
-		} else {
-			await setRoomData(roomInfo);
-		}
+	const { selectedRoomId, setSelectedRoomId, handleRoomSelection, roomData} = useFacultyContext();
+	const selectedRoomIdRef = useRef(selectedRoomId);
 
-	};
+
 	const handleOpen = useCallback(() => {
 		setIsDrawerOpen(true);
 	}, [setIsDrawerOpen]);
@@ -63,7 +43,7 @@ const MapHolder = () => {
 
 	return (
 		<div>
-			<SearchComponent setSelectedRoom={ setSelectedRoom }
+			<SearchComponent setSelectedRoom={ setSelectedRoomId }
 			                 setSelectedFloor={ setSelectedFloor }
 			                 setIsDrawerOpen={ setIsDrawerOpen }
 			                 handleRoomSelection={handleRoomSelection}/>
@@ -75,8 +55,8 @@ const MapHolder = () => {
 			<MapComponent onRoomSelection={ handleRoomSelection }
 			              selectedFloor={ selectedFloor }
 			              setIsDrawerOpen={ setIsDrawerOpen }
-			              selectedRoom={selectedRoom}
-			              setSelectedRoom={setSelectedRoom}
+			              selectedRoom={selectedRoomId}
+			              setSelectedRoom={setSelectedRoomId}
 			/>
 			<RoomInfoDrawer roomInfo={ selectedRoomId }
 			                isDrawerOpen={ isDrawerOpen }

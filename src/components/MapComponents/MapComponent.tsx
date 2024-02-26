@@ -57,14 +57,16 @@ const MapComponent = ({
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
-	const {  } = useFacultyContext()
+	const { selectedRoomId, setSelectedRoomId } = useFacultyContext()
 
 	const location = useLocation();
 	const {
 		centerCoordinates,
 		selectedFaculty,
 		setCenterCoordinates,
-		setSelectedFaculty
+		setSelectedFaculty,
+		setIsMapLoaded,
+		isMapLoaded,
 	} = useMapContext();
 
 	const minZoomLevel = 17;
@@ -128,16 +130,20 @@ const MapComponent = ({
 		mapViewRef.current = mapView;
 
 		mapView.when(() => {
+			setIsMapLoaded(true);
 			mapView.on('click', async (event) => {
+				if (highlightGraphicRef.current) {
+					console.log("Map clicked", highlightGraphicRef.current);
+					mapView.graphics.remove(highlightGraphicRef.current as Graphic);
+					highlightGraphicRef.current = null;
+				}
+
 				const response = await mapView.hitTest(event);
 				if (response.results.length > 0) {
 					const firstHit = response.results[0];
 					if (firstHit.type === "graphic" && firstHit.graphic && firstHit.graphic.attributes) {
 
-						if (highlightGraphicRef.current) {
-							mapView.graphics.remove(highlightGraphicRef.current as Graphic);
-							highlightGraphicRef.current = null;
-						}
+
 
 						const clickedGraphic = firstHit.graphic;
 
@@ -173,20 +179,9 @@ const MapComponent = ({
 				mapViewRef.current = null;
 			}
 		};
-	}, [centerCoordinates.lat, centerCoordinates.lng]);
+	}, []);
 
-	useEffect(() => {
-		if (!mapViewRef.current) {return}
-		// Ensure the mapView is ready before attempting to call goTo
-		mapViewRef.current?.when().then(() => {
-			mapViewRef.current!.goTo({
-				target: [centerCoordinates.lat, centerCoordinates.lng],
-				zoom: 18
-			}, { duration: 1000, easing: "ease-in-out" }).catch(err => {
-				console.error("Error re-centering map:", err);
-			});
-		});
-	}, [centerCoordinates.lat, centerCoordinates.lng]);
+
 
 	useEffect(() => {
 		// Remove any existing highlight from the map
@@ -325,7 +320,6 @@ const MapComponent = ({
 	};
 
 	const addDirectionIndicator = (heading: number | null) => {
-		console.log("Im here", heading, mapViewRef.current);
 		if (!mapViewRef.current) return;
 		if (heading === null) return;
 

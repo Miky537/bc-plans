@@ -10,6 +10,7 @@ import FacultySelection from "./components/FacultySelection/FacultySelection";
 import BuildingSelection from "./components/BuildingSelection";
 import FloorSelection from "./components/FloorSelection";
 import { FacultyProvider } from "./components/FacultyContext";
+import FavouritePlaces from "./components/FavouritePlaces";
 
 function App() {
 
@@ -81,6 +82,7 @@ function App() {
                           <Route path="/:faculty/:building" element={ <FloorSelection /> } />
                           <Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
                           <Route path="/:faculty/:building/:floor/:roomName" element={ <Main><MapHolder /></Main> } />
+                          <Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
                           <Route path="*" element={
                               <FacultySelection /> }
                           />

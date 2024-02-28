@@ -23,6 +23,7 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Point from "@arcgis/core/geometry/Point";
 import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
+import { replaceCzechChars } from "../FloorSelection";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -353,7 +354,8 @@ const MapComponent = ({
 		}
 		const fetchRoomId = async() => {
 			try {
-				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ building }/${ floor }/${ roomName }`);
+				const normalizedBuilding = replaceCzechChars(building).replace(/\s/g, "_");
+				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ normalizedBuilding }/${ floor }/${ roomName }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch room ID');
 				}

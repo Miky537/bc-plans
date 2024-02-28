@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography, Breadcrumbs, Link } from "@mui/material";
+import { Typography, Breadcrumbs, Link, useTheme } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +13,7 @@ export interface BuildingSelection {
 }
 
 function BuildingSelection() {
+	const { palette } = useTheme();
 	const [buildings, setBuildings] = useState([]);
 	const navigate = useNavigate();
 	const { selectedFaculty, setSelectedBuildingId, setSelectedBuilding } = useFacultyContext();
@@ -40,10 +41,14 @@ function BuildingSelection() {
 		navigate(`/FAST/${ buildingName.replace(/\s/g, "_")}`)
 	}
 
+	const handleFavPlacesClick = () => {
+		navigate(`/fvPlaces`);
+	}
+
 	return (
 		<Main>
-			<Breadcrumbs separator="›">
-				<Link>{selectedFaculty}</Link>
+			<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, } }>
+				<Link><Typography variant="h5">{ selectedFaculty }</Typography></Link>
 			</Breadcrumbs>
 			<Box display="flex" flexDirection="column" justifyContent="flex-start" height="100%" width="100%"
 			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white">
@@ -54,16 +59,25 @@ function BuildingSelection() {
 							     width="100%"
 							     pt="0.7em"
 							     pb="0.7em"
-							     pl="0.7em"
 							     bgcolor={ index % 2? "black" : "grey" }
 							     onClick={ () => handleBuildingClick(building.building_id, building.name) }
 							>
-								<Typography variant="h5">{ building.name }</Typography>
+								<Typography variant="h5" ml="0.7em">{ building.name }</Typography>
 							</Box>
 						))
 				) : (
 					<Typography>No buildings found for the selected faculty.</Typography>
 				) }
+				<Box position="absolute"
+				     bottom="0"
+				     py="1em"
+				     display="flex"
+				     justifyContent="center"
+				     width="100%"
+				     bgcolor="gray"
+					 onClick={() => handleFavPlacesClick()}>
+					<Typography variant="h5">Favourite places</Typography>
+				</Box>
 			</Box>
 		</Main>
 	);

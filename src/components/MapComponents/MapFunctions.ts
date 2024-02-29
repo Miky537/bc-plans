@@ -11,6 +11,7 @@ import { FacultyType } from "../FacultySelection/FacultySelection";
 import { Coordinates } from "./MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
+import PictureFillSymbol from "@arcgis/core/symbols/PictureFillSymbol";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -49,10 +50,12 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 				attributes: {
 					isBoundingBox: true
 				},
-				symbol: new SimpleFillSymbol({
-					color: "rgba(255,255,255,1)",
+				symbol: new PictureFillSymbol({
+					url: "https://pbs.twimg.com/profile_images/1084194257710317569/xQVP7yO8_400x400.jpg",
+					width: 100,
+					height: 100,
 					outline: {
-						color: "gray",
+						color: "black",
 						width: 2
 					},
 				})
@@ -124,7 +127,8 @@ const debounce = (func: Function, wait: number) => {
 };
 
 const removeBoundingBoxes = (mapViewRef: React.MutableRefObject<MapView | null>) => {
-	const graphicsLayer = mapViewRef.current!.graphics;
+	const graphicsLayer = mapViewRef.current?.graphics;
+	if (!graphicsLayer) return;
 	const graphicsToRemove = graphicsLayer.toArray().filter((graphic: any) => graphic.attributes && graphic.attributes.isBoundingBox);
 	graphicsToRemove.forEach((graphic: any) => mapViewRef.current!.graphics.remove(graphic));
 };
@@ -133,9 +137,10 @@ export const updateBoundingBoxes = debounce((
 	mapViewRef: React.MutableRefObject<MapView | null>,
 	minZoomLevel: number,
 	featureLayersRef: React.MutableRefObject<FeatureLayer[]>,
-	toggleLayersVisibility: (visible: boolean) => void
+	toggleLayersVisibility: (visible: boolean) => void,
+	zoom: number | undefined
 ) => {
-	const zoom: number | undefined = mapViewRef.current?.zoom;
+	// const zoom: number | undefined = mapViewRef.current?.zoom;
 	if (zoom === undefined) return;
 
 	if (zoom <= 17) {

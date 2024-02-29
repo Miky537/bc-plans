@@ -2,7 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography, AccordionSummary, Accordion, AccordionDetails, Breadcrumbs, Link, useTheme } from "@mui/material";
+import {
+	Typography,
+	AccordionSummary,
+	Accordion,
+	AccordionDetails,
+	Breadcrumbs,
+	Link,
+	useTheme,
+	CircularProgress
+} from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useParams, useNavigate } from "react-router-dom";
@@ -45,6 +54,7 @@ function FloorSelection() {
 	const [floors, setFloors] = useState<FetchedFloor[]>([]);
 	const { selectedBuildingId } = useFacultyContext();
 	const [expanded, setExpanded] = useState<string | false>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
 	const { building, floor } = useParams();
 	const {
@@ -74,6 +84,7 @@ function FloorSelection() {
 
 	useEffect(() => {
 		if (selectedBuildingId === null) return
+		setIsLoading(true);
 		const url = `${ serverAddress }/api/floors/FAST/${ selectedBuildingId }`;
 
 		// Fetch buildings data from the API
@@ -89,7 +100,8 @@ function FloorSelection() {
 			.then(data => {
 				setFloors(data)
 			})
-			.catch(error => console.log("Fetching floors failed: ", error));
+			.catch(error => console.log("Fetching floors failed: ", error))
+			.finally(() => setIsLoading(false));
 	}, [selectedBuildingId]);
 
 	const handleRoomClick = async(roomName: string, roomId: number) => {
@@ -99,7 +111,6 @@ function FloorSelection() {
 		// setSelectedFloor(selectedFloor);
 		navigate(`/FAST/${ building }/${ floor }/${ roomName }`);
 	};
-	console.log("flory", floors)
 
 	return (
 		<Main>
@@ -113,11 +124,11 @@ function FloorSelection() {
 			     justifyContent="flex-start"
 			     height="100%"
 			     width="100%"
-			     pt={ 4 }
 			     pb={ 4 }
 			     bgcolor="#323232"
+			     borderTop="2px solid gray"
 			     color="white">
-				{ floors.length > 0? (
+				{ floors.length > 0 && !isLoading? (
 					floors.map((floor: FetchedFloor, index) => (
 						<Accordion key={ floor.floor_id }
 						           expanded={ expanded === floor.floor_name }
@@ -146,7 +157,9 @@ function FloorSelection() {
 						</Accordion>
 					))
 				) : (
-					<Typography>No floors found for the selected building.</Typography>
+					<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+						<CircularProgress thickness={ 3 } size="5rem" />
+					</Box>
 				) }
 			</Box>
 		</Main>

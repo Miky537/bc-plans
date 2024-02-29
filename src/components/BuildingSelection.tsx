@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography, Breadcrumbs, Link, useTheme } from "@mui/material";
+import { Typography, Breadcrumbs, Link, useTheme, CircularProgress } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
 
@@ -16,9 +16,11 @@ function BuildingSelection() {
 	const { palette } = useTheme();
 	const [buildings, setBuildings] = useState([]);
 	const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { selectedFaculty, setSelectedBuildingId, setSelectedBuilding } = useFacultyContext();
 
 	useEffect(() => {
+		setIsLoading(true);
 		const url = `${ serverAddress }/api/buildings/FAST`;
 
 		// Fetch buildings data from the API
@@ -32,7 +34,8 @@ function BuildingSelection() {
 
 			})
 			.then(data => setBuildings(data))
-			.catch(error => console.log("Fetching buildings failed: ", error));
+			.catch(error => console.log("Fetching buildings failed: ", error))
+			.finally(() => setIsLoading(false));
 	}, []);
 
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
@@ -51,8 +54,8 @@ function BuildingSelection() {
 				<Link><Typography variant="h5">{ selectedFaculty }</Typography></Link>
 			</Breadcrumbs>
 			<Box display="flex" flexDirection="column" justifyContent="flex-start" height="100%" width="100%"
-			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white">
-				{ buildings.length > 0? ( //first sort the buildings by name, then map them to a list
+			     pb={ 4 } bgcolor="#323232" color="white" borderTop="2px solid gray">
+				{ buildings.length > 0 && !isLoading? ( //first sort the buildings by name, then map them to a list
 					buildings.sort((a: BuildingSelection, b: BuildingSelection) => a.name.localeCompare(b.name))
 						.map((building: BuildingSelection, index) => (
 							<Box key={ building.name }
@@ -66,7 +69,9 @@ function BuildingSelection() {
 							</Box>
 						))
 				) : (
-					<Typography>No buildings found for the selected faculty.</Typography>
+					<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+						<CircularProgress thickness={ 3 } size="5rem" />
+					</Box>
 				) }
 				<Box position="absolute"
 				     bottom="0"

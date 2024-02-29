@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MapView from '@arcgis/core/views/MapView';
 import Map from '@arcgis/core/Map';
 import esriConfig from '@arcgis/core/config';
@@ -18,12 +18,10 @@ import {
 	getFacultyCoordinates
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
-import Locate from "@arcgis/core/widgets/Locate";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import Point from "@arcgis/core/geometry/Point";
 import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
+import Track from "@arcgis/core/widgets/Track";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -57,6 +55,8 @@ const MapComponent = ({
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
+	const directionGraphicRef = useRef<Graphic | null>(null);
+	const [userPosition, setUserPosition] = useState<GeolocationPosition | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
 	const { setSelectedRoomId, handleRoomSelection } = useFacultyContext()
 
@@ -116,18 +116,33 @@ const MapComponent = ({
 			center: [centerCoordinates.lat, centerCoordinates.lng],
 			zoom: 18
 		});
+		mapViewRef.current = mapView;
 
-		const locateWidget = new Locate({
+		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
+		const trackWidget = new Track({
 			view: mapView,
-			goToOverride: (view, options) => {
-				options.target.scale = 1500; // Override the default behavior of the goTo method
-				return view.goTo(options.target);
+			rotationEnabled: false, // Disable the rotation of the view
+			goToLocationEnabled: true, // automatically moves the view to the user's location
+			geolocationOptions: {
+				maximumAge: 0,
+				timeout: 15000,
+				enableHighAccuracy: true
+			},
+			goToOverride: (view, goToParams) => {
+				if (isFirstTrackingActivation) {
+					isFirstTrackingActivation = false; // Update the flag
+					return view.goTo(goToParams.target);
+				}
+				return Promise.resolve();
 			}
 		});
 
-		mapView.ui.add(locateWidget, `bottom-right` );
-
-		mapViewRef.current = mapView;
+		mapView.ui.add(trackWidget, `bottom-right` );
+		trackWidget.watch("tracking", function(isTracking) {
+			if (!isTracking) {
+				isFirstTrackingActivation = true; // reset the flag when tracking stops
+			}
+		});
 
 		mapView.when(() => {
 			setIsMapLoaded(true);
@@ -168,7 +183,7 @@ const MapComponent = ({
 				}
 			});
 			mapView.watch("zoom", (zoom) => {
-				updateBoundingBoxes(mapViewRef, minZoomLevel, featureLayersRef, toggleLayersVisibility);
+				updateBoundingBoxes(mapViewRef, minZoomLevel, featureLayersRef, toggleLayersVisibility, zoom);
 			});
 		}).catch((err): any => console.error("MapView failed to load", err));
 
@@ -293,59 +308,6 @@ const MapComponent = ({
 			setSelectedFaculty(facultyType);
 		}
 	}, [location, setCenterCoordinates, setSelectedFaculty]);
-
-	const createDirectionGraphic = (heading: number) => {
-		const point = new Point({
-			longitude: centerCoordinates.lng,
-			latitude: centerCoordinates.lat
-		});
-
-		// Create a symbol for the graphic (an arrow, for example)
-		const symbol = new SimpleMarkerSymbol({
-			path: "M16,4.412l-3.412,3.413L16,11.237l3.412-3.412L16,4.412z M16,0l-8,8l8,8l8-8L16,0z",
-			color: "blue",
-			angle: heading,
-			size: "20px"
-		});
-
-		// Create and return the graphic
-		return new Graphic({
-			geometry: point,
-			symbol: symbol,
-			attributes: { id: 'userDirection' }
-		});
-	};
-
-	const addDirectionIndicator = (heading: number | null) => {
-		if (!mapViewRef.current) return;
-		if (heading === null) return;
-
-		const directionGraphic = createDirectionGraphic(heading);
-
-		// Remove the existing direction indicator, if any
-		const existingIndicator = mapViewRef.current!.graphics.find(g => g.attributes && g.attributes.id === 'userDirection');
-		if (existingIndicator) {
-			mapViewRef.current!.graphics.remove(existingIndicator);
-		}
-
-		// Add the new direction indicator
-		mapViewRef.current!.graphics.add(directionGraphic);
-	};
-	useEffect(() => {
-		const watchId = navigator.geolocation.watchPosition(
-
-			(position) => {
-				// console.log("Position:", position);
-				addDirectionIndicator(position.coords.heading);
-			},
-			(error) => {
-				console.error('Error obtaining location', error);
-			},
-			// { enableHighAccuracy: true }
-		);
-
-		return () => navigator.geolocation.clearWatch(watchId);
-	}, []);
 
 	useEffect(() => {
 

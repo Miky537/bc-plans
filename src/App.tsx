@@ -73,7 +73,8 @@ function App() {
                           }
                           />
                           <Route path="/faculty" element={
-                              <FacultySelection /> }
+                              <FacultySelection />
+                          }
                           />
                           <Route path="/Random" element={
                               <BuildingSelection /> }

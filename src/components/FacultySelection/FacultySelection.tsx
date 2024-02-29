@@ -24,8 +24,8 @@ function FacultySelection() {
 			<Box display="grid"
 			     gridTemplateColumns="repeat(2, 1fr)" // Create two columns
 			     rowGap={ 4 } columnGap={ 0 }
-			     height="100%" justifyContent="flex-end"
-			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white">
+			     height="100" justifyContent="flex-end"
+			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white" overflow="scroll">
 				<FacultyItem name="FIT" />
 				<FacultyItem name="FAST" />
 				<FacultyItem name="FSI" />

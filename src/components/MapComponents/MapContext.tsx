@@ -33,7 +33,7 @@ export const MapProvider = ({children}: any) => {
 	});
 
 	const [isMapVisible, setMapVisibility] = useState<boolean>(true);
-	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType>("FAST");
+	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType>(undefined);
 	const [floors, setFloors] = useState<number[]>([]);
 	const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
 

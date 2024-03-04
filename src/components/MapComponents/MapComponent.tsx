@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import MapView from '@arcgis/core/views/MapView';
 import Map from '@arcgis/core/Map';
 import esriConfig from '@arcgis/core/config';
@@ -6,16 +6,15 @@ import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
-import { featureLayerUrl, fastLayerUrl } from "./constants";
+import { featureLayerUrl, fastLayerUrl, FITLayerUrl } from "./constants";
 import GeoJsonLoader from "./Centroid";
 import { useMapContext } from "./MapContext";
 import {
-	addBoundingBox,
 	handleCentroidsLoaded,
 	adjustMapHeight,
 	updateBoundingBoxes,
 	convertPathToFacultyType,
-	getFacultyCoordinates
+	getFacultyCoordinates, addBoundingBox
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
 import { serverAddress } from "../../config";
@@ -36,6 +35,7 @@ interface MapComponentProps {
 const layerConfigs = [
 	{ url: featureLayerUrl, name: "VUT_Rektorat", facultyId: "facultyRectorate" },
 	{ url: fastLayerUrl, name: "FAST", facultyId: "facultyFAST" },
+	{ url: FITLayerUrl, name: "FIT", facultyId: "facultyFIT" },
 	// Add more configurations as needed
 ];
 
@@ -55,8 +55,6 @@ const MapComponent = ({
 	const mapViewRef = useRef<MapView | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
-	const directionGraphicRef = useRef<Graphic | null>(null);
-	const [userPosition, setUserPosition] = useState<GeolocationPosition | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
 	const { setSelectedRoomId, handleRoomSelection } = useFacultyContext()
 
@@ -90,6 +88,7 @@ const MapComponent = ({
 	useEffect(() => {
 		if (!mapDiv.current) return;
 
+		console.log("yoho", featureLayersRef.current)
 		featureLayersRef.current = layerConfigs.map(config => {
 			const layer = new FeatureLayer({
 				url: config.url,
@@ -98,9 +97,9 @@ const MapComponent = ({
 				title: config.name, //used to only affect selected faculty
 			});
 
-			layer.load().then(() => {
-				addBoundingBox(layer, mapViewRef, minZoomLevel);
-			}).catch((err): any => console.error(`${ config.name } failed to load`, err));
+			// layer.load().then(() => {
+			// 	addBoundingBox(layer, mapViewRef, minZoomLevel);
+			// }).catch((err): any => console.error(`${ config.name } failed to load`, err));
 
 			return layer;
 		});
@@ -198,7 +197,6 @@ const MapComponent = ({
 
 
 	useEffect(() => {
-		// Remove any existing highlight from the map
 		if (mapViewRef.current && highlightGraphicRef.current && "graphics" in mapViewRef.current) {
 			mapViewRef.current.graphics.remove(highlightGraphicRef.current);
 			highlightGraphicRef.current = null;

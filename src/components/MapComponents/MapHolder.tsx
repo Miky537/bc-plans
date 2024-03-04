@@ -4,8 +4,6 @@ import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
 import { findUniqueFloorNumbers } from "../parser/jsonParser";
 import { Room, Floor, Building } from "../parser/types";
 import FloorHolder from "./FloorHolder";
-import { defaultState } from "./constants";
-import { fetchRoomInfo, RoomDetails } from "./tempFile";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
 import { useFacultyContext } from "../FacultyContext";
 

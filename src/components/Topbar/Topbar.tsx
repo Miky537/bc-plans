@@ -4,8 +4,8 @@ import Box from "@mui/material/Box";
 import WestIcon from '@mui/icons-material/West';
 import IconButton from "@mui/material/IconButton";
 import { useMapContext } from "../MapComponents/MapContext";
-import { Select, MenuItem, SelectChangeEvent, FormControl, InputLabel } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { Select, MenuItem, SelectChangeEvent, FormControl, InputLabel, Typography } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import { ReactComponent as CesaLogo } from "../../FacultyLogos/cesa-logo.svg";
 import { ReactComponent as FaLogo } from "../../FacultyLogos/fa-logo.svg";
@@ -17,6 +17,9 @@ import { ReactComponent as FavuLogo } from "../../FacultyLogos/ffa-logo.svg";
 import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
+import MapIcon from '@mui/icons-material/Map';
+import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponents/MapFunctions";
+import { useFacultyContext } from "../FacultyContext";
 
 interface TopbarProps {
 	title?: string;
@@ -35,6 +38,9 @@ const FormControlLabelStyles = {
 		top: "-18% !important",
 	},
 	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.Mui-focused": {
+		opacity: 0,
+	},
+	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiFormLabel-filled.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined": {
 		opacity: 0,
 	},
 }
@@ -71,7 +77,13 @@ const SelectStyles = {
 export function Topbar({title, goBack}: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
-	const { selectedFaculty } = useMapContext();
+	const { setCenterCoordinates, setZoom } = useMapContext();
+	const { selectedFaculty, setSelectedFaculty } = useFacultyContext();
+	const navigate = useNavigate();
+
+	const pathParts = location.pathname.split('/').filter(Boolean);
+	const facultyName = pathParts[0];
+	const facultyType = convertPathToFacultyType(facultyName);
 
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
@@ -84,16 +96,21 @@ export function Topbar({title, goBack}: TopbarProps) {
 		} else {
 			setDisplayTitle(selectedFaculty || title);
 		}
-	}, [location.pathname, selectedFaculty, title]); // Dependency array
+	}, [location.pathname, selectedFaculty, title]);
 
-	const [age, setAge] = useState('');
+	const [faculty, setFaculty] = useState(facultyType as string);
 
 	const handleChange = (event: SelectChangeEvent) => {
-		setAge(event.target.value as string);
+		setFaculty(event.target.value as string);
+		setCenterCoordinates(getFacultyCoordinates(event.target.value as FacultyType));
+		setSelectedFaculty(event.target.value as FacultyType);
+		console.log("event.target.value fac", selectedFaculty)
+		navigate(`/map/${ event.target.value.toUpperCase() }`)
 	};
 
 	const svgStyle = {
-		width: "7em",
+		paddingLeft: "0.5em",
+		width: "fit-content",
 		height: "34px",
 	}
 
@@ -110,6 +127,12 @@ export function Topbar({title, goBack}: TopbarProps) {
 		"USI": <UsiLogo style={ svgStyle } />
 	};
 
+	const handleMapIconClick = () => {
+		setZoom(11);
+		navigate(`/map`)
+	}
+
+
 	return (
 		<div className="Topbar" id="topbar">
 			<IconButton sx={ { position: "absolute", left: 0, display: !isOnFacultyPage ? "inline" : "none" } }
@@ -117,10 +140,11 @@ export function Topbar({title, goBack}: TopbarProps) {
 				<WestIcon sx={ {color: "white"} } />
 			</IconButton>
 			<Box>
-				<FormControl sx={ FormControlLabelStyles }>
+				{ !isOnFacultyPage?
+					<FormControl sx={ FormControlLabelStyles }>
 					<InputLabel>Select faculty</InputLabel>
 					<Select
-						value={ age }
+						value={ faculty? faculty : "" }
 						className="faculty-select-topbar"
 						onChange={ handleChange }
 						sx={ SelectStyles }
@@ -142,9 +166,18 @@ export function Topbar({title, goBack}: TopbarProps) {
 							);
 						}) }
 					</Select>
-				</FormControl>
-
+					</FormControl> : <Typography variant="h5">Select faculty</Typography> }
 			</Box>
+			<IconButton onClick={handleMapIconClick} sx={ {
+				position: "absolute",
+				right: 5,
+				padding: "0.2em",
+				display: isOnFacultyPage? "flex" : "none",
+				borderRadius: "50%",
+				border: "1px solid white",
+			} }>
+				<MapIcon fontSize="medium" sx={ { color: "white" } } />
+			</IconButton>
 		</div>
 	);
 }

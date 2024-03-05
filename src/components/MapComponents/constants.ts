@@ -165,4 +165,4 @@ export const ultraShortFile = "https://gist.githubusercontent.com/Miky537/d2cbf6
 export const featureLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/re_mistnosti2/FeatureServer";
 
 export const fastLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/TempLayer/FeatureServer";
-export const FITLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FIT_Layer/FeatureServer";
+export const FITLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/repairedFIT2Floor/FeatureServer";

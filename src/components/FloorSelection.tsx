@@ -63,12 +63,13 @@ function FloorSelection() {
 		selectedFloor,
 		setSelectedFloor,
 		setSelectedRoomId,
-		handleRoomSelection
+		handleRoomSelection,
+		setSelectedFloorNumber
 	} = useFacultyContext();
 
 	const handleChange = useCallback(
 		(panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-			console.log("Panel: ", panel, " isExpanded: ", isExpanded);
+			// console.log("Panel: ", panel, " isExpanded: ", isExpanded);
 			setExpanded(isExpanded? panel : false);
 			setSelectedFloor(isExpanded? panel : undefined);
 			const selectedFloorLocal = replaceCzechChars(panel)!.replace(/\s/g, "_");
@@ -85,7 +86,7 @@ function FloorSelection() {
 	useEffect(() => {
 		if (selectedBuildingId === null) return
 		setIsLoading(true);
-		const url = `${ serverAddress }/api/floors/FAST/${ selectedBuildingId }`;
+		const url = `${ serverAddress }/api/floors/${ selectedFaculty }/${ selectedBuildingId }`;
 
 		// Fetch buildings data from the API
 		fetch(url)
@@ -104,12 +105,24 @@ function FloorSelection() {
 			.finally(() => setIsLoading(false));
 	}, [selectedBuildingId]);
 
+	function extractNumberFromString(input: string | undefined): number | null {
+		if (!input) return null;
+		const match = input.match(/\d+/);
+		if (match) {
+			return parseInt(match[0], 10);
+		}
+		return null;
+	}
+
+
 	const handleRoomClick = async(roomName: string, roomId: number) => {
-		console.log("Room clicked: ", roomName, roomId);
+		console.log("Room clicked: ", roomName, floor);
 		setSelectedRoomId(roomId);
+		const selectedFloorNumberLocal = extractNumberFromString(floor);
+		if (selectedFloorNumberLocal === null) return;
+		setSelectedFloorNumber(selectedFloorNumberLocal);
 		handleRoomSelection(roomId);
-		// setSelectedFloor(selectedFloor);
-		navigate(`/FAST/${ building }/${ floor }/${ roomName }`);
+		navigate(`/${ selectedFaculty }/${ building }/${ floor }/${ roomName }`);
 	};
 
 	return (
@@ -129,7 +142,7 @@ function FloorSelection() {
 			     borderTop="2px solid gray"
 			     color="white">
 				{ floors.length > 0 && !isLoading? (
-					floors.map((floor: FetchedFloor, index) => (
+					floors.map((floor: FetchedFloor) => (
 						<Accordion key={ floor.floor_id }
 						           expanded={ expanded === floor.floor_name }
 						           onChange={ handleChange(floor.floor_name) }

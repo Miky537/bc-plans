@@ -1,5 +1,4 @@
 import React from 'react';
-// import MapComponents from "./components/MapComponents/MapComponents";
 import Main from "./components/Main/Main";
 import MapHolder from "./components/MapComponents/MapHolder";
 import { ThemeProvider } from "@mui/material";
@@ -26,47 +25,53 @@ function App() {
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FIT" element={
+                          <Route path="/map/FIT" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FAST" element={
+                          <Route path="/map/FAST" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FSI" element={
+                          <Route path="/map/FSI" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FEKT" element={
+                          <Route path="/map/FEKT" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FAVU" element={
+                          <Route path="/map/FAVU" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FCH" element={
+                          <Route path="/map/FCH" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/USI" element={
+                          <Route path="/map/USI" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FP" element={
+                          <Route path="/map/FP" element={
                               <Main>
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/FA" element={
+                          <Route path="/map/FA" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main>
+                          }
+                          />
+                          <Route path="/map" element={
                               <Main>
                                   <MapHolder />
                               </Main>
@@ -76,7 +81,7 @@ function App() {
                               <FacultySelection />
                           }
                           />
-                          <Route path="/Random" element={
+                          <Route path="/select" element={
                               <BuildingSelection /> }
                           />
                           <Route path="/:faculty" element={ <BuildingSelection /> } />

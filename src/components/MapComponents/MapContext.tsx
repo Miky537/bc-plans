@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
 import { Coordinates } from "./MapComponent";
-import { FacultyType } from "../FacultySelection/FacultySelection";
 
 
 interface MapContextType {
@@ -8,12 +7,12 @@ interface MapContextType {
 	setCenterCoordinates: (coordinates: Coordinates) => void;
 	isMapVisible: boolean;
 	setMapVisibility: (visible: boolean) => void; // Function to toggle visibility
-	selectedFaculty: FacultyType;
-	setSelectedFaculty: (faculty: FacultyType) => void;
 	floors: number[];
 	setFloors: React.Dispatch<React.SetStateAction<number[]>>;
 	isMapLoaded: boolean;
 	setIsMapLoaded: (loaded: boolean) => void;
+	zoom: number;
+	setZoom: (zoom: number) => void;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -33,9 +32,9 @@ export const MapProvider = ({children}: any) => {
 	});
 
 	const [isMapVisible, setMapVisibility] = useState<boolean>(true);
-	const [selectedFaculty, setSelectedFaculty] = useState<FacultyType>(undefined);
 	const [floors, setFloors] = useState<number[]>([]);
 	const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
+	const [zoom, setZoom] = useState<number>(18);
 
 	return (
 		<MapContext.Provider value={ {
@@ -43,12 +42,12 @@ export const MapProvider = ({children}: any) => {
 			setCenterCoordinates,
 			isMapVisible,
 			setMapVisibility,
-			selectedFaculty,
-			setSelectedFaculty,
 			setFloors,
 			floors,
 			isMapLoaded,
 			setIsMapLoaded,
+			zoom,
+			setZoom
 		} }>
 			{ children }
 		</MapContext.Provider>

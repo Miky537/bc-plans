@@ -17,6 +17,8 @@ interface FacultyTypeContext {
 	setSelectedBuilding: (building: string | undefined) => void;
 	selectedFloor: string | undefined;
 	setSelectedFloor: (floor: string | undefined) => void;
+	selectedFloorNumber: number;
+	setSelectedFloorNumber: (floorNumber: number) => void;
 }
 
 const FacultyContext = createContext<FacultyTypeContext | undefined>(undefined);
@@ -37,6 +39,7 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [roomData, setRoomData] = useState<RoomDetails>(defaultState);
 	const [selectedBuilding, setSelectedBuilding] = useState<string | undefined>(undefined);
 	const [selectedFloor, setSelectedFloor] = useState<string | undefined>(undefined);
+	const [selectedFloorNumber, setSelectedFloorNumber] = useState<number>(1);
 
 	const handleRoomSelection = async(roomId?: number) => {
 		if (roomId === undefined) {
@@ -74,6 +77,8 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			setSelectedBuilding,
 			selectedFloor,
 			setSelectedFloor,
+			selectedFloorNumber,
+			setSelectedFloorNumber,
 		} }>
 			{children}
 		</FacultyContext.Provider>

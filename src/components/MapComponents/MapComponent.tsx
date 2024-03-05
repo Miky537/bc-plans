@@ -14,7 +14,7 @@ import {
 	adjustMapHeight,
 	updateBoundingBoxes,
 	convertPathToFacultyType,
-	getFacultyCoordinates, addBoundingBox
+	getFacultyCoordinates
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
 import { serverAddress } from "../../config";
@@ -56,15 +56,15 @@ const MapComponent = ({
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
-	const { setSelectedRoomId, handleRoomSelection } = useFacultyContext()
+	const { setSelectedRoomId, handleRoomSelection, selectedFaculty, setSelectedFaculty } = useFacultyContext()
 
 	const location = useLocation();
 	const {
 		centerCoordinates,
-		selectedFaculty,
 		setCenterCoordinates,
-		setSelectedFaculty,
 		setIsMapLoaded,
+		zoom,
+		setZoom
 	} = useMapContext();
 
 	const minZoomLevel = 17;
@@ -87,8 +87,6 @@ const MapComponent = ({
 
 	useEffect(() => {
 		if (!mapDiv.current) return;
-
-		console.log("yoho", featureLayersRef.current)
 		featureLayersRef.current = layerConfigs.map(config => {
 			const layer = new FeatureLayer({
 				url: config.url,
@@ -96,10 +94,6 @@ const MapComponent = ({
 				maxScale: 0,
 				title: config.name, //used to only affect selected faculty
 			});
-
-			// layer.load().then(() => {
-			// 	addBoundingBox(layer, mapViewRef, minZoomLevel);
-			// }).catch((err): any => console.error(`${ config.name } failed to load`, err));
 
 			return layer;
 		});
@@ -113,7 +107,7 @@ const MapComponent = ({
 			container: mapDiv.current,
 			map: map,
 			center: [centerCoordinates.lat, centerCoordinates.lng],
-			zoom: 18
+			zoom: zoom,
 		});
 		mapViewRef.current = mapView;
 
@@ -184,7 +178,7 @@ const MapComponent = ({
 			mapView.watch("zoom", (zoom) => {
 				updateBoundingBoxes(mapViewRef, minZoomLevel, featureLayersRef, toggleLayersVisibility, zoom);
 			});
-		}).catch((err): any => console.error("MapView failed to load", err));
+		}).catch((err: any) => console.error("MapView failed to load", err));
 
 		return () => {
 			if (mapView) {
@@ -192,8 +186,7 @@ const MapComponent = ({
 				mapViewRef.current = null;
 			}
 		};
-	}, []);
-
+	}, [centerCoordinates]);
 
 
 	useEffect(() => {
@@ -243,8 +236,8 @@ const MapComponent = ({
 		if (!selectedRoom) return; // Do nothing if no room is selected
 
 		const centerMapOnRoom = async(roomId: number) => {
-			setIsDrawerOpen(true);
 			const facultyLayer = await featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+			setIsDrawerOpen(true);
 			if (!facultyLayer) {
 				console.error("Faculty layer not found.");
 				return;
@@ -263,6 +256,7 @@ const MapComponent = ({
 
 				try {
 					const result = await facultyLayer.queryFeatures(query);
+					console.log("result", result)
 					if (result.features.length > 0) {
 						const roomFeature = result.features[0];
 						const highlightGraphic = new Graphic({
@@ -297,10 +291,19 @@ const MapComponent = ({
 
 	useEffect(() => {
 		const pathParts = location.pathname.split('/').filter(Boolean);
-		const facultyName = pathParts[0];
-		const facultyType = convertPathToFacultyType(facultyName);
+		const facultyName = pathParts[1];
+		const firstUrlPart = pathParts[0];
+		if (firstUrlPart === "map" && facultyName === undefined) {
+			console.log("sdsem here")
+			mapViewRef.current?.goTo({
+				center: [16.603375432788052, 49.20174147400288],
+				zoom: 10
+			}, { duration: 500, easing: "ease-out" });
+		}
 
+		const facultyType = convertPathToFacultyType(facultyName);
 		if (facultyType) {
+			console.log("em here")
 			const facultyCoordinates = getFacultyCoordinates(facultyType);
 			setCenterCoordinates(facultyCoordinates);
 			setSelectedFaculty(facultyType);

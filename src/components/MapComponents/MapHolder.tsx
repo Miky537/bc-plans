@@ -15,11 +15,17 @@ export interface InfoState {
 
 const MapHolder = () => {
 
-	const [selectedFloor, setSelectedFloor] = useState(2);
 	const [floors, setFloors] = useState(findUniqueFloorNumbers());
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-	const { selectedRoomId, setSelectedRoomId, handleRoomSelection, roomData} = useFacultyContext();
+	const {
+		selectedRoomId,
+		setSelectedRoomId,
+		handleRoomSelection,
+		roomData,
+		selectedFloorNumber,
+		setSelectedFloorNumber
+	} = useFacultyContext();
 	const selectedRoomIdRef = useRef(selectedRoomId);
 
 
@@ -36,22 +42,21 @@ const MapHolder = () => {
 	}, [selectedRoomId]);
 
 	const changeFloor = (newFloor: any) => {
-		setSelectedFloor(newFloor); // Update the selected floor
+		setSelectedFloorNumber(newFloor); // Update the selected floor
 	};
 
 	return (
 		<div>
 			<SearchComponent setSelectedRoom={ setSelectedRoomId }
-			                 setSelectedFloor={ setSelectedFloor }
-			                 setIsDrawerOpen={ setIsDrawerOpen }
-			                 handleRoomSelection={handleRoomSelection}/>
+			                 setSelectedFloor={ setSelectedFloorNumber }
+			                 setIsDrawerOpen={ setIsDrawerOpen } />
 			<FloorHolder
 				floors={ floors }
 				onFloorChange={ changeFloor }
-				selectedFloor={ selectedFloor }
+				selectedFloor={ selectedFloorNumber }
 			/>
 			<MapComponent onRoomSelection={ handleRoomSelection }
-			              selectedFloor={ selectedFloor }
+			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
 			              selectedRoom={selectedRoomId}
 			              setSelectedRoom={setSelectedRoomId}

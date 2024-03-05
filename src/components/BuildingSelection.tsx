@@ -21,7 +21,7 @@ function BuildingSelection() {
 
 	useEffect(() => {
 		setIsLoading(true);
-		const url = `${ serverAddress }/api/buildings/FAST`;
+		const url = `${ serverAddress }/api/buildings/${selectedFaculty}`;
 
 		// Fetch buildings data from the API
 		fetch(url)

@@ -3,10 +3,12 @@ import Box from '@mui/material/Box';
 import { Divider } from "@mui/material";
 import { useMapContext } from "./MapContext";
 import { serverAddress } from "../../config";
+import { useFacultyContext } from "../FacultyContext";
 
 const FloorHolder = ({onFloorChange, selectedFloor = 2}: any) => {
 
-	const {selectedFaculty, setFloors, floors} = useMapContext();
+	const { setFloors, floors} = useMapContext();
+	const {selectedFaculty} = useFacultyContext();
 
 	const handleButtonClick = (floor: any) => {
 		onFloorChange(floor);

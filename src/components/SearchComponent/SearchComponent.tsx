@@ -5,6 +5,8 @@ import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import { fetchFacultyRooms } from "../MapComponents/tempFile";
 import Fuse from "fuse.js";
+import { useMapContext } from "../MapComponents/MapContext";
+import { useFacultyContext } from "../FacultyContext";
 
 interface RoomNames {
 	nazev: string;
@@ -16,19 +18,18 @@ interface SearchComponentProps {
 	setSelectedRoom: (roomId: number) => void;
 	setSelectedFloor: (floor: number) => void;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
-	handleRoomSelection: (roomId: number) => void;
 }
 
-export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawerOpen, handleRoomSelection }: SearchComponentProps) {
+export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawerOpen }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
 	const [query, setQuery] = useState("");
 	const [filteredRooms, setFilteredRooms] = useState<RoomNames[]>([]);
+	const { handleRoomSelection, selectedFaculty } = useFacultyContext();
 
 	useEffect(() => {
 		const fetchRooms = async () => {
-			const fetchedRooms = await fetchFacultyRooms("FAST"); // only for testing, soon change to faculty
-			// console.log("fetched rooms",fetchedRooms);
+			const fetchedRooms = await fetchFacultyRooms(selectedFaculty);
 			if (Array.isArray(fetchedRooms)) {
 				setRooms(fetchedRooms);
 
@@ -38,19 +39,16 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		};
 
 		fetchRooms();
-	}, []);
+	}, [selectedFaculty]);
 
 	useEffect(() => {
 		const options = {
 			includeScore: true,
-			// Adjust these options to fine-tune the fuzzy search
 			keys: ["nazev"], // Assuming the rooms have a 'name' property to search against
 		};
-
 		const fuse = new Fuse(rooms, options);
-
 		const result = query ? fuse.search(query).map(result => result.item) : [];
-		setFilteredRooms(result.slice(0, 4)); // Take the top 4 results
+		setFilteredRooms(result.slice(0, 5)); // Take the top 4 results
 	}, [query, rooms]);
 
 	const handleExpand = () => {
@@ -80,13 +78,13 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 				width: isExpanded ? "95%" : "3em",
 				height: "3em",
 				bgcolor: "black",
-				borderRadius: isExpanded ? "0px" : "50%",
+				borderRadius: isExpanded ? "10px" : "50%",
 				transition: "all 0.3s ease",
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "center",
 				position: "absolute",
-				top: "3em",
+				top: "4em",
 				left: "0.5em",
 				zIndex: 3,
 			}}
@@ -96,7 +94,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 				<>
 					<InputBase
 						autoFocus
-						placeholder="Search…"
+						placeholder="Type to find room.."
 						inputProps={{ "aria-label": "search" }}
 						onBlur={handleCollapse}
 						onChange={handleSearch}

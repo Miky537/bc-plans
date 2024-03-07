@@ -5,7 +5,7 @@ import { useMapContext } from "./MapContext";
 import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 
-const FloorHolder = ({onFloorChange, selectedFloor = 2}: any) => {
+const FloorHolder = ({onFloorChange, selectedFloor}: any) => {
 
 	const { setFloors, floors} = useMapContext();
 	const {selectedFaculty} = useFacultyContext();

@@ -82,29 +82,30 @@ export function Topbar({title, goBack}: TopbarProps) {
 	const navigate = useNavigate();
 
 	const pathParts = location.pathname.split('/').filter(Boolean);
-	const facultyName = pathParts[0];
-	const facultyType = convertPathToFacultyType(facultyName);
+	const facultyName = pathParts[1];
 
+	const facultyType = convertPathToFacultyType(facultyName);
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
+
+	const [faculty, setFaculty] = useState<FacultyType | string>(facultyType || selectedFaculty || "");
+
+	// Update state and context when URL changes
 	useEffect(() => {
-
-		if (isOnFacultyPage) {
-			setDisplayTitle("Select faculty");
-		} else if (isOnFavPlacesPage) {
-			setDisplayTitle("Favourite places");
-		} else {
-			setDisplayTitle(selectedFaculty || title);
+		if (facultyType) {
+			setFaculty(facultyType);
+			if (facultyType !== selectedFaculty) {
+				setSelectedFaculty(facultyType);
+			}
 		}
-	}, [location.pathname, selectedFaculty, title]);
+	}, [facultyType, selectedFaculty, setSelectedFaculty]);
 
-	const [faculty, setFaculty] = useState(facultyType as string);
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setFaculty(event.target.value as string);
 		setCenterCoordinates(getFacultyCoordinates(event.target.value as FacultyType));
 		setSelectedFaculty(event.target.value as FacultyType);
-		console.log("event.target.value fac", selectedFaculty)
+		setZoom(17);
 		navigate(`/map/${ event.target.value.toUpperCase() }`)
 	};
 
@@ -128,7 +129,7 @@ export function Topbar({title, goBack}: TopbarProps) {
 	};
 
 	const handleMapIconClick = () => {
-		setZoom(11);
+		setZoom(12);
 		navigate(`/map`)
 	}
 
@@ -142,31 +143,33 @@ export function Topbar({title, goBack}: TopbarProps) {
 			<Box>
 				{ !isOnFacultyPage?
 					<FormControl sx={ FormControlLabelStyles }>
-					<InputLabel>Select faculty</InputLabel>
-					<Select
-						value={ faculty? faculty : "" }
-						className="faculty-select-topbar"
-						onChange={ handleChange }
-						sx={ SelectStyles }
-					>
-						{ Faculties.map((faculty) => {
-							const Icon = facultyIcons[faculty]; // Get the corresponding icon component
-							return (
-								<MenuItem key={ faculty }
-								          value={ faculty }
-								          sx={ {
-									          height: "2em",
-									          padding: 0,
-									          minHeight: "2.5em",
-									          display: "flex",
-									          justifyContent: "flex-start",
-								          } }>
-									{ Icon }
-								</MenuItem>
-							);
-						}) }
-					</Select>
-					</FormControl> : <Typography variant="h5">Select faculty</Typography> }
+						<InputLabel>Select faculty</InputLabel>
+						<Select
+							value={ faculty? faculty : "" }
+							className="faculty-select-topbar"
+							onChange={ handleChange }
+							sx={ SelectStyles }
+						>
+							{ Faculties.map((faculty) => {
+								const Icon = facultyIcons[faculty]; // Get the corresponding icon component
+								return (
+									<MenuItem key={ faculty }
+									          value={ faculty }
+									          sx={ {
+										          height: "2em",
+										          padding: 0,
+										          minHeight: "2.5em",
+										          display: "flex",
+										          justifyContent: "flex-start",
+									          } }>
+										{ Icon }
+									</MenuItem>
+								);
+							}) }
+						</Select>
+					</FormControl> :
+					<Typography variant="h5">Select faculty</Typography>
+				}
 			</Box>
 			<IconButton onClick={handleMapIconClick} sx={ {
 				position: "absolute",

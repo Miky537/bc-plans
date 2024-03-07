@@ -6,7 +6,7 @@ import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
-import { featureLayerUrl, fastLayerUrl, FITLayerUrl } from "./constants";
+import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping } from "./constants";
 import GeoJsonLoader from "./Centroid";
 import { useMapContext } from "./MapContext";
 import {
@@ -21,6 +21,11 @@ import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
 import Track from "@arcgis/core/widgets/Track";
+import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer";
+import LabelClass from "@arcgis/core/layers/support/LabelClass";
+import TextSymbol from "@arcgis/core/symbols/TextSymbol";
+import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -44,9 +49,14 @@ export type Coordinates = {
 	lng: number;
 };
 
+interface RoomIdWithType {
+	RoomID: number;
+	roomType: number;
+}
+
 const MapComponent = ({
 	                      onRoomSelection,
-	                      selectedFloor = 1,
+	                      selectedFloor,
 	                      setIsDrawerOpen,
 	                      selectedRoom,
 	                      setSelectedRoom
@@ -100,7 +110,7 @@ const MapComponent = ({
 
 		const map = new Map({
 			basemap: 'dark-gray-vector',
-			layers: featureLayersRef.current
+			layers: featureLayersRef.current,
 		});
 
 		const mapView = new MapView({
@@ -196,22 +206,58 @@ const MapComponent = ({
 		}
 
 		const updateLayersWithRooms = async() => {
-			// Fetch room details for the selected floor
 			try {
-				const response = await fetch(
-					`${serverAddress}/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
+				// Fetch room details for the selected floor
+				const response = await fetch(`${ serverAddress }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch rooms');
 				}
-				const rooms = await response.json();
-				const roomIdsString = await rooms.join(', ')
-				const selectedLayer = await featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+				const rooms = await response.json(); // {roomId: roomType}
+
+
+				const uniqueValueInfos = rooms.map(({ RoomID, roomType }: RoomIdWithType) => ({
+					value: RoomID,
+					symbol: new SimpleFillSymbol({
+						color: typeToColorMapping[roomType.toString()] || "#CCCCCC", // Fallback color
+						outline: { color: "black", width: 1 },
+					})
+				}));
+
+				const textSymbol = new TextSymbol({
+					color: "black",
+					text: "{RoomID}", // Use an Arcade expression or a field name for dynamic labeling
+					font: {
+						size: 12,
+						// family: "Arial"
+					}
+				});
+
+				const labelClass = new LabelClass({
+					symbol: textSymbol,
+					labelPlacement: "always-horizontal",
+					labelExpressionInfo: { expression: "$feature.RoomID" },
+				});
+
+
+				const renderer = new UniqueValueRenderer({
+					field: "RoomID",
+					uniqueValueInfos: uniqueValueInfos,
+					defaultSymbol: new SimpleFillSymbol({ // Default symbol if no match
+						color: "#CCCCCC", // Default color
+						outline: { color: "black", width: 1 },
+					})
+				});
+				const roomIds = rooms.map((room: RoomIdWithType) => room.RoomID);
+				const roomIdsString = roomIds.join(', ');
+				console.log("roomIdsString", rooms);
+				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				if (selectedLayer) {
-					selectedLayer.definitionExpression = `RoomID IN (${ roomIdsString })`;
+					selectedLayer.renderer = renderer;
+					selectedLayer.labelingInfo = [labelClass];
+					selectedLayer.definitionExpression = `RoomID IN (${ rooms.map((room: any) => `'${ room.RoomID }'`).join(', ') })`;
 				} else {
 					console.warn(`No layer found for faculty: ${ selectedFaculty }`);
 				}
-
 			} catch (error) {
 				console.error('Error fetching rooms for floor:', error);
 			}
@@ -303,7 +349,6 @@ const MapComponent = ({
 
 		const facultyType = convertPathToFacultyType(facultyName);
 		if (facultyType) {
-			console.log("em here")
 			const facultyCoordinates = getFacultyCoordinates(facultyType);
 			setCenterCoordinates(facultyCoordinates);
 			setSelectedFaculty(facultyType);
@@ -336,12 +381,12 @@ const MapComponent = ({
 
 
 	return (
-		<>
+		<div>
 			<div ref={ mapDiv } id="mapDiv" />
 			<GeoJsonLoader onCentroidsLoaded={ handleCentroidsLoaded }
 			               mapViewRef={ mapViewRef }
 			               selectedFloor={ selectedFloor } />
-		</>
+		</div>
 	);
 };
 

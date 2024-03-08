@@ -17,7 +17,7 @@ import {
 	getFacultyCoordinates
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
-import { serverAddress } from "../../config";
+import { serverAddress, appAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
 import Track from "@arcgis/core/widgets/Track";
@@ -25,7 +25,10 @@ import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer";
 import LabelClass from "@arcgis/core/layers/support/LabelClass";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
-import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
+import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
+import Query from "@arcgis/core/rest/support/Query";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
@@ -52,6 +55,7 @@ export type Coordinates = {
 interface RoomIdWithType {
 	RoomID: number;
 	roomType: number;
+	roomName: string;
 }
 
 const MapComponent = ({
@@ -205,6 +209,8 @@ const MapComponent = ({
 			highlightGraphicRef.current = null;
 		}
 
+		const roomsWithoutLabels = [7, 21, 26, 27, 35, 36, 38, 88, 90, 138, 150, 161]
+
 		const updateLayersWithRooms = async() => {
 			try {
 				// Fetch room details for the selected floor
@@ -212,8 +218,7 @@ const MapComponent = ({
 				if (!response.ok) {
 					throw new Error('Failed to fetch rooms');
 				}
-				const rooms = await response.json(); // {roomId: roomType}
-
+				const rooms = await response.json();
 
 				const uniqueValueInfos = rooms.map(({ RoomID, roomType }: RoomIdWithType) => ({
 					value: RoomID,
@@ -225,19 +230,31 @@ const MapComponent = ({
 
 				const textSymbol = new TextSymbol({
 					color: "black",
-					text: "{RoomID}", // Use an Arcade expression or a field name for dynamic labeling
+					text: "{name}",
 					font: {
+						weight: "bold",
 						size: 12,
-						// family: "Arial"
 					}
 				});
 
 				const labelClass = new LabelClass({
 					symbol: textSymbol,
+					deconflictionStrategy: "none",
 					labelPlacement: "always-horizontal",
-					labelExpressionInfo: { expression: "$feature.RoomID" },
+					labelExpressionInfo: {
+						expression: `
+						            var excludedIDs = Split('${ roomsWithoutLabels }', ',');
+						            var currentID = Text($feature.roomType);
+						            if (Find(currentID, excludedIDs) != -1) {
+						                return '';
+						            } else {
+						                return $feature.name;
+						            }
+						        `
+					},
 				});
-
+				const iconsGraphicsLayer = new GraphicsLayer();
+				mapViewRef.current?.map.add(iconsGraphicsLayer);
 
 				const renderer = new UniqueValueRenderer({
 					field: "RoomID",
@@ -247,14 +264,74 @@ const MapComponent = ({
 						outline: { color: "black", width: 1 },
 					})
 				});
-				const roomIds = rooms.map((room: RoomIdWithType) => room.RoomID);
-				const roomIdsString = roomIds.join(', ');
-				console.log("roomIdsString", rooms);
+
 				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				if (selectedLayer) {
 					selectedLayer.renderer = renderer;
 					selectedLayer.labelingInfo = [labelClass];
 					selectedLayer.definitionExpression = `RoomID IN (${ rooms.map((room: any) => `'${ room.RoomID }'`).join(', ') })`;
+
+					const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));
+					roomsToAddIcons.forEach((room: RoomIdWithType) => {
+						getRoomCenter(selectedLayer, room.RoomID).then(center => {
+							if (center) {
+								let iconGraphic;
+								let excludedRoomIcon;
+
+								if (room.roomType === 35) {
+									excludedRoomIcon = new PictureMarkerSymbol({
+										url: `${ appAddress }/icons/WomanIcon.svg`,
+										width: "44px", // Adjust size as needed
+										height: "44px"
+									});
+									iconGraphic = new Graphic({
+										geometry: center,
+										symbol: excludedRoomIcon
+									});
+
+								} else if (room.roomType == 26) {
+									excludedRoomIcon = new PictureMarkerSymbol({
+										url: `${ appAddress }/icons/WheelchairIcon.svg`,
+										width: "44px", // Adjust size as needed
+										height: "44px"
+									});
+									iconGraphic = new Graphic({
+										geometry: center,
+										symbol: excludedRoomIcon
+									});
+
+								} else if (room.roomType == 36) {
+									excludedRoomIcon = new PictureMarkerSymbol({
+										url: `${ appAddress }/icons/ManIcon.svg`,
+										width: "44px", // Adjust size as needed
+										height: "44px"
+									});
+									iconGraphic = new Graphic({
+										geometry: center,
+										symbol: excludedRoomIcon
+									});
+
+								}else if (room.roomType == 88) {
+									excludedRoomIcon = new PictureMarkerSymbol({
+										url: `${ appAddress }/icons/WCIcon.svg`,
+										width: "44px", // Adjust size as needed
+										height: "44px"
+									});
+									iconGraphic = new Graphic({
+										geometry: center,
+										symbol: excludedRoomIcon
+									});
+
+								} else  {
+									iconGraphic = new Graphic({});
+								}
+
+
+
+								iconsGraphicsLayer.add(iconGraphic);
+							}
+						});
+					});
 				} else {
 					console.warn(`No layer found for faculty: ${ selectedFaculty }`);
 				}
@@ -262,6 +339,27 @@ const MapComponent = ({
 				console.error('Error fetching rooms for floor:', error);
 			}
 		};
+
+		async function getRoomCenter(featureLayer: any, RoomID: number) {
+			let query = new Query();
+			query.where = `RoomID = ${ RoomID }`;
+			query.outSpatialReference = featureLayer.spatialReference;
+			query.returnGeometry = true;
+
+			try {
+				const result = await featureLayer.queryFeatures(query);
+				if (result.features.length > 0) {
+					const feature = result.features[0];
+					return feature.geometry.type === "polygon"? feature.geometry.centroid : feature.geometry;
+				} else {
+					console.error('No feature found with the given RoomID:', RoomID);
+					return null;
+				}
+			} catch (error) {
+				console.error('Error querying feature layer:', error);
+				return null;
+			}
+		}
 
 		// Call the function to update layers if selectedFloor is defined
 		if (selectedFloor) {

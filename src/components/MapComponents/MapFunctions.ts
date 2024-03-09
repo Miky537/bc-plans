@@ -12,6 +12,7 @@ import { Coordinates } from "./MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
 import PictureFillSymbol from "@arcgis/core/symbols/PictureFillSymbol";
+import Query from "@arcgis/core/rest/support/Query";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -183,3 +184,23 @@ export const getFacultyCoordinates = (name: FacultyType): Coordinates => {
 	else return { lat: 15, lng: 49 }
 }
 
+export async function getRoomCenter(featureLayer: any, RoomID: number) {
+	let query = new Query();
+	query.where = `RoomID = ${ RoomID }`;
+	query.outSpatialReference = featureLayer.spatialReference;
+	query.returnGeometry = true;
+
+	try {
+		const result = await featureLayer.queryFeatures(query);
+		if (result.features.length > 0) {
+			const feature = result.features[0];
+			return feature.geometry.type === "polygon"? feature.geometry.centroid : feature.geometry;
+		} else {
+			console.error('No feature found with the given RoomID:', RoomID);
+			return null;
+		}
+	} catch (error) {
+		console.error('Error querying feature layer:', error);
+		return null;
+	}
+}

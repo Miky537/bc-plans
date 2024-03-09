@@ -240,16 +240,22 @@ const MapComponent = ({
 				const labelClass = new LabelClass({
 					symbol: textSymbol,
 					deconflictionStrategy: "none",
+					minScale: 1000,
 					labelPlacement: "always-horizontal",
 					labelExpressionInfo: {
 						expression: `
 						            var excludedIDs = Split('${ roomsWithoutLabels }', ',');
 						            var currentID = Text($feature.roomType);
-						            if (Find(currentID, excludedIDs) != -1) {
-						                return '';
-						            } else {
-						                return $feature.name;
-						            }
+						            var areaThreshold = 0.000000009;
+						            var isAreaSufficient = $feature.Shape_Area >= areaThreshold;
+						            var isExcludedType = Find(currentID, excludedIDs) != -1;
+						                   if (isExcludedType) {
+                                                return '';
+                                           }
+                                           if (!isAreaSufficient) {
+									            return '';
+									       }
+									       return $feature.name;
 						        `
 					},
 				});
@@ -264,6 +270,10 @@ const MapComponent = ({
 						outline: { color: "black", width: 1 },
 					})
 				});
+				const iconProps = {
+					width: "20px",
+					height: "20px"
+				};
 
 				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				if (selectedLayer) {
@@ -280,42 +290,38 @@ const MapComponent = ({
 
 								if (room.roomType === 35) {
 									excludedRoomIcon = new PictureMarkerSymbol({
+										...iconProps,
 										url: `${ appAddress }/icons/WomanIcon.svg`,
-										width: "44px", // Adjust size as needed
-										height: "44px"
 									});
 									iconGraphic = new Graphic({
 										geometry: center,
 										symbol: excludedRoomIcon
 									});
 
-								} else if (room.roomType == 26) {
+								} else if (room.roomType === 26) {
 									excludedRoomIcon = new PictureMarkerSymbol({
+										...iconProps,
 										url: `${ appAddress }/icons/WheelchairIcon.svg`,
-										width: "44px", // Adjust size as needed
-										height: "44px"
 									});
 									iconGraphic = new Graphic({
 										geometry: center,
 										symbol: excludedRoomIcon
 									});
 
-								} else if (room.roomType == 36) {
+								} else if (room.roomType === 36) {
 									excludedRoomIcon = new PictureMarkerSymbol({
+										...iconProps,
 										url: `${ appAddress }/icons/ManIcon.svg`,
-										width: "44px", // Adjust size as needed
-										height: "44px"
 									});
 									iconGraphic = new Graphic({
 										geometry: center,
 										symbol: excludedRoomIcon
 									});
 
-								}else if (room.roomType == 88) {
+								} else if (room.roomType === 88) {
 									excludedRoomIcon = new PictureMarkerSymbol({
+										...iconProps,
 										url: `${ appAddress }/icons/WCIcon.svg`,
-										width: "44px", // Adjust size as needed
-										height: "44px"
 									});
 									iconGraphic = new Graphic({
 										geometry: center,

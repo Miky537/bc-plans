@@ -153,6 +153,7 @@ const MapComponent = ({
 
 		mapView.when(() => {
 			setIsMapLoaded(true);
+			adjustLabelVisibility(mapView, 18, areaThreshold);
 			mapView.on('click', async (event) => {
 				if (highlightGraphicRef.current) {
 					mapView.graphics.remove(highlightGraphicRef.current as Graphic);
@@ -163,9 +164,6 @@ const MapComponent = ({
 				if (response.results.length > 0) {
 					const firstHit = response.results[0];
 					if (firstHit.type === "graphic" && firstHit.graphic && firstHit.graphic.attributes) {
-
-
-
 						const clickedGraphic = firstHit.graphic;
 
 						if ('id' || 'RoomID' in clickedGraphic.attributes) {
@@ -192,6 +190,7 @@ const MapComponent = ({
 			mapView.watch("zoom", (zoom) => {
 				updateBoundingBoxes(mapViewRef, minZoomLevel, featureLayersRef, toggleLayersVisibility, zoom);
 			});
+
 		}).catch((err: any) => console.error("MapView failed to load", err));
 
 		return () => {
@@ -201,6 +200,82 @@ const MapComponent = ({
 			}
 		};
 	}, [centerCoordinates]);
+
+	async function fetchFeatures(featureLayer: FeatureLayer) {
+		const query = new Query();
+		query.returnGeometry = true;
+		query.outFields = ["RoomID", "name", "shape_area"]; // Customize for your data
+		query.where = "1=1";
+
+		try {
+			const response = await featureLayer.queryFeatures(query);
+			return response.features;
+		} catch (error) {
+			console.error("Error fetching features:", error);
+			return [];
+		}
+	}
+
+	function createLabels(features: any, view: MapView | null) {
+		if (view === null) return;
+		features.forEach((feature: any) => {
+			const labelSymbol = new TextSymbol({
+				text: feature.attributes.name,
+				color: "black",
+				font: {
+					size: 12,
+				}
+			});
+
+			const labelGraphic = new Graphic({
+				geometry: feature.geometry.centroid, // Assumes centroid is appropriate
+				symbol: labelSymbol,
+				attributes: feature.attributes
+			});
+
+			view.graphics.add(labelGraphic);
+		});
+	}
+
+	function areaThreshold(zoomLevel: number) {
+		if (zoomLevel >= 15) return 10000; // Smaller areas become visible at closer zoom
+		return 50000; // Larger areas required for labels to be visible at further zoom
+	}
+
+	function adjustLabelVisibility(view: MapView | null, zoomLevelThreshold: number, areaThreshold: any) {
+		if (view === null) return;
+
+		const currentZoom = view.zoom;
+		// console.log("currentZoom", currentZoom)
+
+		view.graphics.forEach((graphic: any) => {
+			console.log("Runnings")
+			if (graphic.attributes && graphic.symbol && graphic.symbol.type === "text") {
+				const isAreaSufficient = graphic.attributes.Shape_Area >= 1.3750139693513574e-8;
+				let shouldDisplay;
+				if (currentZoom >= 19) shouldDisplay = true;
+				else if (currentZoom >= 18) shouldDisplay = isAreaSufficient;
+				else shouldDisplay = currentZoom >= 17.5 && isAreaSufficient;
+				graphic.visible = shouldDisplay;
+			}
+		});
+
+		view.watch('zoom', () => {
+			const currentZoom = view.zoom;
+			// console.log("currentZoom", currentZoom)
+
+			view.graphics.forEach((graphic: any) => {
+				if (graphic.attributes && graphic.symbol && graphic.symbol.type === "text") {
+					const isAreaSufficient = graphic.attributes.Shape_Area >= 1.3750139693513574e-8;
+					let shouldDisplay;
+					if (currentZoom >= 19) shouldDisplay = true;
+					else if (currentZoom >= 18) shouldDisplay = isAreaSufficient;
+					else shouldDisplay = currentZoom >= 17.5 && isAreaSufficient;
+					graphic.visible = shouldDisplay;
+				}
+			});
+		});
+	}
 
 
 	useEffect(() => {
@@ -228,37 +303,7 @@ const MapComponent = ({
 					})
 				}));
 
-				const textSymbol = new TextSymbol({
-					color: "black",
-					text: "{name}",
-					font: {
-						weight: "bold",
-						size: 12,
-					}
-				});
 
-				const labelClass = new LabelClass({
-					symbol: textSymbol,
-					deconflictionStrategy: "none",
-					minScale: 1000,
-					labelPlacement: "always-horizontal",
-					labelExpressionInfo: {
-						expression: `
-						            var excludedIDs = Split('${ roomsWithoutLabels }', ',');
-						            var currentID = Text($feature.roomType);
-						            var areaThreshold = 0.000000009;
-						            var isAreaSufficient = $feature.Shape_Area >= areaThreshold;
-						            var isExcludedType = Find(currentID, excludedIDs) != -1;
-						                   if (isExcludedType) {
-                                                return '';
-                                           }
-                                           if (!isAreaSufficient) {
-									            return '';
-									       }
-									       return $feature.name;
-						        `
-					},
-				});
 				const iconsGraphicsLayer = new GraphicsLayer();
 				mapViewRef.current?.map.add(iconsGraphicsLayer);
 
@@ -277,8 +322,13 @@ const MapComponent = ({
 
 				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				if (selectedLayer) {
+					fetchFeatures(selectedLayer).then(features => {
+						createLabels(features, mapViewRef.current);
+						adjustLabelVisibility(mapViewRef.current, 18, areaThreshold);
+					});
+
+
 					selectedLayer.renderer = renderer;
-					selectedLayer.labelingInfo = [labelClass];
 					selectedLayer.definitionExpression = `RoomID IN (${ rooms.map((room: any) => `'${ room.RoomID }'`).join(', ') })`;
 
 					const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));

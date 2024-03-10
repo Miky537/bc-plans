@@ -196,7 +196,7 @@ export async function getRoomCenter(featureLayer: any, RoomID: number) {
 			const feature = result.features[0];
 			return feature.geometry.type === "polygon"? feature.geometry.centroid : feature.geometry;
 		} else {
-			console.error('No feature found with the given RoomID:', RoomID);
+			// console.error('No feature found with the given RoomID:', RoomID);
 			return null;
 		}
 	} catch (error) {

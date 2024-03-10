@@ -14,8 +14,7 @@ import {
 	adjustMapHeight,
 	updateBoundingBoxes,
 	convertPathToFacultyType,
-	getFacultyCoordinates,
-	getRoomCenter
+	getFacultyCoordinates, getRoomCenter
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
 import { serverAddress, appAddress } from "../../config";
@@ -23,12 +22,11 @@ import { useFacultyContext } from "../FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
-import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import Query from "@arcgis/core/rest/support/Query";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { debounce } from "@mui/material";
+import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -73,7 +71,14 @@ const MapComponent = ({
 	const { faculty, building, floor, roomName } = useParams();
 	const { setSelectedRoomId, handleRoomSelection, selectedFaculty, setSelectedFaculty } = useFacultyContext()
 	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
+	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
+	const LabelsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const [allFeatures, setAllFeatures] = useState<any>([]);
+	const [featureGraphicsLayer] = useState(new GraphicsLayer());
+
+	useEffect(() => {
+		mapViewRef.current?.map.add(featureGraphicsLayer);
+	}, [featureGraphicsLayer]);
 
 	const location = useLocation();
 	const {
@@ -116,7 +121,7 @@ const MapComponent = ({
 
 		const map = new Map({
 			basemap: 'dark-gray-vector',
-			layers: featureLayersRef.current,
+			// layers: featureLayersRef.current,
 		});
 
 		const mapView = new MapView({
@@ -130,6 +135,14 @@ const MapComponent = ({
 		const iconsGraphicsLayer = new GraphicsLayer();
 		mapView.map.add(iconsGraphicsLayer);
 		IconsGraphicsLayerRef.current = iconsGraphicsLayer;
+
+		const featureGraphicsLayer = new GraphicsLayer();
+		mapView.map.add(featureGraphicsLayer);
+		FeaturesGraphicsLayerRef.current = featureGraphicsLayer;
+
+		const labelsGraphicsLayer = new GraphicsLayer();
+		mapView.map.add(labelsGraphicsLayer);
+		LabelsGraphicsLayerRef.current = labelsGraphicsLayer;
 
 
 		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
@@ -215,7 +228,7 @@ const MapComponent = ({
 			const query = new Query();
 			query.where = '1=1';
 			query.returnGeometry = true;
-			query.outFields = ['RoomID', 'Shape_Area', 'name', 'roomType', 'Shape__Area'];
+			query.outFields = ['RoomID', 'name', 'roomType', 'Shape__Area'];
 
 			selectedLayer.queryFeatures(query)
 				.then((results) => {
@@ -223,9 +236,12 @@ const MapComponent = ({
 				})
 				.catch((error) => {
 					console.error("Error fetching feature layer data:", error);
+					if (error?.message) {
+						console.error("Error message:", error.message);
+					}
 				});
 		}
-	}, [featureLayersRef.current]);
+	}, [featureLayersRef.current, selectedFaculty]);
 
 
 	async function fetchFeatures(featureLayer: FeatureLayer) {
@@ -243,8 +259,7 @@ const MapComponent = ({
 		}
 	}
 
-	function createLabels(features: any, view: MapView | null, floorRoomIds: number[]) {
-		if (view === null) return;
+	function createLabels(features: any, floorRoomIds: number[]) {
 		const filteredFeatures = features.filter((feature: Graphic) => floorRoomIds.includes(feature.attributes.RoomID));
 		filteredFeatures.forEach((feature: any) => {
 			const labelSymbol = new TextSymbol({
@@ -252,6 +267,7 @@ const MapComponent = ({
 				color: "black",
 				font: {
 					size: 12,
+					weight: "bold"
 				}
 			});
 
@@ -261,21 +277,21 @@ const MapComponent = ({
 				attributes: feature.attributes
 			});
 
-			view.graphics.add(labelGraphic);
+			LabelsGraphicsLayerRef.current?.add(labelGraphic);
 		});
 	}
 
 	function adjustLabelVisibility(view: MapView | null, floorRoomIds: number[]) {
 		if (view === null) return;
 		const currentZoom = view.zoom;
-		view.graphics.forEach((graphic: any) => {
+		LabelsGraphicsLayerRef.current?.graphics.forEach((graphic: any) => {
 			if (graphic.attributes && graphic.symbol && graphic.symbol.type === "text") {
 				const isRoomOnSelectedFloor = floorRoomIds.includes(graphic.attributes.RoomID);
-				const largestAreaThreshold = 1.57284e-8;
-				const middleAreaThreshold = 8.0e-9;
+				const largestAreaThreshold = 500;
+				const middleAreaThreshold = 100;
 				// const smallestAreaThreshold = 5.0e-9;
 
-				const roomArea = graphic.attributes.Shape_Area;
+				const roomArea = graphic.attributes.Shape__Area;
 				const isLargestArea = roomArea >= largestAreaThreshold;
 				const isMiddleArea = roomArea >= middleAreaThreshold && roomArea < largestAreaThreshold;
 				// const isSmallestArea = roomArea >= smallestAreaThreshold && roomArea < middleAreaThreshold;
@@ -291,131 +307,246 @@ const MapComponent = ({
 			}
 		});
 	}
-
-	const debouncedAdjustLabelVisibility = debounce(adjustLabelVisibility, 100);
 	useEffect(() => {
-		if (mapViewRef.current && highlightGraphicRef.current && "graphics" in mapViewRef.current) {
-			mapViewRef.current.graphics.remove(highlightGraphicRef.current);
-			highlightGraphicRef.current = null;
-		}
-		mapViewRef.current?.graphics.removeAll();
-		const roomsWithoutLabels = [7, 21, 25, 26, 27, 35, 36, 38, 79, 81, 83, 88, 90, 138, 150, 161]
-
-		const updateLayersWithRooms = async() => {
+		// Clear the previous graphics from the layer
+		featureGraphicsLayer.removeAll();
+		const fetchSome = async() => {
 			try {
-				// Fetch room details for the selected floor
 				const response = await fetch(`${ serverAddress }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch rooms');
 				}
 				const rooms = await response.json();
+				const roomsWithoutLabels = [7, 21, 25, 26, 27, 35, 36, 38, 79, 81, 83, 88, 90, 138, 150, 161];
+
 				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+				FeaturesGraphicsLayerRef.current?.removeAll();
+
+				rooms.forEach((room: RoomIdWithType) => {
+					const color = typeToColorMapping[room.roomType] || typeToColorMapping["Default"];
+
+					const feature = allFeatures.find((feature: any) => feature.attributes.RoomID === room.RoomID);
+					if (room.RoomID === 1308) return;
+					if (feature) {
+						const graphic = new Graphic({
+							geometry: feature.geometry, // Assuming this is how you access geometry
+							attributes: feature.attributes,
+							symbol: new SimpleFillSymbol({
+								color: color, // Customize as needed
+								outline: { color: "black", width: 1 },
+							}),
+						});
+						FeaturesGraphicsLayerRef.current?.add(graphic);
+					}
+				});
 				const includedRooms = rooms.filter((room: RoomIdWithType) => !roomsWithoutLabels.includes(room.roomType));
 				const floorRoomIds = includedRooms.map((room: RoomIdWithType) => room.RoomID);
+				LabelsGraphicsLayerRef.current?.removeAll();
+				createLabels(allFeatures, floorRoomIds);
+				adjustLabelVisibility(mapViewRef.current, floorRoomIds);
+
+
+				const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));
+				roomsToAddIcons.forEach((room: RoomIdWithType) => {
+					getRoomCenter(selectedLayer, room.RoomID).then(center => {
+						if (center) {
+							let iconGraphic;
+							let excludedRoomIcon;
+
+							if (room.roomType === 35) {
+								excludedRoomIcon = new PictureMarkerSymbol({
+									...iconProps,
+									url: `${ appAddress }/icons/WomanIcon.svg`,
+								});
+								iconGraphic = new Graphic({
+									geometry: center,
+									symbol: excludedRoomIcon
+								});
+
+							} else if (room.roomType === 26) {
+								excludedRoomIcon = new PictureMarkerSymbol({
+									...iconProps,
+									url: `${ appAddress }/icons/WheelchairIcon.svg`,
+								});
+								iconGraphic = new Graphic({
+									geometry: center,
+									symbol: excludedRoomIcon
+								});
+
+							} else if (room.roomType === 36) {
+								excludedRoomIcon = new PictureMarkerSymbol({
+									...iconProps,
+									url: `${ appAddress }/icons/ManIcon.svg`,
+								});
+								iconGraphic = new Graphic({
+									geometry: center,
+									symbol: excludedRoomIcon
+								});
+
+							} else if (room.roomType === 88) {
+								excludedRoomIcon = new PictureMarkerSymbol({
+									...iconProps,
+									url: `${ appAddress }/icons/WCIcon.svg`,
+								});
+								iconGraphic = new Graphic({
+									geometry: center,
+									symbol: excludedRoomIcon
+								});
+
+							} else {
+								iconGraphic = new Graphic({});
+							}
+							IconsGraphicsLayerRef.current?.add(iconGraphic);
+						}
+					});
+				});
+
 
 
 				mapViewRef.current?.watch('zoom', () => {
 					debouncedAdjustLabelVisibility(mapViewRef.current, floorRoomIds);
 				});
 
-
-				const uniqueValueInfos = rooms.map(({ RoomID, roomType }: RoomIdWithType) => ({
-					value: RoomID,
-					symbol: new SimpleFillSymbol({
-						color: typeToColorMapping[roomType.toString()] || "#CCCCCC", // Fallback color
-						outline: { color: "black", width: 1 },
-					})
-				}));
-
-
-				const renderer = new UniqueValueRenderer({
-					field: "RoomID",
-					uniqueValueInfos: uniqueValueInfos,
-					defaultSymbol: new SimpleFillSymbol({ // Default symbol if no match
-						color: "#CCCCCC", // Default color
-						outline: { color: "black", width: 1 },
-					})
-				});
-
-				await IconsGraphicsLayerRef.current?.removeAll();
-				if (selectedLayer) {
-					selectedLayer.renderer = renderer;
-					selectedLayer.definitionExpression = `RoomID IN (${ rooms.map((room: any) => `'${ room.RoomID }'`).join(', ') })`;
-
-					if (mapViewRef.current) {
-						fetchFeatures(selectedLayer).then(features => {
-							createLabels(features, mapViewRef.current, floorRoomIds);
-							adjustLabelVisibility(mapViewRef.current, floorRoomIds);
-						});
-					}
-					const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));
-					console.log(roomsToAddIcons.length);
-					roomsToAddIcons.forEach((room: RoomIdWithType) => {
-						getRoomCenter(selectedLayer, room.RoomID).then(center => {
-							if (center) {
-								let iconGraphic;
-								let excludedRoomIcon;
-
-								if (room.roomType === 35) {
-									excludedRoomIcon = new PictureMarkerSymbol({
-										...iconProps,
-										url: `${ appAddress }/icons/WomanIcon.svg`,
-									});
-									iconGraphic = new Graphic({
-										geometry: center,
-										symbol: excludedRoomIcon
-									});
-
-								} else if (room.roomType === 26) {
-									excludedRoomIcon = new PictureMarkerSymbol({
-										...iconProps,
-										url: `${ appAddress }/icons/WheelchairIcon.svg`,
-									});
-									iconGraphic = new Graphic({
-										geometry: center,
-										symbol: excludedRoomIcon
-									});
-
-								} else if (room.roomType === 36) {
-									excludedRoomIcon = new PictureMarkerSymbol({
-										...iconProps,
-										url: `${ appAddress }/icons/ManIcon.svg`,
-									});
-									iconGraphic = new Graphic({
-										geometry: center,
-										symbol: excludedRoomIcon
-									});
-
-								} else if (room.roomType === 88) {
-									excludedRoomIcon = new PictureMarkerSymbol({
-										...iconProps,
-										url: `${ appAddress }/icons/WCIcon.svg`,
-									});
-									iconGraphic = new Graphic({
-										geometry: center,
-										symbol: excludedRoomIcon
-									});
-
-								} else  {
-									iconGraphic = new Graphic({});
-								}
-								IconsGraphicsLayerRef.current?.add(iconGraphic);
-							}
-						});
-					});
-
-				} else {
-					console.warn(`No layer found for faculty: ${ selectedFaculty }`);
-				}
 			} catch (error) {
 				console.error('Error fetching rooms for floor:', error);
 			}
-		};
-		if (selectedFloor) {
-			updateLayersWithRooms();
+
 		}
 
-	}, [selectedFloor, selectedFaculty, debouncedAdjustLabelVisibility]);
+
+		// Filter features based on selected floor or other criteria
+		const filteredFeatures = allFeatures.filter((feature: any) =>
+			feature.attributes.Floor === selectedFloor
+		);
+
+		fetchSome();
+	}, [selectedFloor, allFeatures, featureGraphicsLayer]);
+
+
+	const debouncedAdjustLabelVisibility = debounce(adjustLabelVisibility, 100);
+	// useEffect(() => {
+	// 	if (mapViewRef.current && highlightGraphicRef.current && "graphics" in mapViewRef.current) {
+	// 		mapViewRef.current.graphics.remove(highlightGraphicRef.current);
+	// 		highlightGraphicRef.current = null;
+	// 	}
+	// 	mapViewRef.current?.graphics.removeAll();
+	// 	const roomsWithoutLabels = [7, 21, 25, 26, 27, 35, 36, 38, 79, 81, 83, 88, 90, 138, 150, 161]
+	//
+	// 	const updateLayersWithRooms = async() => {
+	// 		try {
+	// 			// Fetch room details for the selected floor
+	// 			const response = await fetch(`${ serverAddress }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloor }`);
+	// 			if (!response.ok) {
+	// 				throw new Error('Failed to fetch rooms');
+	// 			}
+	// 			const rooms = await response.json();
+	// 			const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+	// 			const includedRooms = rooms.filter((room: RoomIdWithType) => !roomsWithoutLabels.includes(room.roomType));
+	// 			const floorRoomIds = includedRooms.map((room: RoomIdWithType) => room.RoomID);
+	//
+	//
+	// 			mapViewRef.current?.watch('zoom', () => {
+	// 				debouncedAdjustLabelVisibility(mapViewRef.current, floorRoomIds);
+	// 			});
+	//
+	//
+	// 			const uniqueValueInfos = rooms.map(({ RoomID, roomType }: RoomIdWithType) => ({
+	// 				value: RoomID,
+	// 				symbol: new SimpleFillSymbol({
+	// 					color: typeToColorMapping[roomType.toString()] || "#CCCCCC", // Fallback color
+	// 					outline: { color: "black", width: 1 },
+	// 				})
+	// 			}));
+	//
+	//
+	// 			const renderer = new UniqueValueRenderer({
+	// 				field: "RoomID",
+	// 				uniqueValueInfos: uniqueValueInfos,
+	// 				defaultSymbol: new SimpleFillSymbol({ // Default symbol if no match
+	// 					color: "#CCCCCC", // Default color
+	// 					outline: { color: "black", width: 1 },
+	// 				})
+	// 			});
+	//
+	// 			await IconsGraphicsLayerRef.current?.removeAll();
+	// 			if (selectedLayer) {
+	// 				selectedLayer.renderer = renderer;
+	// 				selectedLayer.definitionExpression = `RoomID IN (${ rooms.map((room: any) => `'${ room.RoomID }'`).join(', ') })`;
+	//
+	// 				if (mapViewRef.current) {
+	// 					fetchFeatures(selectedLayer).then(features => {
+	// 						createLabels(features, mapViewRef.current, floorRoomIds);
+	// 						adjustLabelVisibility(mapViewRef.current, floorRoomIds);
+	// 					});
+	// 				}
+	// 				const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));
+	// 				console.log(roomsToAddIcons.length);
+	// 				roomsToAddIcons.forEach((room: RoomIdWithType) => {
+	// 					getRoomCenter(selectedLayer, room.RoomID).then(center => {
+	// 						if (center) {
+	// 							let iconGraphic;
+	// 							let excludedRoomIcon;
+	//
+	// 							if (room.roomType === 35) {
+	// 								excludedRoomIcon = new PictureMarkerSymbol({
+	// 									...iconProps,
+	// 									url: `${ appAddress }/icons/WomanIcon.svg`,
+	// 								});
+	// 								iconGraphic = new Graphic({
+	// 									geometry: center,
+	// 									symbol: excludedRoomIcon
+	// 								});
+	//
+	// 							} else if (room.roomType === 26) {
+	// 								excludedRoomIcon = new PictureMarkerSymbol({
+	// 									...iconProps,
+	// 									url: `${ appAddress }/icons/WheelchairIcon.svg`,
+	// 								});
+	// 								iconGraphic = new Graphic({
+	// 									geometry: center,
+	// 									symbol: excludedRoomIcon
+	// 								});
+	//
+	// 							} else if (room.roomType === 36) {
+	// 								excludedRoomIcon = new PictureMarkerSymbol({
+	// 									...iconProps,
+	// 									url: `${ appAddress }/icons/ManIcon.svg`,
+	// 								});
+	// 								iconGraphic = new Graphic({
+	// 									geometry: center,
+	// 									symbol: excludedRoomIcon
+	// 								});
+	//
+	// 							} else if (room.roomType === 88) {
+	// 								excludedRoomIcon = new PictureMarkerSymbol({
+	// 									...iconProps,
+	// 									url: `${ appAddress }/icons/WCIcon.svg`,
+	// 								});
+	// 								iconGraphic = new Graphic({
+	// 									geometry: center,
+	// 									symbol: excludedRoomIcon
+	// 								});
+	//
+	// 							} else  {
+	// 								iconGraphic = new Graphic({});
+	// 							}
+	// 							IconsGraphicsLayerRef.current?.add(iconGraphic);
+	// 						}
+	// 					});
+	// 				});
+	//
+	// 			} else {
+	// 				console.warn(`No layer found for faculty: ${ selectedFaculty }`);
+	// 			}
+	// 		} catch (error) {
+	// 			console.error('Error fetching rooms for floor:', error);
+	// 		}
+	// 	};
+	// 	if (selectedFloor) {
+	// 		updateLayersWithRooms();
+	// 	}
+	//
+	// }, [selectedFloor, selectedFaculty, debouncedAdjustLabelVisibility]);
 
 
 	useEffect(() => {

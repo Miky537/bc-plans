@@ -13,6 +13,8 @@ interface MapContextType {
 	setIsMapLoaded: (loaded: boolean) => void;
 	zoom: number;
 	setZoom: (zoom: number) => void;
+	selectedFloorRoomsIds : number[];
+	setSelectedFloorRoomsIds : React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export const MapProvider = ({children}: any) => {
 	const [floors, setFloors] = useState<number[]>([]);
 	const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
 	const [zoom, setZoom] = useState<number>(18);
+	const [selectedFloorRoomsIds, setSelectedFloorRoomsIds] = useState<number[]>([]);
 
 	return (
 		<MapContext.Provider value={ {
@@ -47,7 +50,9 @@ export const MapProvider = ({children}: any) => {
 			isMapLoaded,
 			setIsMapLoaded,
 			zoom,
-			setZoom
+			setZoom,
+			selectedFloorRoomsIds,
+			setSelectedFloorRoomsIds
 		} }>
 			{ children }
 		</MapContext.Provider>

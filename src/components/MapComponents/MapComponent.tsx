@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MapView from '@arcgis/core/views/MapView';
 import Map from '@arcgis/core/Map';
 import esriConfig from '@arcgis/core/config';
@@ -6,7 +6,7 @@ import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
-import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping } from "./constants";
+import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
 import GeoJsonLoader from "./Centroid";
 import { useMapContext } from "./MapContext";
 import {
@@ -14,7 +14,8 @@ import {
 	adjustMapHeight,
 	updateBoundingBoxes,
 	convertPathToFacultyType,
-	getFacultyCoordinates
+	getFacultyCoordinates,
+	getRoomCenter
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
 import { serverAddress, appAddress } from "../../config";
@@ -23,11 +24,11 @@ import { replaceCzechChars } from "../FloorSelection";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer";
-import LabelClass from "@arcgis/core/layers/support/LabelClass";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import Query from "@arcgis/core/rest/support/Query";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import { debounce } from "@mui/material";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -71,6 +72,8 @@ const MapComponent = ({
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
 	const { setSelectedRoomId, handleRoomSelection, selectedFaculty, setSelectedFaculty } = useFacultyContext()
+	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
+	const [allFeatures, setAllFeatures] = useState<any>([]);
 
 	const location = useLocation();
 	const {
@@ -78,7 +81,6 @@ const MapComponent = ({
 		setCenterCoordinates,
 		setIsMapLoaded,
 		zoom,
-		setZoom
 	} = useMapContext();
 
 	const minZoomLevel = 17;
@@ -125,6 +127,11 @@ const MapComponent = ({
 		});
 		mapViewRef.current = mapView;
 
+		const iconsGraphicsLayer = new GraphicsLayer();
+		mapView.map.add(iconsGraphicsLayer);
+		IconsGraphicsLayerRef.current = iconsGraphicsLayer;
+
+
 		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
 		const trackWidget = new Track({
 			view: mapView,
@@ -153,7 +160,6 @@ const MapComponent = ({
 
 		mapView.when(() => {
 			setIsMapLoaded(true);
-			adjustLabelVisibility(mapView, 18, areaThreshold);
 			mapView.on('click', async (event) => {
 				if (highlightGraphicRef.current) {
 					mapView.graphics.remove(highlightGraphicRef.current as Graphic);
@@ -201,10 +207,31 @@ const MapComponent = ({
 		};
 	}, [centerCoordinates]);
 
+
+	useEffect(() => {
+		if (featureLayersRef.current) {
+			const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+			if (!selectedLayer) { return; }
+			const query = new Query();
+			query.where = '1=1';
+			query.returnGeometry = true;
+			query.outFields = ['RoomID', 'Shape_Area', 'name', 'roomType', 'Shape__Area'];
+
+			selectedLayer.queryFeatures(query)
+				.then((results) => {
+					setAllFeatures(results.features);
+				})
+				.catch((error) => {
+					console.error("Error fetching feature layer data:", error);
+				});
+		}
+	}, [featureLayersRef.current]);
+
+
 	async function fetchFeatures(featureLayer: FeatureLayer) {
 		const query = new Query();
 		query.returnGeometry = true;
-		query.outFields = ["RoomID", "name", "shape_area"]; // Customize for your data
+		query.outFields = ["RoomID", "name", "shape_area"];
 		query.where = "1=1";
 
 		try {
@@ -216,9 +243,10 @@ const MapComponent = ({
 		}
 	}
 
-	function createLabels(features: any, view: MapView | null) {
+	function createLabels(features: any, view: MapView | null, floorRoomIds: number[]) {
 		if (view === null) return;
-		features.forEach((feature: any) => {
+		const filteredFeatures = features.filter((feature: Graphic) => floorRoomIds.includes(feature.attributes.RoomID));
+		filteredFeatures.forEach((feature: any) => {
 			const labelSymbol = new TextSymbol({
 				text: feature.attributes.name,
 				color: "black",
@@ -228,7 +256,7 @@ const MapComponent = ({
 			});
 
 			const labelGraphic = new Graphic({
-				geometry: feature.geometry.centroid, // Assumes centroid is appropriate
+				geometry: feature.geometry.centroid,
 				symbol: labelSymbol,
 				attributes: feature.attributes
 			});
@@ -237,54 +265,41 @@ const MapComponent = ({
 		});
 	}
 
-	function areaThreshold(zoomLevel: number) {
-		if (zoomLevel >= 15) return 10000; // Smaller areas become visible at closer zoom
-		return 50000; // Larger areas required for labels to be visible at further zoom
-	}
-
-	function adjustLabelVisibility(view: MapView | null, zoomLevelThreshold: number, areaThreshold: any) {
+	function adjustLabelVisibility(view: MapView | null, floorRoomIds: number[]) {
 		if (view === null) return;
-
 		const currentZoom = view.zoom;
-		// console.log("currentZoom", currentZoom)
-
 		view.graphics.forEach((graphic: any) => {
-			console.log("Runnings")
 			if (graphic.attributes && graphic.symbol && graphic.symbol.type === "text") {
-				const isAreaSufficient = graphic.attributes.Shape_Area >= 1.3750139693513574e-8;
-				let shouldDisplay;
-				if (currentZoom >= 19) shouldDisplay = true;
-				else if (currentZoom >= 18) shouldDisplay = isAreaSufficient;
-				else shouldDisplay = currentZoom >= 17.5 && isAreaSufficient;
+				const isRoomOnSelectedFloor = floorRoomIds.includes(graphic.attributes.RoomID);
+				const largestAreaThreshold = 1.57284e-8;
+				const middleAreaThreshold = 8.0e-9;
+				// const smallestAreaThreshold = 5.0e-9;
+
+				const roomArea = graphic.attributes.Shape_Area;
+				const isLargestArea = roomArea >= largestAreaThreshold;
+				const isMiddleArea = roomArea >= middleAreaThreshold && roomArea < largestAreaThreshold;
+				// const isSmallestArea = roomArea >= smallestAreaThreshold && roomArea < middleAreaThreshold;
+				let shouldDisplay = false;
+				if (currentZoom > 19.5) { // very close zoom, show all rooms
+					shouldDisplay = isRoomOnSelectedFloor;
+				} else if (currentZoom >= 18.5) { // Closer zoom, show largest and middle-sized rooms
+					shouldDisplay = (isLargestArea || isMiddleArea) && isRoomOnSelectedFloor;
+				} else if (currentZoom >= 16) { //show only the largest rooms
+					shouldDisplay = isLargestArea && isRoomOnSelectedFloor;
+				}
 				graphic.visible = shouldDisplay;
 			}
 		});
-
-		view.watch('zoom', () => {
-			const currentZoom = view.zoom;
-			// console.log("currentZoom", currentZoom)
-
-			view.graphics.forEach((graphic: any) => {
-				if (graphic.attributes && graphic.symbol && graphic.symbol.type === "text") {
-					const isAreaSufficient = graphic.attributes.Shape_Area >= 1.3750139693513574e-8;
-					let shouldDisplay;
-					if (currentZoom >= 19) shouldDisplay = true;
-					else if (currentZoom >= 18) shouldDisplay = isAreaSufficient;
-					else shouldDisplay = currentZoom >= 17.5 && isAreaSufficient;
-					graphic.visible = shouldDisplay;
-				}
-			});
-		});
 	}
 
-
+	const debouncedAdjustLabelVisibility = debounce(adjustLabelVisibility, 100);
 	useEffect(() => {
 		if (mapViewRef.current && highlightGraphicRef.current && "graphics" in mapViewRef.current) {
 			mapViewRef.current.graphics.remove(highlightGraphicRef.current);
 			highlightGraphicRef.current = null;
 		}
-
-		const roomsWithoutLabels = [7, 21, 26, 27, 35, 36, 38, 88, 90, 138, 150, 161]
+		mapViewRef.current?.graphics.removeAll();
+		const roomsWithoutLabels = [7, 21, 25, 26, 27, 35, 36, 38, 79, 81, 83, 88, 90, 138, 150, 161]
 
 		const updateLayersWithRooms = async() => {
 			try {
@@ -294,6 +309,15 @@ const MapComponent = ({
 					throw new Error('Failed to fetch rooms');
 				}
 				const rooms = await response.json();
+				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+				const includedRooms = rooms.filter((room: RoomIdWithType) => !roomsWithoutLabels.includes(room.roomType));
+				const floorRoomIds = includedRooms.map((room: RoomIdWithType) => room.RoomID);
+
+
+				mapViewRef.current?.watch('zoom', () => {
+					debouncedAdjustLabelVisibility(mapViewRef.current, floorRoomIds);
+				});
+
 
 				const uniqueValueInfos = rooms.map(({ RoomID, roomType }: RoomIdWithType) => ({
 					value: RoomID,
@@ -304,9 +328,6 @@ const MapComponent = ({
 				}));
 
 
-				const iconsGraphicsLayer = new GraphicsLayer();
-				mapViewRef.current?.map.add(iconsGraphicsLayer);
-
 				const renderer = new UniqueValueRenderer({
 					field: "RoomID",
 					uniqueValueInfos: uniqueValueInfos,
@@ -315,23 +336,20 @@ const MapComponent = ({
 						outline: { color: "black", width: 1 },
 					})
 				});
-				const iconProps = {
-					width: "20px",
-					height: "20px"
-				};
 
-				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
+				await IconsGraphicsLayerRef.current?.removeAll();
 				if (selectedLayer) {
-					fetchFeatures(selectedLayer).then(features => {
-						createLabels(features, mapViewRef.current);
-						adjustLabelVisibility(mapViewRef.current, 18, areaThreshold);
-					});
-
-
 					selectedLayer.renderer = renderer;
 					selectedLayer.definitionExpression = `RoomID IN (${ rooms.map((room: any) => `'${ room.RoomID }'`).join(', ') })`;
 
+					if (mapViewRef.current) {
+						fetchFeatures(selectedLayer).then(features => {
+							createLabels(features, mapViewRef.current, floorRoomIds);
+							adjustLabelVisibility(mapViewRef.current, floorRoomIds);
+						});
+					}
 					const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));
+					console.log(roomsToAddIcons.length);
 					roomsToAddIcons.forEach((room: RoomIdWithType) => {
 						getRoomCenter(selectedLayer, room.RoomID).then(center => {
 							if (center) {
@@ -381,13 +399,11 @@ const MapComponent = ({
 								} else  {
 									iconGraphic = new Graphic({});
 								}
-
-
-
-								iconsGraphicsLayer.add(iconGraphic);
+								IconsGraphicsLayerRef.current?.add(iconGraphic);
 							}
 						});
 					});
+
 				} else {
 					console.warn(`No layer found for faculty: ${ selectedFaculty }`);
 				}
@@ -395,34 +411,12 @@ const MapComponent = ({
 				console.error('Error fetching rooms for floor:', error);
 			}
 		};
-
-		async function getRoomCenter(featureLayer: any, RoomID: number) {
-			let query = new Query();
-			query.where = `RoomID = ${ RoomID }`;
-			query.outSpatialReference = featureLayer.spatialReference;
-			query.returnGeometry = true;
-
-			try {
-				const result = await featureLayer.queryFeatures(query);
-				if (result.features.length > 0) {
-					const feature = result.features[0];
-					return feature.geometry.type === "polygon"? feature.geometry.centroid : feature.geometry;
-				} else {
-					console.error('No feature found with the given RoomID:', RoomID);
-					return null;
-				}
-			} catch (error) {
-				console.error('Error querying feature layer:', error);
-				return null;
-			}
-		}
-
-		// Call the function to update layers if selectedFloor is defined
 		if (selectedFloor) {
 			updateLayersWithRooms();
 		}
 
-	}, [selectedFloor, selectedFaculty]);
+	}, [selectedFloor, selectedFaculty, debouncedAdjustLabelVisibility]);
+
 
 	useEffect(() => {
 		adjustMapHeight(); // Adjust on mount
@@ -456,7 +450,6 @@ const MapComponent = ({
 
 				try {
 					const result = await facultyLayer.queryFeatures(query);
-					console.log("result", result)
 					if (result.features.length > 0) {
 						const roomFeature = result.features[0];
 						const highlightGraphic = new Graphic({
@@ -494,7 +487,6 @@ const MapComponent = ({
 		const facultyName = pathParts[1];
 		const firstUrlPart = pathParts[0];
 		if (firstUrlPart === "map" && facultyName === undefined) {
-			console.log("sdsem here")
 			mapViewRef.current?.goTo({
 				center: [16.603375432788052, 49.20174147400288],
 				zoom: 10

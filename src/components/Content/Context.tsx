@@ -7,7 +7,7 @@ interface ContentProps {
 
 export default function Content({children}: ContentProps) {
 	return (
-		<Box display="flex" flexGrow="1" flexDirection="column">
+		<Box display="flex" flexGrow="1" flexDirection="column" height="calc(100% - 3.2em)">
 			{ children }
 		</Box>
 	);

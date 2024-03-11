@@ -69,7 +69,15 @@ const MapComponent = ({
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
 	const highlightGraphicRef = useRef<Graphic | null>(null);
 	const { faculty, building, floor, roomName } = useParams();
-	const { setSelectedRoomId, handleRoomSelection, selectedFaculty, setSelectedFaculty } = useFacultyContext()
+	const {
+		setSelectedRoomId,
+		handleRoomSelection,
+		selectedFaculty,
+		setSelectedFaculty,
+		selectedFloorNumber,
+		selectedBuilding,
+		selectedBuildingOriginal,
+	} = useFacultyContext()
 	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const LabelsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
@@ -240,7 +248,7 @@ const MapComponent = ({
 				})
 				.catch((error) => {
 					if (error.name === "AbortError") {
-
+						console.log("Found abortError!")
 					} else {
 						console.error("Error fetching feature layer data:", error);
 						if (error?.message) {
@@ -437,10 +445,13 @@ const MapComponent = ({
 	}, []);
 
 	useEffect(() => {
-		console.log("Got")
 		if (!selectedRoom || allFeatures.length === 0) return;
 
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
+		if (!roomFeature) {
+			console.error("Room not found.");
+			return;
+		}
 
 		if (roomFeature && mapViewRef.current) { //removing existing highlight
 			if (highlightGraphicRef.current) {
@@ -448,7 +459,6 @@ const MapComponent = ({
 					mapViewRef.current.graphics.remove(highlightGraphicRef.current);
 				}
 			}
-
 			// Highlight the selected room
 			const highlightGraphic = new Graphic({
 				geometry: roomFeature.geometry,
@@ -458,32 +468,30 @@ const MapComponent = ({
 			mapViewRef.current?.graphics.add(highlightGraphic);
 			highlightGraphicRef.current = highlightGraphic;
 
+
 			// Zoom to the selected room
 			abortControllerRef.current = new AbortController();
-			mapViewRef.current?.goTo(
+			console.log("Trying")
+			mapViewRef.current!.goTo(
 				{ target: roomFeature.geometry, zoom: 19 },
-				{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal }
+				{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 			).then(() => {
-				// Handle successful animation completion
-			}).catch(error => {
-				if (error.name === 'AbortError') {
-
-				} else {
-					console.error('Animation failed with error:', error);
+				if (!mapViewRef.current) return;
+				console.log("Animation finished");
+			}).catch(function(error) {
+				if (error.name !== "AbortError") {
+					console.error(error);
 				}
 			});
-
-
 			// Reset selectedRoom after processing
-			setSelectedRoom(undefined); // Assuming you have a way to reset this, like a setState call
+			// setSelectedRoom(undefined);
 		} else {
 			console.error("Room not found.");
 		}
 
 		return () => {
-			if (abortControllerRef.current) {
-				abortControllerRef.current!.abort();
-			}
+			abortControllerRef.current!.abort();
+			setSelectedRoom(undefined);
 		};
 	}, [selectedRoom, allFeatures]);
 
@@ -492,12 +500,12 @@ const MapComponent = ({
 		const pathParts = location.pathname.split('/').filter(Boolean);
 		const facultyName = pathParts[1];
 		const firstUrlPart = pathParts[0];
-		if (firstUrlPart === "map" && facultyName === undefined) {
-			mapViewRef.current?.goTo({
-				center: [16.603375432788052, 49.20174147400288],
-				zoom: 10
-			}, { duration: 500, easing: "ease-out" });
-		}
+		// if (firstUrlPart === "map" && facultyName === undefined) {
+		// 	mapViewRef.current?.goTo({
+		// 		center: [16.603375432788052, 49.20174147400288],
+		// 		zoom: 10
+		// 	}, { duration: 500, easing: "ease-out" });
+		// }
 
 		const facultyType = convertPathToFacultyType(facultyName);
 		if (facultyType) {
@@ -514,9 +522,9 @@ const MapComponent = ({
 		}
 		const fetchRoomId = async() => {
 			try {
+				console.log("building", selectedBuilding)
 				const normalizedBuilding = replaceCzechChars(building).replace(/\s/g, "_");
-				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ normalizedBuilding }/${ floor }/${ roomName }`);
-				console.log("Response: ", response);
+				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ selectedBuilding }/${ selectedFloorNumber }/${ roomName }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch room ID');
 				}

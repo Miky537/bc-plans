@@ -66,6 +66,10 @@ function FloorSelection() {
 		handleRoomSelection,
 		setSelectedFloorNumber,
 		selectedBuildingId,
+		setSelectedFloorOriginal,
+		selectedBuildingOriginal,
+		selectedFloorOriginal,
+		selectedFloorNumber
 	} = useFacultyContext();
 	const { setZoom } = useMapContext();
 
@@ -74,6 +78,7 @@ function FloorSelection() {
 			// console.log("Panel: ", panel, " isExpanded: ", isExpanded);
 			setExpanded(isExpanded? panel : false);
 			setSelectedFloor(isExpanded? panel : undefined);
+			setSelectedFloorOriginal(isExpanded? panel : undefined);
 			const selectedFloorLocal = replaceCzechChars(panel)!.replace(/\s/g, "_");
 			if (panel && isExpanded) {
 				navigate(`/${ selectedFaculty }/${ building }/${ selectedFloorLocal }`, { replace: true });
@@ -118,13 +123,13 @@ function FloorSelection() {
 
 
 	const handleRoomClick = async(roomName: string, roomId: number) => {
-		console.log("Room clicked: ", roomName, floor);
+
 		setSelectedRoomId(roomId);
 		const selectedFloorNumberLocal = extractNumberFromString(floor);
 		if (selectedFloorNumberLocal === null) return;
 		setSelectedFloorNumber(selectedFloorNumberLocal);
 		handleRoomSelection(roomId);
-		navigate(`/${ selectedFaculty }/${ building }/${ floor }/${ roomName }`);
+		navigate(`/${ selectedFaculty }/${ selectedBuilding }/${ floor }/${ roomName }`);
 	};
 
 	return (
@@ -156,17 +161,22 @@ function FloorSelection() {
 							</AccordionSummary>
 							<AccordionDetails>
 								<Box>
-									{ floor.rooms.map((room: any) => (
-
-										<Box key={ room.room_id }>
-											<RoomSelectionItem handleRoomClick={ handleRoomClick }
-											                   buildingName={ floor.building_name }
-											                   floorName={ floor.floor_name }
-											                   roomName={ room.room_number }
-											                   roomId={ room.room_id } />
-										</Box>
-
-									)) }
+									{
+										floor.rooms.map((room: any) => {
+											// console.log(floor);
+											return (
+												<Box key={ room.room_id }>
+													<RoomSelectionItem
+														handleRoomClick={ handleRoomClick }
+														buildingName={ floor.building_name }
+														floorName={ floor.floor_name }
+														roomName={ room.room_number }
+														roomId={ room.room_id }
+													/>
+												</Box>
+											);
+										})
+									}
 								</Box>
 							</AccordionDetails>
 						</Accordion>

@@ -14,7 +14,15 @@ interface FavouritePlacesLocalStorage {
 
 function FavouritePlaces() {
 	const navigate = useNavigate();
-	const { handleRoomSelection, setSelectedRoomId, selectedFloor } = useFacultyContext();
+	const {
+		handleRoomSelection,
+		setSelectedRoomId,
+		selectedFloor,
+		selectedFaculty,
+		setSelectedFloor,
+		setSelectedFloorNumber,
+		setSelectedBuilding
+	} = useFacultyContext();
 	const items = localStorage.getItem('favoriteRooms');
 	let mappedItems;
 	if (items) {
@@ -24,13 +32,14 @@ function FavouritePlaces() {
 		mappedItems = [];
 	}
 	const handleRoomClick = async({ roomName, roomId, buildingName, floorName }: FavouritePlacesLocalStorage) => {
-		console.log("Room clicked: ", roomName, roomId);
-		setSelectedRoomId(roomId);
 		handleRoomSelection(roomId);
-		// setSelectedFloor(selectedFloor);
+		setSelectedRoomId(roomId);
+		setSelectedFloor(selectedFloor);
+		setSelectedFloorNumber(Number(floorName.split(" ")[1]));
+		setSelectedBuilding(buildingName);
 		const normalizedBuildingName = replaceCzechChars(buildingName)!.replace(/\s/g, "_");
 		const normalizedFloorName = replaceCzechChars(floorName)!.replace(/\s/g, "_");
-		navigate(`/FAST/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
+		navigate(`/${ selectedFaculty }/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
 	};
 
 	return (

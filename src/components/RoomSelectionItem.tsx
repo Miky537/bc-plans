@@ -32,6 +32,7 @@ const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, handleRo
 	}, [roomId]);
 
 	const toggleFavoriteRoom = (roomToToggle: RoomData): void => {
+		console.log('Toggling favorite room', roomToToggle)
 		const storageKey = 'favoriteRooms';
 
 		const favoriteRoomsString = localStorage.getItem(storageKey);

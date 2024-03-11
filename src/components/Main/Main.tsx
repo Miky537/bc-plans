@@ -14,9 +14,10 @@ interface MainProps {
 
 export default function Main({children, topBarTitle}: MainProps) {
 	const navigation = useNavigate();
-	const { mapViewRef } = useMapContext();
+	const { mapViewRef, setZoom } = useMapContext();
 	const handleGoBack = () => {
 		mapViewRef.current = null;
+		setZoom(18)
 		navigation('/faculty');
 	}
 

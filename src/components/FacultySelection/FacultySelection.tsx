@@ -16,7 +16,7 @@ import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
 
-export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | undefined;
+export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | "CESA" | undefined;
 function FacultySelection() {
 
 	const {setMapVisibility} = useMapContext();
@@ -34,7 +34,7 @@ function FacultySelection() {
 			<Box display="grid"
 			     gridTemplateColumns="repeat(2, 1fr)" // Create two columns
 			     rowGap={ 4 } columnGap={ 0 }
-			     height="100" justifyContent="flex-end"
+			     height="100%" justifyContent="flex-end"
 			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white" overflow="scroll">
 				<FacultyItem name="FIT" Image={FitLogo} />
 				<FacultyItem name="FAST" Image={FastLogo} />
@@ -45,10 +45,7 @@ function FacultySelection() {
 				<FacultyItem name="USI" Image={UsiLogo}/>
 				<FacultyItem name="FP" Image={FpLogo}/>
 				<FacultyItem name="FA" Image={FaLogo}/>
-				<Box onClick={() => {
-					setSelectedFaculty("FAST");
-					navigate("/select")
-				}}>FAST - choosing</Box>
+				<FacultyItem name="CESA" Image={ CesaLogo } />
 			</Box>
 		</Main>
 	);

@@ -16,6 +16,7 @@ import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useParams, useNavigate } from "react-router-dom";
 import RoomSelectionItem from "./RoomSelectionItem";
+import { useMapContext } from "./MapComponents/MapContext";
 
 export interface FetchedFloor {
 	building_id?: number;
@@ -52,7 +53,6 @@ const accordionStyles = {
 function FloorSelection() {
 	const { palette } = useTheme();
 	const [floors, setFloors] = useState<FetchedFloor[]>([]);
-	const { selectedBuildingId } = useFacultyContext();
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
@@ -64,8 +64,10 @@ function FloorSelection() {
 		setSelectedFloor,
 		setSelectedRoomId,
 		handleRoomSelection,
-		setSelectedFloorNumber
+		setSelectedFloorNumber,
+		selectedBuildingId,
 	} = useFacultyContext();
+	const { setZoom } = useMapContext();
 
 	const handleChange = useCallback(
 		(panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {

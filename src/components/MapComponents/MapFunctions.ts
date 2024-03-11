@@ -184,12 +184,16 @@ export const getFacultyCoordinates = (name: FacultyType): Coordinates => {
 
 export function getRoomCenter(allFeatures: any, RoomID: number) {
 	const feature = allFeatures.find((f: any) => f.attributes.RoomID === RoomID);
+	if (feature === undefined) {
+			return;
+	};
 
 	if (feature && feature.geometry.type === "polygon") {
 		return feature.geometry.centroid;
 	} else if (feature) {
 		return feature.geometry;
 	} else {
+		console.log(feature)
 		console.error('No feature found with the given RoomID:', RoomID);
 		return null;
 	}

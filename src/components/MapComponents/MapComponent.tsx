@@ -14,7 +14,8 @@ import {
 	adjustMapHeight,
 	updateBoundingBoxes,
 	convertPathToFacultyType,
-	getFacultyCoordinates, getRoomCenter
+	getFacultyCoordinates,
+	getRoomCenter
 } from "./MapFunctions";
 import { useLocation, useParams } from "react-router-dom";
 import { serverAddress, appAddress } from "../../config";
@@ -133,16 +134,17 @@ const MapComponent = ({
 		mapViewRef.current = mapView;
 
 		const iconsGraphicsLayer = new GraphicsLayer();
-		mapView.map.add(iconsGraphicsLayer);
-		IconsGraphicsLayerRef.current = iconsGraphicsLayer;
-
 		const featureGraphicsLayer = new GraphicsLayer();
+		const labelsGraphicsLayer = new GraphicsLayer();
+
 		mapView.map.add(featureGraphicsLayer);
 		FeaturesGraphicsLayerRef.current = featureGraphicsLayer;
 
-		const labelsGraphicsLayer = new GraphicsLayer();
 		mapView.map.add(labelsGraphicsLayer);
 		LabelsGraphicsLayerRef.current = labelsGraphicsLayer;
+
+		mapView.map.add(iconsGraphicsLayer);
+		IconsGraphicsLayerRef.current = iconsGraphicsLayer;
 
 
 		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
@@ -243,23 +245,8 @@ const MapComponent = ({
 		}
 	}, [featureLayersRef.current, selectedFaculty]);
 
-
-	async function fetchFeatures(featureLayer: FeatureLayer) {
-		const query = new Query();
-		query.returnGeometry = true;
-		query.outFields = ["RoomID", "name", "shape_area"];
-		query.where = "1=1";
-
-		try {
-			const response = await featureLayer.queryFeatures(query);
-			return response.features;
-		} catch (error) {
-			console.error("Error fetching features:", error);
-			return [];
-		}
-	}
-
 	function createLabels(features: any, floorRoomIds: number[]) {
+		LabelsGraphicsLayerRef.current?.removeAll();
 		const filteredFeatures = features.filter((feature: Graphic) => floorRoomIds.includes(feature.attributes.RoomID));
 		filteredFeatures.forEach((feature: any) => {
 			const labelSymbol = new TextSymbol({
@@ -287,7 +274,7 @@ const MapComponent = ({
 		LabelsGraphicsLayerRef.current?.graphics.forEach((graphic: any) => {
 			if (graphic.attributes && graphic.symbol && graphic.symbol.type === "text") {
 				const isRoomOnSelectedFloor = floorRoomIds.includes(graphic.attributes.RoomID);
-				const largestAreaThreshold = 500;
+				const largestAreaThreshold = 400;
 				const middleAreaThreshold = 100;
 				// const smallestAreaThreshold = 5.0e-9;
 
@@ -307,8 +294,74 @@ const MapComponent = ({
 			}
 		});
 	}
+
+	const createIconsForRooms = (roomsToAddIcons: RoomIdWithType[], iconsGraphicsLayer: GraphicsLayer | null) => {
+		if (!iconsGraphicsLayer) return;
+		iconsGraphicsLayer.removeAll();
+		roomsToAddIcons.forEach(room => {
+			const roomCenter = getRoomCenter(allFeatures, room.RoomID);
+			if (roomCenter) {
+				let excludedRoomIconURL;
+
+				switch (room.roomType) {
+					case 35:
+						excludedRoomIconURL = `${ appAddress }/icons/WomanIcon.svg`;
+						break;
+					case 26:
+						excludedRoomIconURL = `${ appAddress }/icons/WheelchairIcon.svg`;
+						break;
+					case 36:
+						excludedRoomIconURL = `${ appAddress }/icons/ManIcon.svg`;
+						break;
+					case 87:
+						excludedRoomIconURL = `${ appAddress }/icons/ElevatorIcon.svg`;
+						break;
+					case 88:
+						excludedRoomIconURL = `${ appAddress }/icons/WCIcon.svg`;
+						break;
+					default:
+						excludedRoomIconURL = ''; // Default or 'none' indicating no icon should be added
+						break;
+				}
+
+				if (excludedRoomIconURL) {
+					const iconGraphic = new Graphic({
+						geometry: roomCenter,
+						symbol: new PictureMarkerSymbol({
+							...iconProps,
+							url: excludedRoomIconURL,
+						}),
+						attributes: room,
+					});
+
+					iconsGraphicsLayer.add(iconGraphic);
+				}
+			}
+		});
+	};
+
+	function adjustIconVisibility(view: MapView | null, floorRoomIds: number[]) {
+		if (view === null) return;
+
+		const currentZoom = view.zoom;
+		IconsGraphicsLayerRef.current?.graphics.forEach((graphic: any) => {
+			if (graphic.attributes) {
+				const isRoomOnSelectedFloor = floorRoomIds.includes(graphic.attributes.RoomID);
+				const largestAreaThreshold = 30;
+				const roomArea = graphic.attributes.Shape__Area;
+
+				const isLargestArea = roomArea >= largestAreaThreshold;
+				let shouldDisplay;
+				if (currentZoom > 18.5) { // Very close zoom, show all icons
+					shouldDisplay = isRoomOnSelectedFloor;
+				} else {
+					shouldDisplay = false
+				}
+				graphic.visible = shouldDisplay;
+			}
+		});
+	}
 	useEffect(() => {
-		// Clear the previous graphics from the layer
 		featureGraphicsLayer.removeAll();
 		const fetchSome = async() => {
 			try {
@@ -317,7 +370,7 @@ const MapComponent = ({
 					throw new Error('Failed to fetch rooms');
 				}
 				const rooms = await response.json();
-				const roomsWithoutLabels = [7, 21, 25, 26, 27, 35, 36, 38, 79, 81, 83, 88, 90, 138, 150, 161];
+				const roomsWithoutLabels = [7, 21, 24, 25, 26, 27, 35, 36, 38, 79, 81, 83, 84, 87, 88, 90, 138, 140, 150, 161];
 
 				const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				FeaturesGraphicsLayerRef.current?.removeAll();
@@ -341,89 +394,31 @@ const MapComponent = ({
 				});
 				const includedRooms = rooms.filter((room: RoomIdWithType) => !roomsWithoutLabels.includes(room.roomType));
 				const floorRoomIds = includedRooms.map((room: RoomIdWithType) => room.RoomID);
-				LabelsGraphicsLayerRef.current?.removeAll();
 				createLabels(allFeatures, floorRoomIds);
 				adjustLabelVisibility(mapViewRef.current, floorRoomIds);
 
-
 				const roomsToAddIcons = rooms.filter((room: RoomIdWithType) => roomsWithoutLabels.includes(room.roomType));
-				roomsToAddIcons.forEach((room: RoomIdWithType) => {
-					getRoomCenter(selectedLayer, room.RoomID).then(center => {
-						if (center) {
-							let iconGraphic;
-							let excludedRoomIcon;
+				const floorRoomIdsIcons = roomsToAddIcons.map((room: RoomIdWithType) => room.RoomID);
 
-							if (room.roomType === 35) {
-								excludedRoomIcon = new PictureMarkerSymbol({
-									...iconProps,
-									url: `${ appAddress }/icons/WomanIcon.svg`,
-								});
-								iconGraphic = new Graphic({
-									geometry: center,
-									symbol: excludedRoomIcon
-								});
-
-							} else if (room.roomType === 26) {
-								excludedRoomIcon = new PictureMarkerSymbol({
-									...iconProps,
-									url: `${ appAddress }/icons/WheelchairIcon.svg`,
-								});
-								iconGraphic = new Graphic({
-									geometry: center,
-									symbol: excludedRoomIcon
-								});
-
-							} else if (room.roomType === 36) {
-								excludedRoomIcon = new PictureMarkerSymbol({
-									...iconProps,
-									url: `${ appAddress }/icons/ManIcon.svg`,
-								});
-								iconGraphic = new Graphic({
-									geometry: center,
-									symbol: excludedRoomIcon
-								});
-
-							} else if (room.roomType === 88) {
-								excludedRoomIcon = new PictureMarkerSymbol({
-									...iconProps,
-									url: `${ appAddress }/icons/WCIcon.svg`,
-								});
-								iconGraphic = new Graphic({
-									geometry: center,
-									symbol: excludedRoomIcon
-								});
-
-							} else {
-								iconGraphic = new Graphic({});
-							}
-							IconsGraphicsLayerRef.current?.add(iconGraphic);
-						}
-					});
+				createIconsForRooms(roomsToAddIcons, IconsGraphicsLayerRef.current);
+				IconsGraphicsLayerRef.current?.when(() => {
+					adjustIconVisibility(mapViewRef.current, floorRoomIdsIcons);
 				});
-
-
 
 				mapViewRef.current?.watch('zoom', () => {
+					debouncedAdjustIconVisibility(mapViewRef.current, floorRoomIdsIcons);
 					debouncedAdjustLabelVisibility(mapViewRef.current, floorRoomIds);
 				});
-
 			} catch (error) {
 				console.error('Error fetching rooms for floor:', error);
 			}
-
 		}
-
-
-		// Filter features based on selected floor or other criteria
-		const filteredFeatures = allFeatures.filter((feature: any) =>
-			feature.attributes.Floor === selectedFloor
-		);
-
 		fetchSome();
 	}, [selectedFloor, allFeatures, featureGraphicsLayer]);
 
 
 	const debouncedAdjustLabelVisibility = debounce(adjustLabelVisibility, 100);
+	const debouncedAdjustIconVisibility = debounce(adjustIconVisibility, 100);
 	// useEffect(() => {
 	// 	if (mapViewRef.current && highlightGraphicRef.current && "graphics" in mapViewRef.current) {
 	// 		mapViewRef.current.graphics.remove(highlightGraphicRef.current);

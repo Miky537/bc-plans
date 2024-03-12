@@ -10,11 +10,16 @@ import BuildingSelection from "./components/BuildingSelection";
 import FloorSelection from "./components/FloorSelection";
 import { FacultyProvider } from "./components/FacultyContext";
 import FavouritePlaces from "./components/FavouritePlaces";
+import TeacherSearch from "./components/TeacherSearch/TeacherSearch";
+import { QueryClient, QueryClientProvider } from "react-query";
 
+const queryClient = new QueryClient();
 function App() {
+
 
     return (
       <ThemeProvider theme={ theme }>
+          <QueryClientProvider client={ queryClient }>
           <MapProvider>
               <div className="App">
                   <BrowserRouter>
@@ -78,7 +83,8 @@ function App() {
                           }
                           />
                           <Route path="/faculty" element={
-                              <FacultySelection />
+                              <TeacherSearch />
+                              // <FacultySelection />
                           }
                           />
                           <Route path="/select" element={
@@ -89,14 +95,13 @@ function App() {
                           <Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
                           <Route path="/:faculty/:building/:floor/:roomName" element={ <Main><MapHolder /></Main> } />
                           <Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
-                          <Route path="*" element={
-                              <FacultySelection /> }
-                          />
+                          <Route path="*" element={ <FacultySelection /> } />
                       </Routes>
                       </FacultyProvider>
                   </BrowserRouter>
               </div>
           </MapProvider>
+          </QueryClientProvider>
       </ThemeProvider>
   );
 }

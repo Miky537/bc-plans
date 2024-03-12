@@ -248,7 +248,7 @@ const MapComponent = ({
 				})
 				.catch((error) => {
 					if (error.name === "AbortError") {
-						console.log("Found abortError!")
+						// console.log("Found abortError!")
 					} else {
 						console.error("Error fetching feature layer data:", error);
 						if (error?.message) {
@@ -449,7 +449,6 @@ const MapComponent = ({
 
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
 		if (!roomFeature) {
-			console.error("Room not found.");
 			return;
 		}
 
@@ -471,13 +470,13 @@ const MapComponent = ({
 
 			// Zoom to the selected room
 			abortControllerRef.current = new AbortController();
-			console.log("Trying")
+			// console.log("Trying")
 			mapViewRef.current!.goTo(
 				{ target: roomFeature.geometry, zoom: 19 },
 				{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 			).then(() => {
 				if (!mapViewRef.current) return;
-				console.log("Animation finished");
+				// console.log("Animation finished");
 			}).catch(function(error) {
 				if (error.name !== "AbortError") {
 					console.error(error);
@@ -522,7 +521,7 @@ const MapComponent = ({
 		}
 		const fetchRoomId = async() => {
 			try {
-				console.log("building", selectedBuilding)
+				// console.log("building", selectedBuilding)
 				const normalizedBuilding = replaceCzechChars(building).replace(/\s/g, "_");
 				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ selectedBuilding }/${ selectedFloorNumber }/${ roomName }`);
 				if (!response.ok) {

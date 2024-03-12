@@ -46,7 +46,6 @@ const FloorHolder = ({onFloorChange}: any) => {
 			 maxHeight="19.5em"
 		     overflow="scroll">
 			{floors.map((floor: number, index: number) => (
-				console.log("floor", selectedFloorNumber as number),
 				<React.Fragment key={floor}>
 					<Box display="flex"
 					     justifyContent="center"

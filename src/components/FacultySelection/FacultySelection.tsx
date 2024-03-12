@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Main from "../Main/Main";
 import FacultyItem from "./FacultyItem";
 import Box from "@mui/material/Box";
 import { useMapContext } from "../MapComponents/MapContext";
@@ -30,7 +29,6 @@ function FacultySelection() {
 	}, [setMapVisibility]);
 
 	return (
-		<Main>
 			<Box display="grid"
 			     gridTemplateColumns="repeat(2, 1fr)" // Create two columns
 			     rowGap={ 4 } columnGap={ 0 }
@@ -47,7 +45,6 @@ function FacultySelection() {
 				<FacultyItem name="FA" Image={FaLogo}/>
 				<FacultyItem name="CESA" Image={ CesaLogo } />
 			</Box>
-		</Main>
 	);
 }
 

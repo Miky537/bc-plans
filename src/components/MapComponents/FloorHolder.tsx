@@ -5,12 +5,12 @@ import { useMapContext } from "./MapContext";
 import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 
-const FloorHolder = ({onFloorChange, selectedFloor}: any) => {
+const FloorHolder = ({onFloorChange}: any) => {
 
-	const { setFloors, floors} = useMapContext();
-	const {selectedFaculty} = useFacultyContext();
+	const {setFloors, floors} = useMapContext();
+	const {selectedFaculty, selectedFloorNumber} = useFacultyContext();
 
-	const handleButtonClick = (floor: any) => {
+	const handleButtonClick = (floor: number) => {
 		onFloorChange(floor);
 	}
 
@@ -27,12 +27,12 @@ const FloorHolder = ({onFloorChange, selectedFloor}: any) => {
 				setFloors(floors);
 			} catch (error) {
 				console.error('Error fetching floors:', error);
-				setFloors([]); // Optionally handle errors more gracefully
+				setFloors([]);
 			}
 		};
 
 		fetchFloors();
-	}, [selectedFaculty, setFloors]); // Dependency array
+	}, [selectedFaculty, setFloors]);
 
 	return (
 		<Box zIndex="2"
@@ -45,15 +45,15 @@ const FloorHolder = ({onFloorChange, selectedFloor}: any) => {
 		     bgcolor="#DBDBDB"
 			 maxHeight="19.5em"
 		     overflow="scroll">
-			{floors.map((floor: any, index: number) => (
+			{floors.map((floor: number, index: number) => (
 				<React.Fragment key={floor}>
 					<Box display="flex"
 					     justifyContent="center"
 					     alignItems="center"
 					     padding="0.5em"
 					     width="1em"
-					     fontWeight={selectedFloor === floor ? "bolder" : "normal"}
-					     bgcolor={selectedFloor === floor ? "#ABABAB" : "#DBDBDB"}
+					     fontWeight={selectedFloorNumber === floor ? "bolder" : "normal"}
+					     bgcolor={selectedFloorNumber === floor ? "#ABABAB" : "#DBDBDB"}
 					     onClick={() => handleButtonClick(floor)}>
 						{floor}
 					</Box>

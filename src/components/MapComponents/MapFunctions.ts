@@ -2,7 +2,6 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Extent from "@arcgis/core/geometry/Extent";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import { CentroidType } from "./Centroid";
 import { getRoomLabelById } from "../parser/jsonParser";
 import Point from "@arcgis/core/geometry/Point";
@@ -12,7 +11,6 @@ import { Coordinates } from "./MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
 import PictureFillSymbol from "@arcgis/core/symbols/PictureFillSymbol";
-import Query from "@arcgis/core/rest/support/Query";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -184,23 +182,19 @@ export const getFacultyCoordinates = (name: FacultyType): Coordinates => {
 	else return { lat: 15, lng: 49 }
 }
 
-export async function getRoomCenter(featureLayer: any, RoomID: number) {
-	let query = new Query();
-	query.where = `RoomID = ${ RoomID }`;
-	query.outSpatialReference = featureLayer.spatialReference;
-	query.returnGeometry = true;
+export function getRoomCenter(allFeatures: any, RoomID: number) {
+	const feature = allFeatures.find((f: any) => f.attributes.RoomID === RoomID);
+	if (feature === undefined) {
+			return;
+	};
 
-	try {
-		const result = await featureLayer.queryFeatures(query);
-		if (result.features.length > 0) {
-			const feature = result.features[0];
-			return feature.geometry.type === "polygon"? feature.geometry.centroid : feature.geometry;
-		} else {
-			console.error('No feature found with the given RoomID:', RoomID);
-			return null;
-		}
-	} catch (error) {
-		console.error('Error querying feature layer:', error);
+	if (feature && feature.geometry.type === "polygon") {
+		return feature.geometry.centroid;
+	} else if (feature) {
+		return feature.geometry;
+	} else {
+		console.log(feature)
+		console.error('No feature found with the given RoomID:', RoomID);
 		return null;
 	}
 }

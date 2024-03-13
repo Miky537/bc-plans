@@ -3,6 +3,7 @@ import React from "react";
 import { useTheme, SxProps, Theme, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { RoomDetails } from "../MapComponents/tempFile";
+import { serverAddress } from "../../config";
 
 
 interface SwipeableDrawerComponentProps {
@@ -41,6 +42,26 @@ export function SwipeableDrawerComponent({
 	const areal_name = areal_info?.nazev_puvodni;
 
 	const theme = useTheme();
+
+	const getPhoto = async(name: any) => {
+		const token = sessionStorage.getItem('sessionToken');
+		const response = await fetch(`https://api.vut.cz/api/nemovitosti/mistnost/1158/fotografie/225211/v1`, {
+			method: 'GET',
+			headers: {
+				'Authorization': `${ token }`,
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (!response.ok) {
+			throw new Error('Search failed');
+		}
+
+		return await response.json();
+	};
+
+
+
 	return (
 		<SwipeableDrawer
 			anchor="bottom"
@@ -56,6 +77,9 @@ export function SwipeableDrawerComponent({
 			     height="1px"
 			     width="50%"
 			     display="flex"></Box>
+			<Box>
+				Ahoj tu bude foto
+			</Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">name:</Typography><Typography variant="h6">{ nazev }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"

@@ -1,71 +1,134 @@
-import React from 'react';
-import Box from "@mui/material/Box";
-import { Typography } from "@mui/material";
-import { useFacultyContext } from "./FacultyContext";
-import { useNavigate } from "react-router-dom";
-import { replaceCzechChars } from "./FloorSelection";
+	import React, { useState, useEffect } from 'react';
+	import Box from "@mui/material/Box";
+	import { Typography, Divider, Paper } from "@mui/material";
+	import { useFacultyContext } from "./FacultyContext";
+	import { useNavigate } from "react-router-dom";
+	import { replaceCzechChars } from "./FloorSelection";
+	import { FavouritePlacesLocalStorage } from "./RoomSelectionItem";
+	import { DividerStyles } from "./TeacherSearch/styles";
+	import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+	import IconButton from "@mui/material/IconButton";
+	import { AnimatePresence, motion } from 'framer-motion'
 
-interface FavouritePlacesLocalStorage {
-	roomName: string;
-	roomId: number;
-	floorName: string;
-	buildingName: string;
-}
+	function FavouritePlaces() {
+		const navigate = useNavigate();
+		const [isFav, setIsFav] = useState<boolean>(true);
+		const [mappedItems, setMappedItems] = useState<FavouritePlacesLocalStorage[]>([]);
+		const {
+			handleRoomSelection,
+			setSelectedRoomId,
+			selectedFloor,
+			selectedFaculty,
+			setSelectedFloor,
+			setSelectedFloorNumber,
+			setSelectedBuilding
+		} = useFacultyContext();
 
-function FavouritePlaces() {
-	const navigate = useNavigate();
-	const { handleRoomSelection, setSelectedRoomId, selectedFloor } = useFacultyContext();
-	const items = localStorage.getItem('favoriteRooms');
-	let mappedItems;
-	if (items) {
-		mappedItems = JSON.parse(items);
-		console.log("Mapped items: ", mappedItems);
-	} else {
-		mappedItems = [];
-	}
-	const handleRoomClick = async({ roomName, roomId, buildingName, floorName }: FavouritePlacesLocalStorage) => {
-		console.log("Room clicked: ", roomName, roomId);
-		setSelectedRoomId(roomId);
-		handleRoomSelection(roomId);
-		// setSelectedFloor(selectedFloor);
-		const normalizedBuildingName = replaceCzechChars(buildingName)!.replace(/\s/g, "_");
-		const normalizedFloorName = replaceCzechChars(floorName)!.replace(/\s/g, "_");
-		navigate(`/FAST/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
-	};
+		useEffect(() => {
+			const items = localStorage.getItem('favoriteRooms');
+			if (items) {
+				setMappedItems(JSON.parse(items));
+			}
+		}, []);
+		const handleRoomClick = async({ roomName, roomId, buildingName, floorName }: FavouritePlacesLocalStorage) => {
+			handleRoomSelection(roomId);
+			setSelectedRoomId(roomId);
+			setSelectedFloor(selectedFloor);
+			setSelectedFloorNumber(Number(floorName.split(" ")[1]));
+			setSelectedBuilding(buildingName);
+			const normalizedBuildingName = replaceCzechChars(buildingName).replace(/\s/g, "_");
+			const normalizedFloorName = replaceCzechChars(floorName).replace(/\s/g, "_");
+			navigate(`/${ selectedFaculty }/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
+		};
 
-	return (
-		<Box display="flex"
-		     flexDirection="column"
-		     bgcolor="#212121"
-		     justifyContent="flex-start"
-		     height="100%"
-		     width="100%">
-			<Typography variant="h4" textAlign="center" mt={ 4 } mb={ 4 } color="white">Favourite Places</Typography>
-			<Box display="flex" flexDirection="column" justifyContent="flex-start" height="100%" width="100%"
-			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white">
-				<Box width="100%" bgcolor="#424242" color="white">
-					{ mappedItems.length > 0? (
-						mappedItems.map((item: FavouritePlacesLocalStorage, index: number) => (
-							<Box key={ item.roomId }
-							     display="flex"
-							     pl="1em"
-							     pr="1em"
-							     pt="0.7em"
-							     pb="0.7em"
-							     borderTop="1px solid white"
-							     borderBottom="1px solid white"
-							     onClick={ () => handleRoomClick(item) }>
-								<Typography variant="h5" flexGrow={ 1 }>{ item.roomName }</Typography>
-								<Typography variant="h5">{ item.floorName }</Typography>
-							</Box>
-						))
-					) : (
-						<Typography>No favourite places found.</Typography>
-					) }
+		const removeFavoriteRoom = (roomId: number) => {
+			const storageKey = 'favoriteRooms';
+
+			const favoriteRoomsString = localStorage.getItem(storageKey);
+			let favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
+
+			const index = favoriteRooms.findIndex(room => room.roomId === roomId);
+
+			if (index !== -1) {
+				// Room is already a favorite, remove it
+				favoriteRooms.splice(index, 1);
+				setIsFav(false);
+				console.log('Removing room from favorites');
+			}
+			localStorage.setItem(storageKey, JSON.stringify(favoriteRooms));
+			setMappedItems(favoriteRooms);
+		};
+		useEffect(() => {
+
+		}, [isFav]);
+
+		return (
+			<Box display="flex"
+			     flexDirection="column"
+			     bgcolor="#212121"
+			     justifyContent="flex-start"
+			     height="100%"
+			     width="100%">
+				<Paper sx={{borderBottom: "1px solid white"}}>
+					<Typography variant="h4" textAlign="center" mt={ 2 } mb={ 2 } color="white">Favourite Places</Typography>
+				</Paper>
+				<Box display="flex" flexDirection="column" justifyContent="flex-start" height="100%" width="100%"
+				     pt={ 1 } pb={ 4 } bgcolor="background.paper" color="white">
+					<Box width="100%" color="white">
+						<AnimatePresence>
+						{ mappedItems.length > 0? (
+							mappedItems.map((item: FavouritePlacesLocalStorage, index: number) => (
+								<motion.div
+									key={ item.roomId }
+									layout
+									initial={ { opacity: 1, x: 0 } }
+									animate={ { opacity: 1 } }
+									exit={ { opacity: 0, y: -10 } }
+									transition={ { duration: 0.2 } }
+								>
+									<Box
+								     display="flex"
+								     width="100%"
+								     py={ 1 }
+								     borderBottom="1px solid white"
+								     bgcolor={ "background.paper" } >
+										<Box display="flex" justifyContent="space-evenly"
+										     alignItems="center" gap={ 2} pl={ 2 } onClick={ () => handleRoomClick(item) }>
+											<Typography variant="h6" sx={{width: "fit-content"}}>{ item.roomName }</Typography>
+											<Divider orientation="vertical"
+											         variant="middle"
+											         flexItem
+											         sx={ DividerStyles } />
+											<Typography variant="body1">{ item.floorName }</Typography>
+											<Divider orientation="vertical"
+											         variant="middle"
+											         flexItem
+											         sx={ DividerStyles } />
+											<Typography variant="body1">{ item.buildingName }</Typography>
+											<Divider orientation="vertical"
+											         variant="middle"
+											         flexItem
+											         sx={ DividerStyles } />
+											<Typography variant="body1">{ item.faculty }</Typography>
+										</Box>
+
+										<IconButton onClick={ () => removeFavoriteRoom(item.roomId) }
+										            sx={ { pl: 1, height: "100%", zIndex: "snack-bar", flexGrow: 1 } }>
+											<RemoveCircleOutlineIcon color="error" />
+										</IconButton>
+									</Box>
+								</motion.div>
+							))
+						) : (
+							<Paper elevation={8} sx={{p: 4, width: "60%", margin: "auto"}}>
+								<Typography variant="h5" textAlign="center">You don't have any favourite places yet!</Typography>
+							</Paper>
+						) }
+						</AnimatePresence>
+					</Box>
 				</Box>
 			</Box>
-		</Box>
-	);
-}
+		);
+	}
 
-export default FavouritePlaces;
+	export default FavouritePlaces;

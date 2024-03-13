@@ -16,6 +16,7 @@ import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useParams, useNavigate } from "react-router-dom";
 import RoomSelectionItem from "./RoomSelectionItem";
+import { useMapContext } from "./MapComponents/MapContext";
 
 export interface FetchedFloor {
 	building_id?: number;
@@ -52,7 +53,6 @@ const accordionStyles = {
 function FloorSelection() {
 	const { palette } = useTheme();
 	const [floors, setFloors] = useState<FetchedFloor[]>([]);
-	const { selectedBuildingId } = useFacultyContext();
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
@@ -64,14 +64,21 @@ function FloorSelection() {
 		setSelectedFloor,
 		setSelectedRoomId,
 		handleRoomSelection,
-		setSelectedFloorNumber
+		setSelectedFloorNumber,
+		selectedBuildingId,
+		setSelectedFloorOriginal,
+		selectedBuildingOriginal,
+		selectedFloorOriginal,
+		selectedFloorNumber
 	} = useFacultyContext();
+	const { setZoom } = useMapContext();
 
 	const handleChange = useCallback(
 		(panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
 			// console.log("Panel: ", panel, " isExpanded: ", isExpanded);
 			setExpanded(isExpanded? panel : false);
 			setSelectedFloor(isExpanded? panel : undefined);
+			setSelectedFloorOriginal(isExpanded? panel : undefined);
 			const selectedFloorLocal = replaceCzechChars(panel)!.replace(/\s/g, "_");
 			if (panel && isExpanded) {
 				navigate(`/${ selectedFaculty }/${ building }/${ selectedFloorLocal }`, { replace: true });
@@ -116,13 +123,14 @@ function FloorSelection() {
 
 
 	const handleRoomClick = async(roomName: string, roomId: number) => {
-		console.log("Room clicked: ", roomName, floor);
-		setSelectedRoomId(roomId);
+
+		await setSelectedRoomId(roomId);
 		const selectedFloorNumberLocal = extractNumberFromString(floor);
 		if (selectedFloorNumberLocal === null) return;
-		setSelectedFloorNumber(selectedFloorNumberLocal);
-		handleRoomSelection(roomId);
-		navigate(`/${ selectedFaculty }/${ building }/${ floor }/${ roomName }`);
+		await setSelectedFloorNumber(selectedFloorNumberLocal);
+		await handleRoomSelection(roomId);
+		console.log("Selected faculty: ", selectedBuilding);
+		navigate(`/${ selectedFaculty }/${ selectedBuilding!.replace(/\s/g, "_") }/${ floor }/${ roomName }`);
 	};
 
 	return (
@@ -142,7 +150,7 @@ function FloorSelection() {
 			     borderTop="2px solid gray"
 			     color="white">
 				{ floors.length > 0 && !isLoading? (
-					floors.map((floor: FetchedFloor) => (
+					floors.map((floor: FetchedFloor, index: number) => (
 						<Accordion key={ floor.floor_id }
 						           expanded={ expanded === floor.floor_name }
 						           onChange={ handleChange(floor.floor_name) }
@@ -154,17 +162,22 @@ function FloorSelection() {
 							</AccordionSummary>
 							<AccordionDetails>
 								<Box>
-									{ floor.rooms.map((room: any) => (
-
-										<Box key={ room.room_id }>
-											<RoomSelectionItem handleRoomClick={ handleRoomClick }
-											                   buildingName={ floor.building_name }
-											                   floorName={ floor.floor_name }
-											                   roomName={ room.room_number }
-											                   roomId={ room.room_id } />
-										</Box>
-
-									)) }
+									{
+										floor.rooms.map((room: any) => {
+											// console.log(floor);
+											return (
+												<Box key={ room.room_id }>
+													<RoomSelectionItem
+														handleRoomClick={ handleRoomClick }
+														buildingName={ floor.building_name }
+														floorName={ floor.floor_name }
+														roomName={ room.room_number }
+														roomId={ room.room_id }
+													/>
+												</Box>
+											);
+										})
+									}
 								</Box>
 							</AccordionDetails>
 						</Accordion>

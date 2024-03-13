@@ -212,7 +212,7 @@ export const typeToColorMapping: ColorMapping = {
 	"51": "#ed913f", // server, PC cluster IT
 	"52": "#66CDAA", // projection booth
 	"53": "#8FBC8F", // garage
-	"54": "#20B2AA", // copy room
+	"54": "#ed913f", // copy room
 	"56": "#008B8B", // photochamber
 	"57": "#ed913f", // kitchen
 	"58": "#00FFFF", // room (outside the dormitory)
@@ -277,6 +277,11 @@ export const typeToColorMapping: ColorMapping = {
 	"160": "#ed913f",  // Room
 	"172": "#8d8d8d",  // Terrace
 	"186": "#ed913f",  // Write room
+};
+
+export const iconProps = {
+	width: "20px",
+	height: "20px"
 };
 
 export const geoJsonUrl = "https://gist.githubusercontent.com/Miky537/cb568efc11c1833a5cd54ba87e583db5/raw/5a32a29cc63a8a017de7e134150ee74b2f7779ac/rektorat-mistnosti.geojson";

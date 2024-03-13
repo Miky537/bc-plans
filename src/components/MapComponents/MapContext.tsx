@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useRef } from 'react';
 import { Coordinates } from "./MapComponent";
+import MapView from "@arcgis/core/views/MapView";
 
 
 interface MapContextType {
@@ -13,6 +14,9 @@ interface MapContextType {
 	setIsMapLoaded: (loaded: boolean) => void;
 	zoom: number;
 	setZoom: (zoom: number) => void;
+	selectedFloorRoomsIds : number[];
+	setSelectedFloorRoomsIds : React.Dispatch<React.SetStateAction<number[]>>;
+	mapViewRef: React.MutableRefObject<MapView | null>;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -35,6 +39,8 @@ export const MapProvider = ({children}: any) => {
 	const [floors, setFloors] = useState<number[]>([]);
 	const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
 	const [zoom, setZoom] = useState<number>(18);
+	const [selectedFloorRoomsIds, setSelectedFloorRoomsIds] = useState<number[]>([]);
+	const mapViewRef = useRef<MapView | null>(null);
 
 	return (
 		<MapContext.Provider value={ {
@@ -47,7 +53,10 @@ export const MapProvider = ({children}: any) => {
 			isMapLoaded,
 			setIsMapLoaded,
 			zoom,
-			setZoom
+			setZoom,
+			selectedFloorRoomsIds,
+			setSelectedFloorRoomsIds,
+			mapViewRef,
 		} }>
 			{ children }
 		</MapContext.Provider>

@@ -2,40 +2,43 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { FacultyType } from "./FacultySelection/FacultySelection";
+import { useFacultyContext } from "./FacultyContext";
 
-interface RoomData {
+export interface FavouritePlacesLocalStorage {
 	roomName: string;
 	roomId: number;
-	floorName?: string;
-	floorId?: number;
-	buildingName?: string;
+	floorName: string;
+	buildingName: string;
+	faculty: FacultyType;
 }
 
 interface RoomSelectionItemProps {
 	roomName: string;
 	roomId: number;
-	floorName?: string;
-	buildingName?: string;
-	buildingId?: number;
+	floorName: string;
+	buildingName: string;
 	handleRoomClick: (roomName: string, roomId: number) => void;
 }
 
 const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, handleRoomClick }: RoomSelectionItemProps) => {
 	const [isFav, setIsFav] = useState<boolean>(false);
+	const {selectedFaculty: faculty} = useFacultyContext();
 
 	useEffect(() => {
 		const storageKey = 'favoriteRooms';
 		const favoriteRoomsString = localStorage.getItem(storageKey);
-		const favoriteRooms: RoomData[] = favoriteRoomsString ? JSON.parse(favoriteRoomsString) : [];
+		const favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString ? JSON.parse(favoriteRoomsString) : [];
 		const isFavorite = favoriteRooms.some(room => room.roomId === roomId);
 		setIsFav(isFavorite);
 	}, [roomId]);
 
-	const toggleFavoriteRoom = (roomToToggle: RoomData): void => {
+	const toggleFavoriteRoom = (roomToToggle: FavouritePlacesLocalStorage) => {
+		console.log('Toggling favorite room', roomToToggle)
 		const storageKey = 'favoriteRooms';
 
 		const favoriteRoomsString = localStorage.getItem(storageKey);
-		let favoriteRooms: RoomData[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
+		let favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
 
 		const index = favoriteRooms.findIndex(room => room.roomId === roomToToggle.roomId);
 
@@ -60,7 +63,7 @@ const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, handleRo
 			<Typography variant="h6"
 			            width="100%"
 			            onClick={ () => handleRoomClick(roomName, roomId) }>{ roomName }</Typography>
-			<IconButton onClick={() => toggleFavoriteRoom({roomName, roomId, floorName, buildingName})}>
+			<IconButton onClick={() => toggleFavoriteRoom({roomName, roomId, floorName, buildingName, faculty })}>
 				<FavoriteBorderIcon color="error"
 				                    style={ {
 					                    fontSize: "1.8rem",

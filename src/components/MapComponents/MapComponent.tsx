@@ -523,6 +523,10 @@ const MapComponent = ({
 			try {
 				// console.log("building", selectedBuilding)
 				const normalizedBuilding = replaceCzechChars(building).replace(/\s/g, "_");
+				if (!faculty || !selectedBuilding || !selectedFloorNumber || !roomName) {
+					console.log("Missing parameters for fetching room ID");
+					return
+				}
 				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ selectedBuilding }/${ selectedFloorNumber }/${ roomName }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch room ID');

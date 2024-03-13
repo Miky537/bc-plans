@@ -14,6 +14,7 @@ import { ReactComponent as FavuLogo } from "../../FacultyLogos/ffa-logo.svg";
 import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
+import { Typography, Paper } from "@mui/material";
 
 export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | "CESA" | undefined;
 function FacultySelection() {
@@ -28,12 +29,30 @@ function FacultySelection() {
 		return () => { setMapVisibility(true); };
 	}, [setMapVisibility]);
 
+	const handleFavPlacesClick = () => {
+		navigate(`/fvPlaces`);
+	}
+
 	return (
+		<Box display="flex" flexDirection="column" justifyContent="center" bgcolor="#323232">
+
 			<Box display="grid"
 			     gridTemplateColumns="repeat(2, 1fr)" // Create two columns
 			     rowGap={ 4 } columnGap={ 0 }
 			     height="100%" justifyContent="flex-end"
-			     pt={ 4 } pb={ 4 } bgcolor="#323232" color="white" overflow="scroll">
+			     pt={ 4 } pb={ 4 }  color="white" overflow="scroll">
+				<Box mt="1em"
+				     display="flex"
+				     alignItems="center"
+				     justifyContent="center"
+				     gridColumn="1 / span 2"
+				     width="80%"
+				     margin="auto"
+				     onClick={() => handleFavPlacesClick()}>
+					<Paper elevation={0} sx={{width: "100%", height: "100%", py: 3, textAlign: "center", borderRadius: 3}}>
+						<Typography variant="h5">Favourite places</Typography>
+					</Paper>
+				</Box>
 				<FacultyItem name="FIT" Image={FitLogo} />
 				<FacultyItem name="FAST" Image={FastLogo} />
 				<FacultyItem name="FSI" Image={FsiLogo}/>
@@ -45,6 +64,8 @@ function FacultySelection() {
 				<FacultyItem name="FA" Image={FaLogo}/>
 				<FacultyItem name="CESA" Image={ CesaLogo } />
 			</Box>
+		</Box>
+
 	);
 }
 

@@ -50,10 +50,6 @@ function BuildingSelection() {
 		navigate(`/FAST/${ buildingName.replace(/\s/g, "_") }`)
 	}
 
-	const handleFavPlacesClick = () => {
-		navigate(`/fvPlaces`);
-	}
-
 	return (
 		<Main>
 			<div>
@@ -69,7 +65,8 @@ function BuildingSelection() {
 								     width="100%"
 								     pt="0.7em"
 								     pb="0.7em"
-								     bgcolor={ index % 2? "black" : "grey" }
+								     bgcolor={ "background.paper" }
+								     borderBottom="1px solid white"
 								     onClick={ () => handleBuildingClick(building.building_id, building.name) }
 								>
 									<Typography variant="h5" ml="0.7em">{ building.name }</Typography>
@@ -80,16 +77,6 @@ function BuildingSelection() {
 							<CircularProgress thickness={ 3 } size="5rem" />
 						</Box>
 					) }
-					<Box position="absolute"
-					     bottom="0"
-					     py="1em"
-					     display="flex"
-					     justifyContent="center"
-					     width="100%"
-					     bgcolor="gray"
-					     onClick={() => handleFavPlacesClick()}>
-						<Typography variant="h5">Favourite places</Typography>
-					</Box>
 				</Box>
 			</div>
 

@@ -6055,6 +6055,7 @@ __metadata:
     "@types/react": "npm:^18.0.0"
     "@types/react-dom": "npm:^18.0.0"
     esri-loader: "npm:^2.14.0"
+    framer-motion: "npm:^11.0.12"
     fuse.js: "npm:^7.0.0"
     loadash: "npm:^1.0.0"
     lodash: "npm:^4.17.21"
@@ -8645,6 +8646,26 @@ __metadata:
   version: 4.3.7
   resolution: "fraction.js@npm:4.3.7"
   checksum: df291391beea9ab4c263487ffd9d17fed162dbb736982dee1379b2a8cc94e4e24e46ed508c6d278aded9080ba51872f1bc5f3a5fd8d7c74e5f105b508ac28711
+  languageName: node
+  linkType: hard
+
+"framer-motion@npm:^11.0.12":
+  version: 11.0.12
+  resolution: "framer-motion@npm:11.0.12"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: a29ddc34f8d99208e9e76ce09fa2ae431630ba7c57b7efea240b4a6effb63cfe06ca5091fa737bb599efe436d2f8223018a9363b0bd2c02d2e19bdd9e30d8342
   languageName: node
   linkType: hard
 
@@ -15014,7 +15035,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.3":
+"tslib@npm:^2.0.3, tslib@npm:^2.4.0":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb

@@ -124,12 +124,13 @@ function FloorSelection() {
 
 	const handleRoomClick = async(roomName: string, roomId: number) => {
 
-		setSelectedRoomId(roomId);
+		await setSelectedRoomId(roomId);
 		const selectedFloorNumberLocal = extractNumberFromString(floor);
 		if (selectedFloorNumberLocal === null) return;
-		setSelectedFloorNumber(selectedFloorNumberLocal);
-		handleRoomSelection(roomId);
-		navigate(`/${ selectedFaculty }/${ selectedBuilding }/${ floor }/${ roomName }`);
+		await setSelectedFloorNumber(selectedFloorNumberLocal);
+		await handleRoomSelection(roomId);
+		console.log("Selected faculty: ", selectedBuilding);
+		navigate(`/${ selectedFaculty }/${ selectedBuilding!.replace(/\s/g, "_") }/${ floor }/${ roomName }`);
 	};
 
 	return (
@@ -149,7 +150,7 @@ function FloorSelection() {
 			     borderTop="2px solid gray"
 			     color="white">
 				{ floors.length > 0 && !isLoading? (
-					floors.map((floor: FetchedFloor) => (
+					floors.map((floor: FetchedFloor, index: number) => (
 						<Accordion key={ floor.floor_id }
 						           expanded={ expanded === floor.floor_name }
 						           onChange={ handleChange(floor.floor_name) }

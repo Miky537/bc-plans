@@ -108,11 +108,6 @@ function TeacherRooms() {
 		return <div>Failed to login: { loginError.toString() }</div>;
 	}
 
-	// if (!loginSuccess) {
-	// 	return <div>Logging in...</div>;
-	// }
-
-
 	return (
 		<>
 			<Paper square>

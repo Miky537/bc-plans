@@ -9,7 +9,7 @@ export const login = async() => {
 	});
 
 	if (!response.ok) {
-		console.log(response);
+		console.log("errrorr", response);
 		throw new Error('Authentication failed');
 	}
 
@@ -32,4 +32,28 @@ export const searchTeacher = async(name: any) => {
 	}
 
 	return await response.json();
+};
+
+export const getRoomPhoto = async (roomId: number) => {
+	const token = sessionStorage.getItem('sessionToken');
+	const headers: HeadersInit = {};
+
+	if (token) {
+		headers['Authorization'] = token;
+	}
+	const response = await fetch(`${serverAddress}/api/photo/${roomId}`, {
+		method: 'GET',
+		headers: headers,
+	});
+
+	if (!response.ok) {
+		throw new Error('Failed to fetch photo');
+	}
+
+	// Convert the response to a blob if you're working with binary data
+	const imageBlob = await response.blob();
+	// Create a local URL for the blob to be used in an <img> element
+	const imageObjectURL = URL.createObjectURL(imageBlob);
+	console.log("imageObjectURL", imageObjectURL)
+	return imageObjectURL;
 };

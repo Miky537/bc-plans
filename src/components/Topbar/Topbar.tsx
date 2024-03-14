@@ -20,6 +20,7 @@ import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
 import MapIcon from '@mui/icons-material/Map';
 import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponents/MapFunctions";
 import { useFacultyContext } from "../FacultyContext";
+import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
 
 interface TopbarProps {
 	title?: string;
@@ -33,48 +34,7 @@ type FacultyIcons = {
 const Faculties = ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP", "FA", "CESA"];
 
 
-const FormControlLabelStyles = {
-	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl": {
-		top: "-18% !important",
-	},
-	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.Mui-focused": {
-		opacity: 0,
-	},
-	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiFormLabel-filled.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined": {
-		opacity: 0,
-	},
-}
-
-const SelectStyles = {
-	"&": {
-		display: "flex",
-	},
-
-	"&.faculty-select-topbar .MuiSelect-select.MuiSelect-outlined.MuiInputBase-input": {
-		paddingRight: "0em",
-	},
-	"&.faculty-select-topbar .MuiSelect-select svg": {
-		height: "2em",
-		width: "7em",
-		padding: 0,
-		display: "flex",
-		paddingTop: "0.2em",
-		paddingBottom: "0.2em",
-	},
-	"&.faculty-select-topbar .MuiSelect-select": {
-		height: "2.5em",
-		width: "9em",
-		padding: 0,
-
-	},
-	"&.faculty-select-topbar .MuiSvgIcon-root": {
-		width: "1em",
-		height: "1em",
-		color: "white",
-	},
-}
-
-export function Topbar({title, goBack}: TopbarProps) {
+export function Topbar({ title, goBack }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
 	const { setCenterCoordinates, setZoom } = useMapContext();
@@ -87,6 +47,18 @@ export function Topbar({title, goBack}: TopbarProps) {
 	const facultyType = convertPathToFacultyType(facultyName);
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
+	const isOnTeacherPage = location.pathname === '/teacher';
+	useEffect(() => {
+		if (isOnFavPlacesPage) {
+			setDisplayTitle("Favourite places");
+		} else if (isOnFacultyPage) {
+			setDisplayTitle("Select faculty");
+		} else if (isOnTeacherPage) {
+			setDisplayTitle("Teacher search");
+		} else {
+			setDisplayTitle("");
+		}
+	}, [facultyType, selectedFaculty, setSelectedFaculty, isOnFacultyPage, isOnFavPlacesPage, displayTitle, isOnTeacherPage]);
 
 	const [faculty, setFaculty] = useState<FacultyType | string>(facultyType || selectedFaculty || "");
 
@@ -109,12 +81,6 @@ export function Topbar({title, goBack}: TopbarProps) {
 		navigate(`/map/${ event.target.value.toUpperCase() }`)
 	};
 
-	const svgStyle = {
-		paddingLeft: "0.5em",
-		width: "fit-content",
-		height: "34px",
-	}
-
 	const facultyIcons: FacultyIcons = {
 		"CESA": <CesaLogo style={ svgStyle } />,
 		"FA": <FaLogo style={ svgStyle } />,
@@ -136,12 +102,12 @@ export function Topbar({title, goBack}: TopbarProps) {
 
 	return (
 		<div className="Topbar" id="topbar">
-			<IconButton sx={ { position: "absolute", left: 0, display: !isOnFacultyPage ? "inline" : "none" } }
+			<IconButton sx={ { position: "absolute", left: 0, display: !isOnFacultyPage? "inline" : "none" } }
 			            onClick={ goBack }>
-				<WestIcon sx={ {color: "white"} } />
+				<WestIcon sx={ { color: "white" } } />
 			</IconButton>
 			<Box>
-				{ !isOnFacultyPage?
+				{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage?
 					<FormControl sx={ FormControlLabelStyles }>
 						<InputLabel>Select faculty</InputLabel>
 						<Select
@@ -168,10 +134,10 @@ export function Topbar({title, goBack}: TopbarProps) {
 							}) }
 						</Select>
 					</FormControl> :
-					<Typography variant="h5">Select faculty</Typography>
+					<Typography variant="h5">{ displayTitle }</Typography>
 				}
 			</Box>
-			<IconButton onClick={handleMapIconClick} sx={ {
+			<IconButton onClick={ handleMapIconClick } sx={ {
 				position: "absolute",
 				right: 5,
 				padding: "0.2em",

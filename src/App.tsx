@@ -87,6 +87,7 @@ function App() {
                               // <FacultySelection />
                           }
                           />
+                          <Route path="/teacher" element={ <TeacherSearch /> } />
                           <Route path="/select" element={
                               <BuildingSelection /> }
                           />

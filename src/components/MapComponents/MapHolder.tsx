@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
-import RoomInfoDrawer from "./Drawer/RoomInfoDrawer";
 import { findUniqueFloorNumbers } from "../parser/jsonParser";
 import { Room, Floor, Building } from "../parser/types";
 import FloorHolder from "./FloorHolder";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
 import { useFacultyContext } from "../FacultyContext";
+import { SwipeableDrawerComponent } from "../SwipeableDrawer/SwipeableDrawerComponent";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -58,14 +58,13 @@ const MapHolder = () => {
 			<MapComponent onRoomSelection={ handleRoomSelection }
 			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
-			              selectedRoom={selectedRoomId}
-			              setSelectedRoom={setSelectedRoomId}
+			              selectedRoom={ selectedRoomId }
+			              setSelectedRoom={ setSelectedRoomId }
 			/>
-			<RoomInfoDrawer roomInfo={ selectedRoomId }
-			                isDrawerOpen={ isDrawerOpen }
-			                onClose={ handleClose }
-			                onOpen={ handleOpen }
-			                roomData={ roomData } />
+			<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
+			                          onClose={ handleClose }
+			                          onOpen={ handleOpen }
+			                          roomData={ roomData } />
 		</div>
 	);
 };

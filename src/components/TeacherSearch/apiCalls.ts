@@ -34,7 +34,7 @@ export const searchTeacher = async(name: any) => {
 	return await response.json();
 };
 
-export const getRoomPhoto = async (roomId: number) => {
+export const getRoomPhoto = async (roomId: number)=> {
 	const token = sessionStorage.getItem('sessionToken');
 	const headers: HeadersInit = {};
 
@@ -49,11 +49,14 @@ export const getRoomPhoto = async (roomId: number) => {
 	if (!response.ok) {
 		throw new Error('Failed to fetch photo');
 	}
-
+	if (response.status === 204) {
+		return "";
+	}
 	// Convert the response to a blob if you're working with binary data
 	const imageBlob = await response.blob();
+
 	// Create a local URL for the blob to be used in an <img> element
 	const imageObjectURL = URL.createObjectURL(imageBlob);
-	console.log("imageObjectURL", imageObjectURL)
+	// console.log("imageObjectURL", imageObjectURL)
 	return imageObjectURL;
 };

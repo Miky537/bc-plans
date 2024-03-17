@@ -68,8 +68,8 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	const handleRoomSearchClick = (room: RoomNames) => {
 		setSelectedRoom(room.room_id);
 		setSelectedFloor(room.floor_number);
-		setIsExpanded(false);
 		handleRoomSelection(room.room_id);
+		setIsExpanded(false);
 		setIsDrawerOpen(true);
 		// navigate(`/map/${ selectedFaculty }/${ selectedRoomDetail?.BuildingDetail.urlBuildingName }/${ selectedRoomDetail?.FloorDetail.urlFloorName }/${ selectedRoomDetail?.RoomDetail.urlRoomName }`, { replace: true });
 	}

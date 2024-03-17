@@ -94,6 +94,7 @@ const MapComponent = ({
 		centerCoordinates,
 		setCenterCoordinates,
 		setIsMapLoaded,
+		isMapLoaded,
 		zoom,
 		mapViewRef
 	} = useMapContext();
@@ -192,14 +193,12 @@ const MapComponent = ({
 			setIsMapLoaded(true);
 			mapView.on('click', async(event) => {
 				// Remove the current highlight if it exists
-
 				if (RoomHighlightGraphicsLayerRef.current) {
 					RoomHighlightGraphicsLayerRef.current!.removeAll();
 				}
 
 				const response = await mapView.hitTest(event);
 				if (response.results.length > 0) {
-					console.log(RoomHighlightGraphicsLayerRef.current)
 					const firstHit = response.results.find(result => result.type === "graphic");
 
 					if (firstHit && "graphic" in firstHit) {
@@ -212,20 +211,17 @@ const MapComponent = ({
 						}
 
 						const currentClickedId = clickedGraphic.attributes.id || clickedGraphic.attributes.RoomID;
-						console.log("current", currentClickedId, lastClickedId)
 						if (currentClickedId === lastClickedId) {
 							console.log("clicked same")
 						}
 						setLastClickedId(currentClickedId)
 						// Check if the graphic has an 'id' or 'RoomID' attribute
 						if ('id' in clickedGraphic.attributes || 'RoomID' in clickedGraphic.attributes) {
-							const highlightGraphic = new Graphic({
-								geometry: clickedGraphic.geometry,
-								symbol: highlightSymbol // Make sure 'highlightSymbol' is defined
-							});
+							// highlightGraphicRef.current = new Graphic({
+							// 	geometry: clickedGraphic.geometry,
+							// 	symbol: highlightSymbol // Make sure 'highlightSymbol' is defined
+							// });
 
-							// Add the highlight to the roomHighlightGraphicsLayer
-							await RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic);
 							// Trigger any additional actions on room selection
 							if ('id' in clickedGraphic.attributes) {
 								onRoomSelection(clickedGraphic.attributes.id);
@@ -247,8 +243,14 @@ const MapComponent = ({
 
 		return () => {
 			if (mapView) {
+				setIsMapLoaded(false);
 				mapView.destroy();
 				mapViewRef.current = null;
+				if (abortControllerRef.current) {
+					if ("abort" in abortControllerRef.current) {
+						abortControllerRef.current.abort();
+					}
+				}
 			}
 		};
 	}, [centerCoordinates]);
@@ -405,7 +407,7 @@ const MapComponent = ({
 	}
 
 	useEffect(() => {
-		RoomHighlightGraphicsLayerRef.current?.removeAll()
+
 		if (!mapViewRef.current || !featureLayersRef.current) return;
 		featureGraphicsLayer.removeAll();
 		const fetchSome = async() => {
@@ -474,8 +476,12 @@ const MapComponent = ({
 	}, []);
 
 	useEffect(() => {
-		RoomHighlightGraphicsLayerRef.current?.removeAll()
+		RoomHighlightGraphicsLayerRef.current?.removeAll();
+	}, [selectedFloor, selectedFloorNumber]);
+
+	useEffect(() => {
 		if (!selectedRoom || allFeatures.length === 0) return;
+		RoomHighlightGraphicsLayerRef.current!.removeAll();
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
 		if (!roomFeature) {
 			return;
@@ -488,10 +494,10 @@ const MapComponent = ({
 				geometry: roomFeature.geometry,
 				symbol: highlightSymbol // Make sure 'highlightSymbol' is defined
 			});
-			RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic)
+				RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic)
 			abortControllerRef.current = new AbortController();
 			if (roomFeature.geometry.extent) {
-				mapViewRef.current!.goTo(
+				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5)},
 					{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
@@ -510,6 +516,7 @@ const MapComponent = ({
 					if (!mapViewRef.current) return;
 					// console.log("Animation finished");
 				}).catch(function(error) {
+					if (!isMapLoaded) return;
 					if (error.name !== "AbortError") {
 						console.error(error);
 					}
@@ -526,7 +533,7 @@ const MapComponent = ({
 			abortControllerRef.current!.abort();
 			setSelectedRoom(undefined);
 		};
-	}, [selectedRoom, allFeatures, setSelectedRoom, selectedFloorNumber, selectedFloor]);
+	}, [selectedRoom, allFeatures, setSelectedRoom]);
 
 
 	useEffect(() => {

@@ -94,9 +94,9 @@ function App() {
                           <Route path="/:faculty" element={ <BuildingSelection /> } />
                           <Route path="/:faculty/:building" element={ <FloorSelection /> } />
                           <Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
-                          <Route path="/:faculty/:building/:floor/:roomName" element={ <Main><MapHolder /></Main> } />
+                          <Route path="/map/:faculty/:building/:floor/:roomName" element={ <Main><MapHolder /></Main> } />
                           <Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
-                          <Route path="*" element={ <FacultySelection /> } />
+                          <Route path="*" element={ <Main><FacultySelection /></Main> } />
                       </Routes>
                       </FacultyProvider>
                   </BrowserRouter>

@@ -9,6 +9,7 @@ import { DividerStyles } from "./TeacherSearch/styles";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import IconButton from "@mui/material/IconButton";
 import { AnimatePresence, motion } from 'framer-motion'
+import { appAddress } from "../config";
 
 function FavouritePlaces() {
 	const navigate = useNavigate();
@@ -22,7 +23,8 @@ function FavouritePlaces() {
 		selectedFaculty,
 		setSelectedFloor,
 		setSelectedFloorNumber,
-		setSelectedBuilding
+		setSelectedBuilding,
+		selectedRoomDetail,
 	} = useFacultyContext();
 
 	useEffect(() => {
@@ -32,14 +34,14 @@ function FavouritePlaces() {
 		}
 	}, []);
 	const handleRoomClick = async({ roomName, roomId, buildingName, floorName }: FavouritePlacesLocalStorage) => {
-		handleRoomSelection(roomId);
+		await handleRoomSelection(roomId);
 		setSelectedRoomId(roomId);
 		setSelectedFloor(selectedFloor);
 		setSelectedFloorNumber(Number(floorName.split(" ")[1]));
 		setSelectedBuilding(buildingName);
 		const normalizedBuildingName = replaceCzechChars(buildingName).replace(/\s/g, "_");
 		const normalizedFloorName = replaceCzechChars(floorName).replace(/\s/g, "_");
-		navigate(`/${ selectedFaculty }/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
+		navigate(`/map/${ selectedFaculty }/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
 	};
 
 	const removeFavoriteRoom = (roomId: number) => {

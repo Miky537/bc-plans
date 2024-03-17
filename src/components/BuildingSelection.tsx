@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography, Breadcrumbs, Link, useTheme, CircularProgress } from "@mui/material";
+import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
 
@@ -47,12 +47,12 @@ function BuildingSelection() {
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
 		setSelectedBuilding(buildingName);
 		setSelectedBuildingId(buildingId);
-		navigate(`/FAST/${ buildingName.replace(/\s/g, "_") }`)
+		navigate(`/${selectedFaculty}/${ buildingName.replace(/\s/g, "_") }`)
 	}
 
 	return (
-		<Main>
-			<div>
+		<Main topBarSelectedDisabled>
+			<Paper sx={{height: "100%"}}>
 				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, } }>
 					<Link><Typography variant="h5">{ selectedFaculty }</Typography></Link>
 				</Breadcrumbs>
@@ -78,7 +78,7 @@ function BuildingSelection() {
 						</Box>
 					) }
 				</Box>
-			</div>
+			</Paper>
 
 		</Main>
 	);

@@ -1,3 +1,4 @@
+import { Theme } from '@mui/material/styles';
 export const FormControlLabelStyles = {
 	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl": {
 		top: "-18% !important",
@@ -11,13 +12,16 @@ export const FormControlLabelStyles = {
 }
 
 
-export const SelectStyles = {
+export const SelectStyles = ({palette}: Theme) => ({
 	"&": {
 		display: "flex",
 	},
 
 	"&.faculty-select-topbar .MuiSelect-select.MuiSelect-outlined.MuiInputBase-input": {
 		paddingRight: "0em",
+	},
+	"&.faculty-select-topbar .MuiSvgIcon-root.Mui-disabled": {
+		color: palette.text.disabled
 	},
 	"&.faculty-select-topbar .MuiSelect-select svg": {
 		height: "2em",
@@ -38,7 +42,7 @@ export const SelectStyles = {
 		height: "1em",
 		color: "white",
 	},
-}
+})
 
 export const svgStyle = {
 	paddingLeft: "0.5em",

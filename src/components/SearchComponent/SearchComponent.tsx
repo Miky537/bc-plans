@@ -5,8 +5,8 @@ import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import { fetchFacultyRooms } from "../MapComponents/tempFile";
 import Fuse from "fuse.js";
-import { useMapContext } from "../MapComponents/MapContext";
 import { useFacultyContext } from "../FacultyContext";
+import { useNavigate } from "react-router-dom";
 
 interface RoomNames {
 	nazev: string;
@@ -24,11 +24,12 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
 	const [query, setQuery] = useState("");
+	const navigate = useNavigate();
 	const [filteredRooms, setFilteredRooms] = useState<RoomNames[]>([]);
-	const { handleRoomSelection, selectedFaculty } = useFacultyContext();
+	const { handleRoomSelection, selectedFaculty, selectedRoomDetail } = useFacultyContext();
 
 	useEffect(() => {
-		const fetchRooms = async () => {
+		const fetchRooms = async() => {
 			const fetchedRooms = await fetchFacultyRooms(selectedFaculty);
 			if (Array.isArray(fetchedRooms)) {
 				setRooms(fetchedRooms);
@@ -47,7 +48,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 			keys: ["nazev"], // Assuming the rooms have a 'name' property to search against
 		};
 		const fuse = new Fuse(rooms, options);
-		const result = query ? fuse.search(query).map(result => result.item) : [];
+		const result = query? fuse.search(query).map(result => result.item) : [];
 		setFilteredRooms(result.slice(0, 5)); // Take the top 4 results
 	}, [query, rooms]);
 
@@ -70,15 +71,16 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		setIsExpanded(false);
 		handleRoomSelection(room.room_id);
 		setIsDrawerOpen(true);
+		// navigate(`/map/${ selectedFaculty }/${ selectedRoomDetail?.BuildingDetail.urlBuildingName }/${ selectedRoomDetail?.FloorDetail.urlFloorName }/${ selectedRoomDetail?.RoomDetail.urlRoomName }`, { replace: true });
 	}
 
 	return (
 		<Box
-			sx={{
-				width: isExpanded ? "95%" : "3em",
+			sx={ {
+				width: isExpanded? "95%" : "3em",
 				height: "3em",
 				bgcolor: "black",
-				borderRadius: isExpanded ? "10px" : "50%",
+				borderRadius: isExpanded? "10px" : "50%",
 				transition: "all 0.3s ease",
 				display: "flex",
 				alignItems: "center",
@@ -87,41 +89,41 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 				top: "4em",
 				left: "0.5em",
 				zIndex: 3,
-			}}
-			onClick={handleExpand}
+			} }
+			onClick={ handleExpand }
 		>
-			{isExpanded ? (
+			{ isExpanded? (
 				<>
 					<InputBase
 						autoFocus
 						placeholder="Type to find room.."
-						inputProps={{ "aria-label": "search" }}
-						onBlur={handleCollapse}
-						onChange={handleSearch}
-						sx={{
+						inputProps={ { "aria-label": "search" } }
+						onBlur={ handleCollapse }
+						onChange={ handleSearch }
+						sx={ {
 							color: "white",
 							width: "100%",
 							'.MuiInputBase-input': {
 								padding: "10px 0",
 								pl: "1em",
 							},
-						}}
+						} }
 					/>
-					<Box sx={{ position: "absolute", top: "100%", width: "100%", bgcolor: "white", color: "black" }}>
-						{filteredRooms.map((room, index) => (
+					<Box sx={ { position: "absolute", top: "100%", width: "100%", bgcolor: "white", color: "black" } }>
+						{ filteredRooms.map((room, index) => (
 							<Box key={ index }
 							     sx={ { padding: "10px" } }
-							     onClick={ () => handleRoomSearchClick(room)}>
-								{room.nazev} : {room.floor_number}
+							     onClick={ () => handleRoomSearchClick(room) }>
+								{ room.nazev } : { room.floor_number }
 							</Box>
-						))}
+						)) }
 					</Box>
 				</>
 			) : (
-				<IconButton sx={{ color: "white", padding: 0 }}>
+				<IconButton sx={ { color: "white", padding: 0 } }>
 					<SearchIcon fontSize="large" />
 				</IconButton>
-			)}
+			) }
 		</Box>
 	);
 }

@@ -130,11 +130,11 @@ function FloorSelection() {
 		await setSelectedFloorNumber(selectedFloorNumberLocal);
 		await handleRoomSelection(roomId);
 		console.log("Selected faculty: ", selectedBuilding);
-		navigate(`/${ selectedFaculty }/${ selectedBuilding!.replace(/\s/g, "_") }/${ floor }/${ roomName }`);
+		navigate(`/map/${ selectedFaculty }/${ selectedBuilding!.replace(/\s/g, "_") }/${ floor }/${ roomName }`);
 	};
 
 	return (
-		<Main>
+		<Main topBarSelectedDisabled>
 			<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, } }>
 				<Link underline="hover"><Typography variant="h5">{ selectedFaculty }</Typography></Link>
 				<Link underline="hover"><Typography variant="h5">{ selectedBuilding }</Typography></Link>

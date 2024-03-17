@@ -15,7 +15,7 @@ import {
 	getFacultyCoordinates,
 	getRoomCenter
 } from "./MapFunctions";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { serverAddress, appAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
@@ -26,6 +26,7 @@ import Query from "@arcgis/core/rest/support/Query";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { debounce } from "@mui/material";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
+import { FacultyType } from "../FacultySelection/FacultySelection";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -83,9 +84,12 @@ const MapComponent = ({
 	const [allFeatures, setAllFeatures] = useState<any>([]);
 	const [featureGraphicsLayer] = useState(new GraphicsLayer());
 	const abortControllerRef = useRef<AbortController | null>(null);
+	const [lastClickedId, setLastClickedId] = useState(null);
+	const navigate = useNavigate();
 
 	const location = useLocation();
 
+	const {selectedRoomDetail} = useFacultyContext()
 	const {
 		centerCoordinates,
 		setCenterCoordinates,
@@ -101,11 +105,11 @@ const MapComponent = ({
 
 	const highlightSymbol = { // design one selected room
 		type: "simple-fill",
-		color: [255, 0, 0, 0.4],
+		color: [255, 0, 0, 1],
 		style: "solid",
 		outline: {
-			color: "blue",
-			width: 2
+			color: "black",
+			width: 3
 		}
 	};
 
@@ -188,19 +192,31 @@ const MapComponent = ({
 			setIsMapLoaded(true);
 			mapView.on('click', async(event) => {
 				// Remove the current highlight if it exists
+
 				if (RoomHighlightGraphicsLayerRef.current) {
 					RoomHighlightGraphicsLayerRef.current!.removeAll();
 				}
 
 				const response = await mapView.hitTest(event);
 				if (response.results.length > 0) {
+					console.log(RoomHighlightGraphicsLayerRef.current)
 					const firstHit = response.results.find(result => result.type === "graphic");
 
 					if (firstHit && "graphic" in firstHit) {
 						const clickedGraphic = firstHit.graphic;
 
-						if (clickedGraphic.attributes === null)
+
+						if (clickedGraphic.attributes === null){
+							console.log("click", clickedGraphic)
 							return;
+						}
+
+						const currentClickedId = clickedGraphic.attributes.id || clickedGraphic.attributes.RoomID;
+						console.log("current", currentClickedId, lastClickedId)
+						if (currentClickedId === lastClickedId) {
+							console.log("clicked same")
+						}
+						setLastClickedId(currentClickedId)
 						// Check if the graphic has an 'id' or 'RoomID' attribute
 						if ('id' in clickedGraphic.attributes || 'RoomID' in clickedGraphic.attributes) {
 							const highlightGraphic = new Graphic({
@@ -389,6 +405,7 @@ const MapComponent = ({
 	}
 
 	useEffect(() => {
+		RoomHighlightGraphicsLayerRef.current?.removeAll()
 		if (!mapViewRef.current || !featureLayersRef.current) return;
 		featureGraphicsLayer.removeAll();
 		const fetchSome = async() => {
@@ -457,33 +474,22 @@ const MapComponent = ({
 	}, []);
 
 	useEffect(() => {
+		RoomHighlightGraphicsLayerRef.current?.removeAll()
 		if (!selectedRoom || allFeatures.length === 0) return;
-
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
 		if (!roomFeature) {
 			return;
 		}
 
 		if (roomFeature && mapViewRef.current) { //removing existing highlight
-			// if (highlightGraphicRef.current) {
-			// 	if (highlightGraphicRef.current && "graphics" in mapViewRef.current) {
-			// 		mapViewRef.current.graphics.remove(highlightGraphicRef.current);
-			// 	}
-			// }
-			// RoomHighlightGraphicsLayerRef.current?.removeAll();
-			// Highlight the selected room
+			// Zoom to the selected room
+
 			const highlightGraphic = new Graphic({
 				geometry: roomFeature.geometry,
-				symbol: highlightSymbol
+				symbol: highlightSymbol // Make sure 'highlightSymbol' is defined
 			});
-
-			// mapViewRef.current?.graphics.add(highlightGraphic);
-			// highlightGraphicRef.current = highlightGraphic;
-
-
-			// Zoom to the selected room
+			RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic)
 			abortControllerRef.current = new AbortController();
-			// console.log("Trying")
 			if (roomFeature.geometry.extent) {
 				mapViewRef.current!.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5)},
@@ -520,19 +526,30 @@ const MapComponent = ({
 			abortControllerRef.current!.abort();
 			setSelectedRoom(undefined);
 		};
-	}, [selectedRoom, allFeatures]);
+	}, [selectedRoom, allFeatures, setSelectedRoom, selectedFloorNumber, selectedFloor]);
 
 
 	useEffect(() => {
+		if (!allFeatures) return;
 		const pathParts = location.pathname.split('/').filter(Boolean);
-		const facultyName = pathParts[1];
 		const firstUrlPart = pathParts[0];
-		// if (firstUrlPart === "map" && facultyName === undefined) {
-		// 	mapViewRef.current?.goTo({
-		// 		center: [16.603375432788052, 49.20174147400288],
-		// 		zoom: 10
-		// 	}, { duration: 500, easing: "ease-out" });
-		// }
+		const facultyName = pathParts[1];
+		const floorName = pathParts[2];
+		const roomNames = pathParts[3]
+		const roomFeature = allFeatures.find((feature: any) => {
+			// console.log("yosososososo", feature.attributes.name, roomNames)
+			return(feature.attributes.name === roomNames)
+		});
+		if (firstUrlPart === "map" && facultyName === undefined) {
+			mapViewRef.current?.goTo({
+				center: [16.603375432788052, 49.20174147400288],
+				zoom: 10
+			}, { duration: 500, easing: "ease-out" });
+			return
+		} else {
+
+		}
+
 
 		const facultyType = convertPathToFacultyType(facultyName);
 		if (facultyType) {
@@ -543,7 +560,10 @@ const MapComponent = ({
 	}, [location, setCenterCoordinates, setSelectedFaculty]);
 
 	useEffect(() => {
-
+		console.log("aaaaaaa", faculty, building,  floor,  roomName)
+		if (faculty){
+			setSelectedFaculty(faculty as FacultyType)
+		}
 		if (!faculty || !building || !floor || !roomName) {
 			return
 		}
@@ -551,20 +571,25 @@ const MapComponent = ({
 			try {
 				// console.log("building", selectedBuilding)
 				const normalizedBuilding = replaceCzechChars(building).replace(/\s/g, "_");
-				if (!faculty || !selectedBuilding || !selectedFloorNumber || !roomName) {
-					console.log("Missing parameters for fetching room ID");
+				if (!faculty || !building || !selectedFloorNumber || !roomName) {
+					console.log("Missing parameters for fetching room ID", faculty,  building, selectedFloorNumber, roomName);
 					return
 				}
-				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ selectedBuilding }/${ selectedFloorNumber }/${ roomName }`);
+				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ building }/${ selectedFloorNumber }/${ roomName }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch room ID');
 				}
 				const data = await response.json();
 				setSelectedRoomId(data.room_id);
-				handleRoomSelection(data.room_id);
+				await handleRoomSelection(data.room_id);
+				const selectedFacultyNav = selectedRoomDetail?.Faculty;
+				const selectedBuildingNav = selectedRoomDetail?.BuildingDetail.urlBuildingName;
+				const selectedFloorNav = selectedRoomDetail?.FloorDetail.urlFloorName;
+				const selectedRoomNav = selectedRoomDetail?.RoomDetail.urlRoomName;
+				// navigate(`${appAddress}/map/${selectedFacultyNav}/${selectedBuildingNav}/${selectedFloorNav}/${selectedRoomNav}`, { replace: true });
 			} catch (error) {
 				console.error('Error fetching room ID:', error);
-				setSelectedRoomId(0);
+				setSelectedRoomId(undefined);
 			}
 		};
 

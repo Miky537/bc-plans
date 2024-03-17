@@ -25,6 +25,7 @@ import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
 interface TopbarProps {
 	title?: string;
 	goBack?: () => void;
+	disabled?: boolean;
 }
 
 type FacultyIcons = {
@@ -34,7 +35,7 @@ type FacultyIcons = {
 const Faculties = ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP", "FA", "CESA"];
 
 
-export function Topbar({ title, goBack }: TopbarProps) {
+export function Topbar({ title, goBack, disabled }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
 	const { setCenterCoordinates, setZoom } = useMapContext();
@@ -95,7 +96,8 @@ export function Topbar({ title, goBack }: TopbarProps) {
 	};
 
 	const handleMapIconClick = () => {
-		setZoom(12);
+		if (!selectedFaculty)
+			setZoom(12);
 		navigate(`/map`)
 	}
 
@@ -115,6 +117,7 @@ export function Topbar({ title, goBack }: TopbarProps) {
 							className="faculty-select-topbar"
 							onChange={ handleChange }
 							sx={ SelectStyles }
+							disabled={disabled}
 						>
 							{ Faculties.map((faculty) => {
 								const Icon = facultyIcons[faculty]; // Get the corresponding icon component

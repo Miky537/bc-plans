@@ -24,11 +24,11 @@ import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
 import { TopbarProps, FacultyIcons, Faculties } from "./types";
 
 
-export function Topbar({ title, goBack, disabled }: TopbarProps) {
+export function Topbar({ goBack, disabled }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
 	const { setCenterCoordinates, setZoom, setActivateAnimation } = useMapContext();
-	const { selectedFaculty, setSelectedFaculty, setSelectedRoomDetail } = useFacultyContext();
+	const { selectedFaculty, setSelectedFaculty, facultyChangeSource, setFacultyChangeSource } = useFacultyContext();
 	const navigate = useNavigate();
 	const pathParts = location.pathname.split('/').filter(Boolean);
 	const facultyName = pathParts[1];
@@ -51,20 +51,37 @@ export function Topbar({ title, goBack, disabled }: TopbarProps) {
 		}
 	}, [facultyType, selectedFaculty, setSelectedFaculty, isOnFacultyPage, isOnFavPlacesPage, displayTitle, isOnTeacherPage]);
 
+	useEffect(() => {
+		setFacultyChangeSource('url');
+	}, [location, setFacultyChangeSource])
+
+
+	useEffect(() => {
+		const pathParts = location.pathname.split('/').filter(Boolean);
+		// Assuming the faculty part is the second segment in the URL: /map/FIT
+		const urlFaculty = pathParts.length > 1 ? pathParts[1] : null;
+		if (urlFaculty === null) { return }
+		// Convert URL segment to faculty type if necessary
+		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
+
+		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {
+			if (facultyChangeSource === "url") {
+				setSelectedFaculty(facultyFromUrl);
+				console.log("Just set it here, too bad.")
+				setCenterCoordinates(getFacultyCoordinates(facultyFromUrl));
+			}
+		}
+	}, [location, setSelectedFaculty, selectedFaculty]);
 
 	// Update state and context when URL changes
 	useEffect(() => {
 		if (facultyType) {
 			setFaculty(facultyType);
-			if (facultyType !== selectedFaculty) {
-				setSelectedFaculty(facultyType);
-			}
 		}
 	}, [facultyType, selectedFaculty, setSelectedFaculty]);
 
 
 	const handleChange = (event: SelectChangeEvent) => {
-		console.log("sdsdsdsd")
 		setFaculty(event.target.value as string);
 		setCenterCoordinates(getFacultyCoordinates(event.target.value as FacultyType));
 		setSelectedFaculty(event.target.value as FacultyType);
@@ -109,29 +126,28 @@ export function Topbar({ title, goBack, disabled }: TopbarProps) {
 					<FormControl sx={ FormControlLabelStyles }>
 						<InputLabel>Select faculty</InputLabel>
 						<Select
-							value={ faculty? faculty : "" }
+							value={ selectedFaculty? selectedFaculty : ""}
 							className="faculty-select-topbar"
 							onChange={ handleChange }
 							sx={ SelectStyles }
 							disabled={ disabled }
 						>
-							{ Faculties.map((faculty) => {
-								const Icon = facultyIcons[faculty]; // Get the corresponding icon component
-								return (
-									<MenuItem key={ faculty }
-									          onClick={ () => {handleItemClick(faculty)} }
-									          value={ faculty }
-									          sx={ {
-										          height: "2em",
-										          padding: 0,
-										          minHeight: "2.5em",
-										          display: "flex",
-										          justifyContent: "flex-start",
-									          } }>
-										{ Icon }
-									</MenuItem>
-								);
-							}) }
+							{ Faculties.map((faculty) =>
+								<MenuItem key={ faculty }
+								          onClick={ () => {
+									          handleItemClick(faculty)
+								          } }
+								          value={ faculty }
+								          sx={ {
+									          height: "2em",
+									          padding: 0,
+									          minHeight: "2.5em",
+									          display: "flex",
+									          justifyContent: "flex-start",
+								          } }>
+									{ facultyIcons[faculty] }
+								</MenuItem>
+							) }
 						</Select>
 					</FormControl> :
 					<Typography variant="h5">{ displayTitle }</Typography>

@@ -31,7 +31,10 @@ interface FacultyTypeContext {
 	setSelectedRoomOriginal: (room: string | undefined) => void;
 
 	selectedRoomDetail: SelectedRoomDetail | undefined;
-	setSelectedRoomDetail: (selectedRoomDetai: SelectedRoomDetail | undefined) => void;
+	setSelectedRoomDetail: (selectedRoomDetail: SelectedRoomDetail | undefined) => void;
+
+	facultyChangeSource: "url" | "search";
+	setFacultyChangeSource: (source: "url" | "search") => void;
 }
 
 const FacultyContext = createContext<FacultyTypeContext | undefined>(undefined);
@@ -80,6 +83,7 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedFloor, setSelectedFloor] = useState<string | undefined>(undefined);
 	const [selectedFloorNumber, setSelectedFloorNumber] = useState<number>(1);
 	const [selectedRoomDetail, setSelectedRoomDetail] = useState<SelectedRoomDetail | undefined>(undefined)
+	const [facultyChangeSource, setFacultyChangeSource] = useState<"url" | "search">('url');
 	const navigate = useNavigate()
 
 	const [selectedBuildingOriginal, setSelectedBuildingOriginal] = useState<string | undefined>(undefined);
@@ -180,6 +184,9 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 
 			selectedRoomDetail,
 			setSelectedRoomDetail,
+
+			facultyChangeSource,
+			setFacultyChangeSource,
 		} }>
 			{children}
 		</FacultyContext.Provider>

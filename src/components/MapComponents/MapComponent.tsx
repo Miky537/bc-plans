@@ -280,7 +280,7 @@ const MapComponent = ({
 	}, [allFeatures]); // Include other dependencies as needed
 
 	const displayPinsWhenZoomChange = (mapView: MapView) => {
-		console.log("Removing features")
+		RoomHighlightGraphicsLayerRef.current?.removeAll();
 		FeaturesGraphicsLayerRef.current?.graphics.removeAll()
 		Object.entries(facultyInfo).forEach(([faculty, data]) => {
 			const coordinates: Coordinates = getFacultyCoordinates(faculty as FacultyType);
@@ -352,6 +352,7 @@ const MapComponent = ({
 			if (!selectedLayer) {
 				return;
 			}
+
 			const query = new Query();
 			query.where = '1=1';
 			query.returnGeometry = true;
@@ -572,6 +573,7 @@ const MapComponent = ({
 	useEffect(() => {
 		if (!selectedRoom || allFeatures.length === 0) return;
 		RoomHighlightGraphicsLayerRef.current!.removeAll();
+
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
 		if (!roomFeature) {
 			return;
@@ -589,10 +591,10 @@ const MapComponent = ({
 			if (roomFeature.geometry.extent) {
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
-					{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
+					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
 					if (!mapViewRef.current) return;
-					// console.log("Animation finished");
+					console.log("Animation finished");
 				}).catch(function(error) {
 					if (error.name !== "AbortError") {
 						console.error(error);
@@ -624,8 +626,9 @@ const MapComponent = ({
 
 	useEffect(() => {
 		if (activateAnimation) {
+			const arr = [centerCoordinates.lat, centerCoordinates.lng]
 			mapViewRef.current?.goTo({
-				center: centerCoordinates,
+				target: arr,
 				zoom: zoom
 			}, { duration: 500, easing: "ease-out" })
 				.then(() => {
@@ -637,38 +640,7 @@ const MapComponent = ({
 		}
 	}, [activateAnimation])
 
-
 	useEffect(() => {
-		if (!allFeatures) return;
-		const pathParts = location.pathname.split('/').filter(Boolean);
-		const firstUrlPart = pathParts[0];
-		const facultyName = pathParts[1];
-		const floorName = pathParts[2];
-		const roomNames = pathParts[3]
-		const roomFeature = allFeatures.find((feature: any) => {
-			return (feature.attributes.name === roomNames)
-		});
-		if (firstUrlPart === "map" && facultyName === undefined) {
-			mapViewRef.current?.goTo({
-				center: [16.603375432788052, 49.20174147400288],
-				zoom: 10
-			}, { duration: 500, easing: "ease-out" });
-			return
-		} else {
-
-		}
-
-
-		const facultyType = convertPathToFacultyType(facultyName);
-		if (facultyType) {
-			const facultyCoordinates = getFacultyCoordinates(facultyType);
-			setCenterCoordinates(facultyCoordinates);
-			setSelectedFaculty(facultyType);
-		}
-	}, [location, setCenterCoordinates, setSelectedFaculty]);
-
-	useEffect(() => {
-		// console.log("aaaaaaa", faculty, building, floor, roomName)
 		if (faculty) {
 			setSelectedFaculty(faculty as FacultyType)
 		}

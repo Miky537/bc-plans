@@ -21,31 +21,21 @@ import MapIcon from '@mui/icons-material/Map';
 import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponents/MapFunctions";
 import { useFacultyContext } from "../FacultyContext";
 import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
-
-interface TopbarProps {
-	title?: string;
-	goBack?: () => void;
-	disabled?: boolean;
-}
-
-type FacultyIcons = {
-	[key: string]: React.ReactElement;
-};
-
-const Faculties = ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP", "FA", "CESA"];
+import { TopbarProps, FacultyIcons, Faculties } from "./types";
 
 
 export function Topbar({ title, goBack, disabled }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
-	const { setCenterCoordinates, setZoom } = useMapContext();
-	const { selectedFaculty, setSelectedFaculty } = useFacultyContext();
+	const { setCenterCoordinates, setZoom, setActivateAnimation } = useMapContext();
+	const { selectedFaculty, setSelectedFaculty, setSelectedRoomDetail } = useFacultyContext();
 	const navigate = useNavigate();
-
 	const pathParts = location.pathname.split('/').filter(Boolean);
 	const facultyName = pathParts[1];
-
 	const facultyType = convertPathToFacultyType(facultyName);
+	const [faculty, setFaculty] = useState<FacultyType | string>(facultyType || selectedFaculty || "");
+
+
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
 	const isOnTeacherPage = location.pathname === '/teacher';
@@ -61,7 +51,6 @@ export function Topbar({ title, goBack, disabled }: TopbarProps) {
 		}
 	}, [facultyType, selectedFaculty, setSelectedFaculty, isOnFacultyPage, isOnFavPlacesPage, displayTitle, isOnTeacherPage]);
 
-	const [faculty, setFaculty] = useState<FacultyType | string>(facultyType || selectedFaculty || "");
 
 	// Update state and context when URL changes
 	useEffect(() => {
@@ -75,6 +64,7 @@ export function Topbar({ title, goBack, disabled }: TopbarProps) {
 
 
 	const handleChange = (event: SelectChangeEvent) => {
+		console.log("sdsdsdsd")
 		setFaculty(event.target.value as string);
 		setCenterCoordinates(getFacultyCoordinates(event.target.value as FacultyType));
 		setSelectedFaculty(event.target.value as FacultyType);
@@ -100,6 +90,12 @@ export function Topbar({ title, goBack, disabled }: TopbarProps) {
 			setZoom(12);
 		navigate(`/map`)
 	}
+	const handleItemClick = (clickedFaculty: string) => {
+		if (clickedFaculty === faculty) {
+			setZoom(18);
+			setActivateAnimation(true)
+		}
+	}
 
 
 	return (
@@ -117,12 +113,13 @@ export function Topbar({ title, goBack, disabled }: TopbarProps) {
 							className="faculty-select-topbar"
 							onChange={ handleChange }
 							sx={ SelectStyles }
-							disabled={disabled}
+							disabled={ disabled }
 						>
 							{ Faculties.map((faculty) => {
 								const Icon = facultyIcons[faculty]; // Get the corresponding icon component
 								return (
 									<MenuItem key={ faculty }
+									          onClick={ () => {handleItemClick(faculty)} }
 									          value={ faculty }
 									          sx={ {
 										          height: "2em",

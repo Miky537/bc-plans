@@ -12,10 +12,52 @@ import usiLogo from "./ife-logo.svg";
 
 const Faculties = ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP", "FA"];
 
-export function Topbar() {
+export const facultyInfo = {
+	"FIT": {
+		width: 247.648,
+		logo: fitLogo,
+	},
+	"FAST": {
+		width: 321.121,
+		logo: fastLogo,
+	},
+	"FSI": {
+		width: 251.159,
+		logo: fsiLogo,
+	},
+	"FEKT": {
+		width: 322.088,
+		logo: fektLogo,
+	},
+	"FAVU": {
+		width: 18.609,
+		logo: favuLogo,
+	},
+	"FCH": {
+		width: 282.266,
+		logo: fchLogo,
+		USILogo: usiLogo,
+		USIWidth: 263.148,
+	},
+	"FP": {
+		width: 225.377,
+		logo: fpLogo,
+	},
+	"FA": {
+		width: 223.439,
+		logo: faLogo,
+	},
+};
 
-
-	return (
-		<div></div>
-	);
-}
+export const FacultyIconsWithNames = {
+	"FIT": fitLogo,
+	"FAST": fastLogo,
+	"FSI": fsiLogo,
+	"FEKT": fektLogo,
+	"FAVU": favuLogo,
+	"FCH": fchLogo,
+	"USI": usiLogo,
+	"FP": fpLogo,
+	"FA": faLogo,
+	"CESA": cesaLogo
+};

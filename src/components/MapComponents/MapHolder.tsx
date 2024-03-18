@@ -6,6 +6,8 @@ import FloorHolder from "./FloorHolder";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
 import { useFacultyContext } from "../FacultyContext";
 import { SwipeableDrawerComponent } from "../SwipeableDrawer/SwipeableDrawerComponent";
+import { CircularProgress, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -17,6 +19,7 @@ const MapHolder = () => {
 
 	const [floors, setFloors] = useState(findUniqueFloorNumbers());
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
 
 	const {
 		selectedRoomId,
@@ -41,31 +44,48 @@ const MapHolder = () => {
 		selectedRoomIdRef.current = selectedRoomId;
 	}, [selectedRoomId]);
 
-	const changeFloor = (newFloor: any) => {
-		setSelectedFloorNumber(newFloor); // Update the selected floor
-	};
-
 	return (
-		<div>
-			<SearchComponent setSelectedRoom={ setSelectedRoomId }
-			                 setSelectedFloor={ setSelectedFloorNumber }
-			                 setIsDrawerOpen={ setIsDrawerOpen } />
-			<FloorHolder
-				floors={ floors }
-				onFloorChange={ changeFloor }
-				selectedFloor={ selectedFloorNumber }
-			/>
+		<Box className="Map-Holder">
+			<Box display={areFeaturesLoading? "none" : "block"}>
+				<SearchComponent setSelectedRoom={ setSelectedRoomId }
+				                 setSelectedFloor={ setSelectedFloorNumber }
+				                 setIsDrawerOpen={ setIsDrawerOpen } />
+			</Box>
+
+			<Box display={areFeaturesLoading? "none" : "block"}>
+				<FloorHolder />
+			</Box>
 			<MapComponent onRoomSelection={ handleRoomSelection }
 			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
 			              selectedRoom={ selectedRoomId }
 			              setSelectedRoom={ setSelectedRoomId }
+			              setAreFeaturesLoading={ setAreFeaturesLoading }
 			/>
 			<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
 			                          onClose={ handleClose }
 			                          onOpen={ handleOpen }
 			                          roomData={ roomData } />
-		</div>
+			<Box width="35%"
+			     position="absolute"
+			     top="4em"
+			     right={ 0 }
+			     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
+			     left={ 0 }
+			     marginLeft="auto"
+			     marginRight="auto"
+			     bgcolor="background.paper"
+			     color="white"
+			     px="1em"
+			     py="0.3em"
+			     display={ areFeaturesLoading? "flex" : "none" }
+			     borderRadius="20px"
+			     justifyContent="space-around"
+			     zIndex={ 100 }>
+				<Typography>Loading..</Typography>
+				<CircularProgress size={27} thickness={5}/>
+			</Box>
+		</Box>
 	);
 };
 

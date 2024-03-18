@@ -10,7 +10,8 @@ import { FacultyType } from "../FacultySelection/FacultySelection";
 import { Coordinates } from "./MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
-import PictureFillSymbol from "@arcgis/core/symbols/PictureFillSymbol";
+import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -49,13 +50,11 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 				attributes: {
 					isBoundingBox: true
 				},
-				symbol: new PictureFillSymbol({
-					url: "https://pbs.twimg.com/profile_images/1084194257710317569/xQVP7yO8_400x400.jpg",
-					width: 100,
-					height: 100,
+				symbol: new SimpleFillSymbol({
+					color: [255, 0, 0, 0.5], // RGBA color, here red with 50% opacity
 					outline: {
 						color: "black",
-						width: 2
+						width: 5
 					},
 				})
 			});
@@ -65,6 +64,65 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 	}).catch((err): any => {
 		console.error("Failed to query features:", err);
 	});
+};
+export const addPinMarkerWithSvg = (mapView: MapView, latitude: number, longitude: number, data: any, faculty: FacultyType) => {
+	const height = 99.189;
+	const ratio = data.width / height;
+	const desiredHeight = 30;
+	const desiredWidth = desiredHeight * ratio;
+	const point = new Point({
+		latitude: longitude,
+		longitude: latitude
+	});
+
+	// Pin symbol
+	const pinSymbol = new PictureMarkerSymbol({
+		url: "https://static.arcgis.com/images/Symbols/Shapes/RedPin1LargeB.png",
+		width: "54px",
+		height: "54px"
+	});
+
+	const pinGraphic = new Graphic({
+		geometry: point,
+		symbol: pinSymbol
+	});
+
+	mapView.graphics.add(pinGraphic);
+
+	// SVG symbol placed above the pin
+	const svgSymbol = new PictureMarkerSymbol({
+		url: data.logo, // Replace with the path to your SVG image
+		width: `${ desiredWidth }px`,
+		height: `${ desiredHeight }px`,
+		yoffset: "37px" // Half of the pin's height to position the SVG above the pin
+	});
+
+	const svgGraphic = new Graphic({
+		geometry: point, // Use the same point for placement
+		symbol: svgSymbol
+	});
+
+	if (faculty === "FCH") {
+		const desiredHeight = 30;
+		const desiredWidth = desiredHeight * ratio;
+		const usiSvgUrl = data.USILogo;
+
+		const usiSvgSymbol = new PictureMarkerSymbol({
+			url: usiSvgUrl,
+			width: `${desiredWidth}px`,
+			height: `${desiredHeight}px`,
+			yoffset: "70px" // Adjust this value based on the visual stacking requirement
+		});
+
+		const usiSvgGraphic = new Graphic({
+			geometry: point,
+			symbol: usiSvgSymbol
+		});
+
+		mapView.graphics.add(usiSvgGraphic);
+	}
+
+	mapView.graphics.add(svgGraphic);
 };
 
 
@@ -111,7 +169,7 @@ export const adjustMapHeight = () => {
 	}
 };
 
-const debounce = (func: Function, wait: number) => {
+export const debounce = (func: Function, wait: number) => {
 	let timeout: NodeJS.Timeout;
 
 	return function executedFunction(...args: any) {
@@ -156,16 +214,26 @@ export const convertPathToFacultyType = (path: string): FacultyType | null => {
 	if (!path) return null;
 	const pathUpper = path.toUpperCase();
 	switch (pathUpper) {
-		case "FIT": return "FIT";
-		case "FAST": return "FAST";
-		case "FSI": return "FSI";
-		case "FEKT": return "FEKT";
-		case "FAVU": return "FAVU";
-		case "FCH": return "FCH";
-		case "USI": return "USI";
-		case "FP": return "FP";
-		case "FA": return "FA";
-		default: return null; // or return a default value if you have one
+		case "FIT":
+			return "FIT";
+		case "FAST":
+			return "FAST";
+		case "FSI":
+			return "FSI";
+		case "FEKT":
+			return "FEKT";
+		case "FAVU":
+			return "FAVU";
+		case "FCH":
+			return "FCH";
+		case "USI":
+			return "USI";
+		case "FP":
+			return "FP";
+		case "FA":
+			return "FA";
+		default:
+			return null; // or return a default value if you have one
 	}
 };
 
@@ -179,14 +247,14 @@ export const getFacultyCoordinates = (name: FacultyType): Coordinates => {
 	else if (name === "USI") return { lat: 16.578578883550467, lng: 49.23125625760177 }
 	else if (name === "FP") return { lat: 16.573466531972247, lng: 49.231060330007544 }
 	else if (name === "FA") return { lat: 16.59381902575785, lng: 49.186889974169276 }
-	else return { lat: 15, lng: 49 }
+	else return { lat: 16, lng: 49 }
 }
 
 export function getRoomCenter(allFeatures: any, RoomID: number) {
 	const feature = allFeatures.find((f: any) => f.attributes.RoomID === RoomID);
 	if (feature === undefined) {
-			return;
-	};
+		return;
+	}
 
 	if (feature && feature.geometry.type === "polygon") {
 		return feature.geometry.centroid;

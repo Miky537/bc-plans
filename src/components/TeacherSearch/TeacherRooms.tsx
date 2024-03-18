@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Paper, TextField, Typography, Divider, InputAdornment, CircularProgress, debounce } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useMutation, useQuery } from "react-query";
-import { serverAddress } from "../../config";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import SearchIcon from "@mui/icons-material/Search";
 import { Teachers, AuthType } from "./types";
@@ -28,7 +27,7 @@ function TeacherRooms() {
 
 	const { refetch: refetchRoomInfo } = useQuery(
 		['fetchRoomInfo', roomId],
-		() => fetch(`${ serverAddress }/api/room/${ roomId }`).then(res => res.json()), // Ensure you return the result of res.json()
+		() => fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/room/${ roomId }`).then(res => res.json()), // Ensure you return the result of res.json()
 		{
 			enabled: false, // Initially, do not automatically run the query
 		}

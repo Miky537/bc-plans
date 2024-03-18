@@ -1,6 +1,5 @@
 import { Building, Floor, Room, Areal } from "../parser/types";
 import { FacultyType } from "../FacultySelection/FacultySelection";
-import { serverAddress } from "../../config";
 
 export interface RoomDetails {
 	room_info: Room;
@@ -11,7 +10,7 @@ export interface RoomDetails {
 
 export const fetchRoomInfo = async(roomId: number) => {
 	try {
-		const response = await fetch(`${serverAddress}/api/room/${ roomId }`);
+		const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/room/${ roomId }`);
 		if (!response.ok) {
 			throw new Error('Network response was not ok');
 		}
@@ -25,7 +24,7 @@ export const fetchRoomInfo = async(roomId: number) => {
 
 export const fetchFacultyRooms = async(faculty: FacultyType) => {
 	try {
-		const response = await fetch(`${serverAddress}/api/faculty/${ faculty }`);
+		const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/faculty/${ faculty }`);
 		if (!response.ok) {
 			throw new Error('Network response was not ok');
 		}

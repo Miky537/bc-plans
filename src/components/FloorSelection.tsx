@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
-import { serverAddress } from "../config";
 import {
 	Typography,
 	AccordionSummary,
@@ -89,7 +88,7 @@ function FloorSelection() {
 	useEffect(() => {
 		if (selectedBuildingId === null) return
 		setIsLoading(true);
-		const url = `${ serverAddress }/api/floors/${ selectedFaculty }/${ selectedBuildingId }`;
+		const url = `${ process.env.REACT_APP_BACKEND_URL }/api/floors/${ selectedFaculty }/${ selectedBuildingId }`;
 
 		// Fetch buildings data from the API
 		fetch(url)

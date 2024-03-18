@@ -2,16 +2,14 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Extent from "@arcgis/core/geometry/Extent";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
-import { CentroidType } from "./Centroid";
-import { getRoomLabelById } from "../parser/jsonParser";
 import Point from "@arcgis/core/geometry/Point";
-import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import { Coordinates } from "./MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
+import { facultyInfo } from "../../FacultyLogos/constants";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -66,6 +64,7 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 	});
 };
 export const addPinMarkerWithSvg = (mapView: MapView, latitude: number, longitude: number, data: any, faculty: FacultyType) => {
+	if (faculty === "USI") return;
 	const height = 99.189;
 	const ratio = data.width / height;
 	const desiredHeight = 30;
@@ -99,7 +98,12 @@ export const addPinMarkerWithSvg = (mapView: MapView, latitude: number, longitud
 
 	const svgGraphic = new Graphic({
 		geometry: point, // Use the same point for placement
-		symbol: svgSymbol
+		symbol: svgSymbol,
+		attributes: {
+			type: 'facultyAddressPin',
+			faculty: faculty,
+			address: data.address // faculty address
+		}
 	});
 
 	if (faculty === "FCH") {
@@ -109,8 +113,8 @@ export const addPinMarkerWithSvg = (mapView: MapView, latitude: number, longitud
 
 		const usiSvgSymbol = new PictureMarkerSymbol({
 			url: usiSvgUrl,
-			width: `${desiredWidth}px`,
-			height: `${desiredHeight}px`,
+			width: `${ desiredWidth }px`,
+			height: `${ desiredHeight }px`,
 			yoffset: "70px" // Adjust this value based on the visual stacking requirement
 		});
 
@@ -124,36 +128,6 @@ export const addPinMarkerWithSvg = (mapView: MapView, latitude: number, longitud
 
 	mapView.graphics.add(svgGraphic);
 };
-
-
-export const handleCentroidsLoaded = (centroids: CentroidType[], mapViewRef: any, selectedFloor: number) => {
-	centroids.forEach(({ longitude, latitude, id }: CentroidType) => {
-		const roomLabel = getRoomLabelById(id, selectedFloor);
-		const labelPoint = new Point({
-			longitude: longitude,
-			latitude: latitude
-		});
-
-		const textSymbol = new TextSymbol({
-			text: roomLabel,
-			color: "black",
-			font: {
-				size: 12,
-				family: "Arial"
-			}
-		});
-
-		const labelGraphic = new Graphic({
-			geometry: labelPoint,
-			symbol: textSymbol
-		});
-
-		if (mapViewRef.current) {
-			mapViewRef.current?.graphics.add(labelGraphic);
-		}
-	});
-};
-
 
 export const adjustMapHeight = () => {
 	const topBarElement = document.getElementById('topbar'); // Adjust 'topbar' to your topbar's ID
@@ -266,3 +240,20 @@ export function getRoomCenter(allFeatures: any, RoomID: number) {
 		return null;
 	}
 }
+
+export const displayPinsWhenZoomChange = (mapView: MapView, RoomHighlightGraphicsLayerRef: any, FeaturesGraphicsLayerRef: any) => {
+	RoomHighlightGraphicsLayerRef.current?.removeAll();
+	FeaturesGraphicsLayerRef.current?.graphics.removeAll()
+	Object.entries(facultyInfo).forEach(([faculty, data]) => {
+		if (faculty === "USI") return;
+		const coordinates: Coordinates = getFacultyCoordinates(faculty as FacultyType);
+		if (coordinates) {
+			addPinMarkerWithSvg(mapView, coordinates.lat, coordinates.lng, data, faculty as FacultyType);
+		} else {
+			console.warn(`No coordinates found for ${ faculty }`);
+		}
+	});
+}
+
+
+

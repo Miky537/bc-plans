@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 import { RoomDetails } from "../MapComponents/tempFile";
 import { getRoomPhoto } from "../TeacherSearch/apiCalls";
 import { useFacultyContext } from "../FacultyContext";
-import { useQuery } from "react-query";
 
 
 interface SwipeableDrawerComponentProps {

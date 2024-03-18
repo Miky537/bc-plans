@@ -16,7 +16,7 @@ import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useParams, useNavigate } from "react-router-dom";
 import RoomSelectionItem from "./RoomSelectionItem";
-import { useMapContext } from "./MapComponents/MapContext";
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 export interface FetchedFloor {
 	building_id?: number;
@@ -67,15 +67,11 @@ function FloorSelection() {
 		setSelectedFloorNumber,
 		selectedBuildingId,
 		setSelectedFloorOriginal,
-		selectedBuildingOriginal,
-		selectedFloorOriginal,
-		selectedFloorNumber
 	} = useFacultyContext();
-	const { setZoom } = useMapContext();
+
 
 	const handleChange = useCallback(
 		(panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-			// console.log("Panel: ", panel, " isExpanded: ", isExpanded);
 			setExpanded(isExpanded? panel : false);
 			setSelectedFloor(isExpanded? panel : undefined);
 			setSelectedFloorOriginal(isExpanded? panel : undefined);
@@ -101,7 +97,6 @@ function FloorSelection() {
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${ response.status }`);
 				}
-
 				return response.json();
 
 			})
@@ -123,22 +118,33 @@ function FloorSelection() {
 
 
 	const handleRoomClick = async(roomName: string, roomId: number) => {
-
 		await setSelectedRoomId(roomId);
 		const selectedFloorNumberLocal = extractNumberFromString(floor);
 		if (selectedFloorNumberLocal === null) return;
 		await setSelectedFloorNumber(selectedFloorNumberLocal);
 		await handleRoomSelection(roomId);
-		console.log("Selected faculty: ", selectedBuilding);
 		navigate(`/map/${ selectedFaculty }/${ selectedBuilding!.replace(/\s/g, "_") }/${ floor }/${ roomName }`);
 	};
+	const handleGoBuildingSelection = () => {
+		navigate(`/${ selectedFaculty }`);
+	}
+	const handleGoFloorSelection = () => {
+		setExpanded(false);
+	}
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, } }>
-				<Link underline="hover"><Typography variant="h5">{ selectedFaculty }</Typography></Link>
-				<Link underline="hover"><Typography variant="h5">{ selectedBuilding }</Typography></Link>
-				<Link underline="hover"><Typography variant="h5">{ selectedFloor }</Typography></Link>
+			<Breadcrumbs separator={ <NavigateNextIcon fontSize="medium" /> }
+			             sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
+				<Link underline="none" onClick={ handleGoBuildingSelection }>
+					<Typography variant="h5" color="#61677A">{ selectedFaculty }</Typography>
+				</Link>
+				<Link underline="none" onClick={ handleGoFloorSelection }>
+					<Typography variant="h5" color="#61677A">{ selectedBuilding }</Typography>
+				</Link>
+				<Link underline="none">
+					<Typography variant="h5" color="#61677A">{ selectedFloor }</Typography>
+				</Link>
 			</Breadcrumbs>
 			<Box display="flex"
 			     flexDirection="column"
@@ -154,7 +160,7 @@ function FloorSelection() {
 						<Accordion key={ floor.floor_id }
 						           expanded={ expanded === floor.floor_name }
 						           onChange={ handleChange(floor.floor_name) }
-						           sx={accordionStyles}
+						           sx={ accordionStyles }
 						           disableGutters
 						>
 							<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
@@ -164,7 +170,6 @@ function FloorSelection() {
 								<Box>
 									{
 										floor.rooms.map((room: any) => {
-											// console.log(floor);
 											return (
 												<Box key={ room.room_id }>
 													<RoomSelectionItem

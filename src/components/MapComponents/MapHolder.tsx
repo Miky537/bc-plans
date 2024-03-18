@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
-import { findUniqueFloorNumbers } from "../parser/jsonParser";
 import { Room, Floor, Building } from "../parser/types";
 import FloorHolder from "./FloorHolder";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
@@ -16,8 +15,6 @@ export interface InfoState {
 }
 
 const MapHolder = () => {
-
-	const [floors, setFloors] = useState(findUniqueFloorNumbers());
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
 
@@ -46,13 +43,13 @@ const MapHolder = () => {
 
 	return (
 		<Box className="Map-Holder">
-			<Box display={areFeaturesLoading? "none" : "block"}>
+			<Box display={ areFeaturesLoading? "none" : "block" }>
 				<SearchComponent setSelectedRoom={ setSelectedRoomId }
 				                 setSelectedFloor={ setSelectedFloorNumber }
 				                 setIsDrawerOpen={ setIsDrawerOpen } />
 			</Box>
 
-			<Box display={areFeaturesLoading? "none" : "block"}>
+			<Box display={ areFeaturesLoading? "none" : "block" }>
 				<FloorHolder />
 			</Box>
 			<MapComponent onRoomSelection={ handleRoomSelection }
@@ -83,7 +80,7 @@ const MapHolder = () => {
 			     justifyContent="space-around"
 			     zIndex={ 100 }>
 				<Typography>Loading..</Typography>
-				<CircularProgress size={27} thickness={5}/>
+				<CircularProgress size={ 27 } thickness={ 5 } />
 			</Box>
 		</Box>
 	);

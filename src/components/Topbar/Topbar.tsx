@@ -58,20 +58,18 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 
 	useEffect(() => {
 		const pathParts = location.pathname.split('/').filter(Boolean);
-		// Assuming the faculty part is the second segment in the URL: /map/FIT
 		const urlFaculty = pathParts.length > 1 ? pathParts[1] : null;
 		if (urlFaculty === null) { return }
-		// Convert URL segment to faculty type if necessary
+		// Convert URL segment to faculty type
 		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
 
 		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {
 			if (facultyChangeSource === "url") {
 				setSelectedFaculty(facultyFromUrl);
-				console.log("Just set it here, too bad.")
 				setCenterCoordinates(getFacultyCoordinates(facultyFromUrl));
 			}
 		}
-	}, [location, setSelectedFaculty, selectedFaculty]);
+	}, [location, setSelectedFaculty, selectedFaculty, facultyChangeSource, setCenterCoordinates]);
 
 	// Update state and context when URL changes
 	useEffect(() => {
@@ -105,7 +103,11 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 	const handleMapIconClick = () => {
 		if (!selectedFaculty)
 			setZoom(12);
-		navigate(`/map`)
+		if (selectedFaculty === undefined) {
+			navigate(`/map`)
+		} else {
+			navigate(`/map/${ selectedFaculty }`)
+		}
 	}
 	const handleItemClick = (clickedFaculty: string) => {
 		if (clickedFaculty === faculty) {

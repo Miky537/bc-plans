@@ -76,6 +76,13 @@ function App() {
                               </Main>
                           }
                           />
+                          <Route path="/map/CESA" element={
+                              <Main>
+                                  <MapHolder />
+                              </Main>
+                          }
+                          />
+
                           <Route path="/map" element={
                               <Main>
                                   <MapHolder />
@@ -84,7 +91,6 @@ function App() {
                           />
                           <Route path="/faculty" element={
                               <TeacherSearch />
-                              // <FacultySelection />
                           }
                           />
                           <Route path="/teacher" element={ <TeacherSearch /> } />

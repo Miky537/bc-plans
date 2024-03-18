@@ -60,6 +60,6 @@
   },
   "packageManager": "yarn@4.0.1",
   "devDependencies": {
-    "@types/polylabel": "^1"
+    "@types/polylabel": "^1.1.3"
   }
 }

@@ -9,7 +9,6 @@ import { DividerStyles } from "./TeacherSearch/styles";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import IconButton from "@mui/material/IconButton";
 import { AnimatePresence, motion } from 'framer-motion'
-import { appAddress } from "../config";
 
 function FavouritePlaces() {
 	const navigate = useNavigate();
@@ -56,7 +55,6 @@ function FavouritePlaces() {
 			// Room is already a favorite, remove it
 			favoriteRooms.splice(index, 1);
 			setIsFav(false);
-			console.log('Removing room from favorites');
 		}
 		localStorage.setItem(storageKey, JSON.stringify(favoriteRooms));
 		setMappedItems(favoriteRooms);

@@ -2,9 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { RoomDetails, fetchRoomInfo } from "./MapComponents/tempFile";
 import { defaultState } from "./MapComponents/constants";
 import { FacultyType } from "./FacultySelection/FacultySelection";
-import { useNavigate } from "react-router-dom";
 import { replaceCzechChars } from "./FloorSelection";
-import { appAddress } from "../config";
 
 interface FacultyTypeContext {
 	selectedBuildingId: number | null;
@@ -84,7 +82,6 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedFloorNumber, setSelectedFloorNumber] = useState<number>(1);
 	const [selectedRoomDetail, setSelectedRoomDetail] = useState<SelectedRoomDetail | undefined>(undefined)
 	const [facultyChangeSource, setFacultyChangeSource] = useState<"url" | "search">('url');
-	const navigate = useNavigate()
 
 	const [selectedBuildingOriginal, setSelectedBuildingOriginal] = useState<string | undefined>(undefined);
 	const [selectedFloorOriginal, setSelectedFloorOriginal] = useState<string | undefined>(undefined);
@@ -98,12 +95,6 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 
 		let roomInfo: RoomDetails | undefined = await fetchRoomInfo(roomId);
 		if (roomInfo === undefined) {
-			console.log("Didnt find room!");
-			setRoomData(defaultState);
-			return;
-		}
-		if (roomInfo.room_info === undefined) {
-			console.log("Didnt find room!");
 			setRoomData(defaultState);
 			return;
 		} else {
@@ -113,25 +104,19 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			setSelectedFloor(random.replace(" ", "_"))
 			setSelectedFloorNumber(roomInfo.floor_info.cislo)
 			updateSelectedRoomDetail(roomInfo);
-
-			const selectedFacultyNav = selectedRoomDetail?.Faculty;
-			const selectedBuildingNav = selectedRoomDetail?.BuildingDetail.urlBuildingName;
-			const selectedFloorNav = selectedRoomDetail?.FloorDetail.urlFloorName;
-			const selectedRoomNav = selectedRoomDetail?.RoomDetail.urlRoomName;
-			// navigate(`${appAddress}/map/${selectedFacultyNav}/${selectedBuildingNav}/${selectedFloorNav}/${selectedRoomNav}`);
 		}
 	};
 
 
 	const updateSelectedRoomDetail = (fetchedData: RoomDetails) => {
-		setSelectedRoomDetail((currentDetails) => {
+		setSelectedRoomDetail(() => {
 			const adjustedRoomDetail: RoomDetail = {
 				roomName: fetchedData.room_info.cislo,
 				roomId: fetchedData.room_info.mistnost_id,
 				urlRoomName: fetchedData.room_info.cislo,
 			};
 
-			const urlFloorName = replaceCzechChars(fetchedData.floor_info.nazev.replace(" ","_"))
+			const urlFloorName = replaceCzechChars(fetchedData.floor_info.nazev.replace(" ", "_"))
 			const adjustedFloorDetail: FloorDetail = {
 				floorName: fetchedData.floor_info.nazev,
 				floorId: fetchedData.floor_info.podlazi_id,
@@ -188,7 +173,7 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			facultyChangeSource,
 			setFacultyChangeSource,
 		} }>
-			{children}
+			{ children }
 		</FacultyContext.Provider>
 	);
 };

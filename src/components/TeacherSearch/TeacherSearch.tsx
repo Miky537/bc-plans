@@ -14,7 +14,7 @@ function TeacherSearch() {
 	const location = useLocation();
 	const currentPath = location.pathname;
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-		if (newValue === 0) {;
+		if (newValue === 0) {
 			navigate(`/faculty`, { replace: true });
 		} else {
 			navigate(`/teacher`, { replace: true });

@@ -6,7 +6,6 @@ import Box from "@mui/material/Box";
 import { fetchFacultyRooms } from "../MapComponents/tempFile";
 import Fuse from "fuse.js";
 import { useFacultyContext } from "../FacultyContext";
-import { useNavigate } from "react-router-dom";
 import { Typography, Divider } from "@mui/material";
 import HistoryIcon from '@mui/icons-material/History';
 import PlaceIcon from '@mui/icons-material/Place';
@@ -29,9 +28,13 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
 	const [query, setQuery] = useState("");
-	const navigate = useNavigate();
 	const [filteredRooms, setFilteredRooms] = useState<RoomNames[]>([]);
-	const { handleRoomSelection, selectedFaculty, setSelectedFaculty, setFacultyChangeSource } = useFacultyContext();
+	const {
+		handleRoomSelection,
+		selectedFaculty,
+		setSelectedFaculty,
+		setFacultyChangeSource,
+	} = useFacultyContext();
 	const [previouslySearchedRooms, setPreviouslySearchedRooms] = useState<RoomNames[]>([]);
 	const [isWriting, setIsWriting] = useState(false);
 
@@ -90,9 +93,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		};
 		fetchPreviouslySearched();
 	}, []);
-	useEffect(() => {
-		console.log("Just changeg", selectedFaculty)
-	}, [selectedFaculty]);
 
 	const handleRoomSearchClick = (room: RoomNames, event: any) => {
 		event.stopPropagation();
@@ -130,8 +130,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		setIsExpanded(false);
 		setIsDrawerOpen(true);
 		setSelectedFaculty(room.faculty);
-
-		// navigate(`/map/${ selectedFaculty }/${ selectedRoomDetail?.BuildingDetail.urlBuildingName }/${ selectedRoomDetail?.FloorDetail.urlFloorName }/${ selectedRoomDetail?.RoomDetail.urlRoomName }`, { replace: true });
 	}
 
 	return (

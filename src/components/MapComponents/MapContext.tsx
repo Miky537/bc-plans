@@ -17,6 +17,8 @@ interface MapContextType {
 	selectedFloorRoomsIds : number[];
 	setSelectedFloorRoomsIds : React.Dispatch<React.SetStateAction<number[]>>;
 	mapViewRef: React.MutableRefObject<MapView | null>;
+	setActivateAnimation: (activate: boolean) => void;
+	activateAnimation: boolean;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ export const MapProvider = ({children}: any) => {
 	const [zoom, setZoom] = useState<number>(18);
 	const [selectedFloorRoomsIds, setSelectedFloorRoomsIds] = useState<number[]>([]);
 	const mapViewRef = useRef<MapView | null>(null);
+	const [activateAnimation, setActivateAnimation] = useState<boolean>(false);
 
 	return (
 		<MapContext.Provider value={ {
@@ -57,6 +60,8 @@ export const MapProvider = ({children}: any) => {
 			selectedFloorRoomsIds,
 			setSelectedFloorRoomsIds,
 			mapViewRef,
+			activateAnimation,
+			setActivateAnimation
 		} }>
 			{ children }
 		</MapContext.Provider>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { serverAddress } from "../config";
-import { Typography, Breadcrumbs, Link, useTheme, CircularProgress } from "@mui/material";
+import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
 
@@ -21,8 +21,6 @@ function BuildingSelection() {
 		selectedFaculty,
 		setSelectedBuildingId,
 		setSelectedBuilding,
-		selectedBuilding,
-		setSelectedBuildingOriginal
 	} = useFacultyContext();
 
 	useEffect(() => {
@@ -35,11 +33,11 @@ function BuildingSelection() {
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${ response.status }`);
 				}
-
 				return response.json();
-
 			})
-			.then(data => setBuildings(data))
+			.then(data => {
+				setBuildings(data)
+			})
 			.catch(error => console.log("Fetching buildings failed: ", error))
 			.finally(() => setIsLoading(false));
 	}, []);
@@ -47,20 +45,22 @@ function BuildingSelection() {
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
 		setSelectedBuilding(buildingName);
 		setSelectedBuildingId(buildingId);
-		navigate(`/FAST/${ buildingName.replace(/\s/g, "_") }`)
+		navigate(`/${selectedFaculty}/${ buildingName.replace(/\s/g, "_") }`)
 	}
 
 	return (
-		<Main>
-			<div>
-				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, } }>
-					<Link><Typography variant="h5">{ selectedFaculty }</Typography></Link>
+		<Main topBarSelectedDisabled>
+			<Paper sx={{height: "100%"}}>
+				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
+					<Link underline="none"><Typography variant="h5" color="#61677A" >{ selectedFaculty }</Typography></Link>
 				</Breadcrumbs>
-				<Box display="flex" flexDirection="column" justifyContent="flex-start" height="100%" width="100%"
-				     pb={ 4 } bgcolor="#323232" color="white" borderTop="2px solid gray">
+				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%"
+				     mb={ 4 } color="white" borderTop="2px solid gray">
 					{ buildings.length > 0 && !isLoading? ( //first sort the buildings by name, then map them to a list
-						buildings.sort((a: BuildingSelection, b: BuildingSelection) => a.name.localeCompare(b.name))
-							.map((building: BuildingSelection, index) => (
+						buildings
+							.filter((building: BuildingSelection) => building.building_id !== 39)
+							.sort((a: BuildingSelection, b: BuildingSelection) => a.name.localeCompare(b.name))
+							.map((building: BuildingSelection) => (
 								<Box key={ building.building_id }
 								     width="100%"
 								     pt="0.7em"
@@ -78,7 +78,7 @@ function BuildingSelection() {
 						</Box>
 					) }
 				</Box>
-			</div>
+			</Paper>
 
 		</Main>
 	);

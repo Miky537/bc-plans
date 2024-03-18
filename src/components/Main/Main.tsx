@@ -9,10 +9,10 @@ import { useMapContext } from "../MapComponents/MapContext";
 interface MainProps {
 	children: React.ReactNode;
 	topBarTitle?: string;
-
+	topBarSelectedDisabled?: boolean;
 }
 
-export default function Main({children, topBarTitle}: MainProps) {
+export default function Main({children, topBarTitle, topBarSelectedDisabled}: MainProps) {
 	const navigation = useNavigate();
 	const { mapViewRef, setZoom } = useMapContext();
 	const handleGoBack = () => {
@@ -23,7 +23,7 @@ export default function Main({children, topBarTitle}: MainProps) {
 
 	return (
 		<Box display="flex" flexDirection="column" height="100vh">
-			<Topbar title={topBarTitle} goBack={handleGoBack} />
+			<Topbar title={topBarTitle} goBack={handleGoBack} disabled={topBarSelectedDisabled} />
 			<Content>{ children }</Content>
 		</Box>
 	);

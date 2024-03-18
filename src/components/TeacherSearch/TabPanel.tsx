@@ -4,7 +4,7 @@ import { Paper } from "@mui/material";
 import { TabPanelProps } from "./types";
 
 function TabPanel(props: TabPanelProps) {
-	const { children, value, index, ...other } = props;
+	const { children, value, index } = props;
 
 	return (
 		<Box

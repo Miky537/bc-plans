@@ -7,7 +7,6 @@ import { useMapContext } from "../MapComponents/MapContext";
 import { Coordinates } from "../MapComponents/MapComponent";
 import { getFacultyCoordinates } from "../MapComponents/MapFunctions";
 import { useFacultyContext } from "../FacultyContext";
-import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 
 interface FacultyItemProps {
 	name: FacultyType;
@@ -31,7 +30,7 @@ function FacultyItem({ name, Image }: FacultyItemProps) {
 		     justifyContent="center"
 		     alignItems="center"
 		     gap={ 2 }
-		     onClick={ () => handleFacultyClick(name, getFacultyCoordinates(name)) } sx={ {cursor: "pointer"} }>
+		     onClick={ () => handleFacultyClick(name, getFacultyCoordinates(name)) } sx={ { cursor: "pointer" } }>
 			<Box width="7em"
 			     height="7em"
 			     borderRadius="50%"
@@ -39,7 +38,7 @@ function FacultyItem({ name, Image }: FacultyItemProps) {
 			     display="flex"
 			     justifyContent="center"
 			     alignItems="center" overflow="hidden">
-				{Image ? <Image style={{ width: "8em" }} /> : null}
+				{ Image? <Image style={ { width: "8em" } } /> : null }
 			</Box>
 
 			<Typography>{ name?.toString() }</Typography>

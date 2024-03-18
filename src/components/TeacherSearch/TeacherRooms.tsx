@@ -37,7 +37,7 @@ function TeacherRooms() {
 			queryKey: ['searchTeacher', teacherName],
 			queryFn: () => searchTeacher(teacherName),
 			enabled: false, // Turn off automatic execution
-			onSuccess: ({data}) => {
+			onSuccess: ({ data }) => {
 				setTeachers(data.vysledky)
 			},
 		},
@@ -52,7 +52,6 @@ function TeacherRooms() {
 		onSuccess: (data: AuthType) => {
 			const sessionToken = data.http_session_token;
 			sessionStorage.setItem('sessionToken', sessionToken);
-			// console.log('Session token:', data.http_session_token);
 		},
 		onError: (error) => {
 			console.error('Login Error', error);
@@ -69,9 +68,6 @@ function TeacherRooms() {
 	);
 	useEffect(() => {
 		debouncedSearch(teacherName);
-
-		// Cleanup function to cancel the debounce if the component unmounts or if searchTerm changes again before the debounce executes
-		// return () => debouncedSearch.cancel();
 	}, [teacherName, debouncedSearch]);
 
 	const handleInputChange = (event: any) => {
@@ -82,36 +78,26 @@ function TeacherRooms() {
 		loginMutate();
 	}, [loginMutate]);
 
-
-
-
 	const handleTeacherTabClick = async(roomId: number | null) => {
 		if (roomId === null) {
 			return;
 		}
 		await setRoomId(roomId);
 		refetchRoomInfo().then(({ data }) => {
-			console.log('Room data:', data);
 			setSelectedRoomId(roomId);
 			setSelectedFaculty(data.building_info.zkratka_prezentacni.split(' ')[0]);
 			const normalizedBuildingName = replaceCzechChars(data.building_info.nazev_prezentacni)!.replace(/\s/g, "_")
 			setSelectedBuilding(data.building_info.nazev_prezentacni);
-			console.log('Selected building:', normalizedBuildingName);
 			const normalizedFloorName = replaceCzechChars(data.floor_info.nazev)!.replace(/\s/g, "_");
 			setSelectedFloor(normalizedFloorName);
 			setSelectedFloorNumber(data.floor_info.cislo);
-			navigate(`/${ data.building_info.zkratka_prezentacni.split(' ')[0] }/${ normalizedBuildingName }/${ normalizedFloorName }/${ data.room_info.cislo }`);
+			navigate(`/map/${ data.building_info.zkratka_prezentacni.split(' ')[0] }/${ normalizedBuildingName }/${ normalizedFloorName }/${ data.room_info.cislo }`);
 		});
 	}
 
 	if (loginError) {
 		return <div>Failed to login: { loginError.toString() }</div>;
 	}
-
-	// if (!loginSuccess) {
-	// 	return <div>Logging in...</div>;
-	// }
-
 
 	return (
 		<>

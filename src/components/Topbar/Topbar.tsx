@@ -20,83 +20,61 @@ import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
 import MapIcon from '@mui/icons-material/Map';
 import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponents/MapFunctions";
 import { useFacultyContext } from "../FacultyContext";
-
-interface TopbarProps {
-	title?: string;
-	goBack?: () => void;
-}
-
-type FacultyIcons = {
-	[key: string]: React.ReactElement;
-};
-
-const Faculties = ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP", "FA", "CESA"];
+import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
+import { TopbarProps, FacultyIcons, Faculties } from "./types";
 
 
-const FormControlLabelStyles = {
-	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl": {
-		top: "-18% !important",
-	},
-	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.Mui-focused": {
-		opacity: 0,
-	},
-	"& .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiFormLabel-filled.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined": {
-		opacity: 0,
-	},
-}
-
-const SelectStyles = {
-	"&": {
-		display: "flex",
-	},
-
-	"&.faculty-select-topbar .MuiSelect-select.MuiSelect-outlined.MuiInputBase-input": {
-		paddingRight: "0em",
-	},
-	"&.faculty-select-topbar .MuiSelect-select svg": {
-		height: "2em",
-		width: "7em",
-		padding: 0,
-		display: "flex",
-		paddingTop: "0.2em",
-		paddingBottom: "0.2em",
-	},
-	"&.faculty-select-topbar .MuiSelect-select": {
-		height: "2.5em",
-		width: "9em",
-		padding: 0,
-
-	},
-	"&.faculty-select-topbar .MuiSvgIcon-root": {
-		width: "1em",
-		height: "1em",
-		color: "white",
-	},
-}
-
-export function Topbar({title, goBack}: TopbarProps) {
+export function Topbar({ goBack, disabled }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
-	const { setCenterCoordinates, setZoom } = useMapContext();
-	const { selectedFaculty, setSelectedFaculty } = useFacultyContext();
+	const { setCenterCoordinates, setZoom, setActivateAnimation } = useMapContext();
+	const { selectedFaculty, setSelectedFaculty, facultyChangeSource, setFacultyChangeSource } = useFacultyContext();
 	const navigate = useNavigate();
-
 	const pathParts = location.pathname.split('/').filter(Boolean);
 	const facultyName = pathParts[1];
-
 	const facultyType = convertPathToFacultyType(facultyName);
+	const [faculty, setFaculty] = useState<FacultyType | string>(facultyType || selectedFaculty || "");
+
+
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
+	const isOnTeacherPage = location.pathname === '/teacher';
+	useEffect(() => {
+		if (isOnFavPlacesPage) {
+			setDisplayTitle("Favourite places");
+		} else if (isOnFacultyPage) {
+			setDisplayTitle("Select faculty");
+		} else if (isOnTeacherPage) {
+			setDisplayTitle("Teacher search");
+		} else {
+			setDisplayTitle("");
+		}
+	}, [facultyType, selectedFaculty, setSelectedFaculty, isOnFacultyPage, isOnFavPlacesPage, displayTitle, isOnTeacherPage]);
 
-	const [faculty, setFaculty] = useState<FacultyType | string>(facultyType || selectedFaculty || "");
+	useEffect(() => {
+		setFacultyChangeSource('url');
+	}, [location, setFacultyChangeSource])
+
+
+	useEffect(() => {
+		const pathParts = location.pathname.split('/').filter(Boolean);
+		const urlFaculty = pathParts.length > 1 ? pathParts[1] : null;
+		if (urlFaculty === null) { return }
+		// Convert URL segment to faculty type
+		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
+
+		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {
+			if (facultyChangeSource === "url") {
+				setSelectedFaculty(facultyFromUrl);
+				setCenterCoordinates(getFacultyCoordinates(facultyFromUrl));
+			}
+		}
+	}, [location, setSelectedFaculty, selectedFaculty, facultyChangeSource, setCenterCoordinates]);
 
 	// Update state and context when URL changes
 	useEffect(() => {
 		if (facultyType) {
 			setFaculty(facultyType);
-			if (facultyType !== selectedFaculty) {
-				setSelectedFaculty(facultyType);
-			}
 		}
 	}, [facultyType, selectedFaculty, setSelectedFaculty]);
 
@@ -108,12 +86,6 @@ export function Topbar({title, goBack}: TopbarProps) {
 		setZoom(17);
 		navigate(`/map/${ event.target.value.toUpperCase() }`)
 	};
-
-	const svgStyle = {
-		paddingLeft: "0.5em",
-		width: "fit-content",
-		height: "34px",
-	}
 
 	const facultyIcons: FacultyIcons = {
 		"CESA": <CesaLogo style={ svgStyle } />,
@@ -129,49 +101,61 @@ export function Topbar({title, goBack}: TopbarProps) {
 	};
 
 	const handleMapIconClick = () => {
-		setZoom(12);
-		navigate(`/map`)
+		if (!selectedFaculty)
+			setZoom(12);
+		if (selectedFaculty === undefined) {
+			navigate(`/map`)
+		} else {
+			navigate(`/map/${ selectedFaculty }`)
+		}
+	}
+	const handleItemClick = (clickedFaculty: string) => {
+		if (clickedFaculty === faculty) {
+			setZoom(18);
+			setActivateAnimation(true)
+		}
 	}
 
 
 	return (
 		<div className="Topbar" id="topbar">
-			<IconButton sx={ { position: "absolute", left: 0, display: !isOnFacultyPage ? "inline" : "none" } }
+			<IconButton sx={ { position: "absolute", left: 0, display: !isOnFacultyPage? "inline" : "none" } }
 			            onClick={ goBack }>
-				<WestIcon sx={ {color: "white"} } />
+				<WestIcon sx={ { color: "white" } } />
 			</IconButton>
 			<Box>
-				{ !isOnFacultyPage?
+				{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage?
 					<FormControl sx={ FormControlLabelStyles }>
 						<InputLabel>Select faculty</InputLabel>
 						<Select
-							value={ faculty? faculty : "" }
+							value={ selectedFaculty? selectedFaculty : ""}
 							className="faculty-select-topbar"
 							onChange={ handleChange }
 							sx={ SelectStyles }
+							disabled={ disabled }
 						>
-							{ Faculties.map((faculty) => {
-								const Icon = facultyIcons[faculty]; // Get the corresponding icon component
-								return (
-									<MenuItem key={ faculty }
-									          value={ faculty }
-									          sx={ {
-										          height: "2em",
-										          padding: 0,
-										          minHeight: "2.5em",
-										          display: "flex",
-										          justifyContent: "flex-start",
-									          } }>
-										{ Icon }
-									</MenuItem>
-								);
-							}) }
+							{ Faculties.map((faculty) =>
+								<MenuItem key={ faculty }
+								          onClick={ () => {
+									          handleItemClick(faculty)
+								          } }
+								          value={ faculty }
+								          sx={ {
+									          height: "2em",
+									          padding: 0,
+									          minHeight: "2.5em",
+									          display: "flex",
+									          justifyContent: "flex-start",
+								          } }>
+									{ facultyIcons[faculty] }
+								</MenuItem>
+							) }
 						</Select>
 					</FormControl> :
-					<Typography variant="h5">Select faculty</Typography>
+					<Typography variant="h5">{ displayTitle }</Typography>
 				}
 			</Box>
-			<IconButton onClick={handleMapIconClick} sx={ {
+			<IconButton onClick={ handleMapIconClick } sx={ {
 				position: "absolute",
 				right: 5,
 				padding: "0.2em",

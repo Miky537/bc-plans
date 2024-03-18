@@ -5,13 +5,13 @@ import { useMapContext } from "./MapContext";
 import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 
-const FloorHolder = ({onFloorChange}: any) => {
+const FloorHolder = () => {
 
 	const {setFloors, floors} = useMapContext();
-	const {selectedFaculty, selectedFloorNumber} = useFacultyContext();
+	const {selectedFaculty, selectedFloorNumber, setSelectedFloorNumber} = useFacultyContext();
 
 	const handleButtonClick = (floor: number) => {
-		onFloorChange(floor);
+		setSelectedFloorNumber(floor)
 	}
 
 	useEffect(() => {

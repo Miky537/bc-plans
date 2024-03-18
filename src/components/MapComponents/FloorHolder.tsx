@@ -2,26 +2,25 @@ import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { Divider } from "@mui/material";
 import { useMapContext } from "./MapContext";
-import { serverAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 
 const FloorHolder = () => {
 
-	const {setFloors, floors} = useMapContext();
-	const {selectedFaculty, selectedFloorNumber, setSelectedFloorNumber} = useFacultyContext();
+	const { setFloors, floors } = useMapContext();
+	const { selectedFaculty, selectedFloorNumber, setSelectedFloorNumber } = useFacultyContext();
 
 	const handleButtonClick = (floor: number) => {
 		setSelectedFloorNumber(floor)
 	}
 
 	useEffect(() => {
-		const fetchFloors = async () => {
+		const fetchFloors = async() => {
 			if (!selectedFaculty) {
 				setFloors([]);
 				return;
 			}
 			try {
-				const response = await fetch(`${serverAddress}/api/floors/${selectedFaculty}`);
+				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/floors/${ selectedFaculty }`);
 				if (!response.ok) throw new Error('Failed to fetch floors');
 				const floors: number[] = await response.json();
 				setFloors(floors);
@@ -43,23 +42,23 @@ const FloorHolder = () => {
 		     top="4em"
 		     right="1em"
 		     bgcolor="#DBDBDB"
-			 maxHeight="19.5em"
+		     maxHeight="19.5em"
 		     overflow="scroll">
-			{floors.map((floor: number, index: number) => (
-				<React.Fragment key={floor}>
+			{ floors.map((floor: number, index: number) => (
+				<React.Fragment key={ floor }>
 					<Box display="flex"
 					     justifyContent="center"
 					     alignItems="center"
 					     padding="0.5em"
 					     width="1em"
-					     fontWeight={selectedFloorNumber === floor ? "bolder" : "normal"}
-					     bgcolor={selectedFloorNumber === floor ? "#ABABAB" : "#DBDBDB"}
-					     onClick={() => handleButtonClick(floor)}>
-						{floor}
+					     fontWeight={ selectedFloorNumber === floor? "bolder" : "normal" }
+					     bgcolor={ selectedFloorNumber === floor? "#ABABAB" : "#DBDBDB" }
+					     onClick={ () => handleButtonClick(floor) }>
+						{ floor }
 					</Box>
-					{index !== floors.length - 1 && <Divider flexItem />}
+					{ index !== floors.length - 1 && <Divider flexItem /> }
 				</React.Fragment>
-			))}
+			)) }
 		</Box>
 	);
 };

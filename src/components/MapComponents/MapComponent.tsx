@@ -10,7 +10,6 @@ import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconPro
 import { useMapContext } from "./MapContext";
 import { adjustMapHeight, getRoomCenter, debounce, displayPinsWhenZoomChange } from "./MapFunctions";
 import { useParams } from "react-router-dom";
-import { serverAddress, appAddress } from "../../config";
 import { useFacultyContext } from "../FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
@@ -260,7 +259,7 @@ const MapComponent = ({
 
 	const fetchCurrentFloorRooms = async() => {
 		try {
-			const response = await fetch(`${ serverAddress }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloorNumberRef.current }`);
+			const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloorNumberRef.current }`);
 			if (!response.ok) {
 				throw new Error('Failed to fetch rooms');
 			}
@@ -415,19 +414,19 @@ const MapComponent = ({
 
 				switch (room.roomType) {
 					case 35:
-						excludedRoomIconURL = `${ appAddress }/icons/WomanIcon.svg`;
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WomanIcon.svg`;
 						break;
 					case 26:
-						excludedRoomIconURL = `${ appAddress }/icons/WheelchairIcon.svg`;
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WheelchairIcon.svg`;
 						break;
 					case 36:
-						excludedRoomIconURL = `${ appAddress }/icons/ManIcon.svg`;
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/ManIcon.svg`;
 						break;
 					case 87:
-						excludedRoomIconURL = `${ appAddress }/icons/ElevatorIcon.svg`;
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/ElevatorIcon.svg`;
 						break;
 					case 88:
-						excludedRoomIconURL = `${ appAddress }/icons/WCIcon.svg`;
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WCIcon.svg`;
 						break;
 					default:
 						excludedRoomIconURL = ''; // Default or 'none' indicating no icon should be added
@@ -476,7 +475,7 @@ const MapComponent = ({
 		featureGraphicsLayer.removeAll();
 		const fetchSome = async() => {
 			try {
-				const response = await fetch(`${ serverAddress }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloorNumber }`);
+				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloorNumber }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch rooms');
 				}
@@ -622,7 +621,7 @@ const MapComponent = ({
 					console.log("Missing parameters for fetching room ID", faculty, building, selectedFloorNumber, roomName);
 					return
 				}
-				const response = await fetch(`${ serverAddress }/api/roomid/${ faculty }/${ building }/${ selectedFloorNumber }/${ roomName }`);
+				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/roomid/${ faculty }/${ building }/${ selectedFloorNumber }/${ roomName }`);
 				if (!response.ok) {
 					throw new Error('Failed to fetch room ID');
 				}

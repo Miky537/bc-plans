@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
-import { serverAddress } from "../config";
 import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +24,7 @@ function BuildingSelection() {
 
 	useEffect(() => {
 		setIsLoading(true);
-		const url = `${ serverAddress }/api/buildings/${selectedFaculty}`;
+		const url = `${ process.env.REACT_APP_BACKEND_URL }/api/buildings/${ selectedFaculty }`;
 
 		// Fetch buildings data from the API
 		fetch(url)
@@ -45,14 +44,15 @@ function BuildingSelection() {
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
 		setSelectedBuilding(buildingName);
 		setSelectedBuildingId(buildingId);
-		navigate(`/${selectedFaculty}/${ buildingName.replace(/\s/g, "_") }`)
+		navigate(`/${ selectedFaculty }/${ buildingName.replace(/\s/g, "_") }`)
 	}
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Paper sx={{height: "100%"}}>
+			<Paper sx={ { height: "100%" } }>
 				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
-					<Link underline="none"><Typography variant="h5" color="#61677A" >{ selectedFaculty }</Typography></Link>
+					<Link underline="none"><Typography variant="h5"
+					                                   color="#61677A">{ selectedFaculty }</Typography></Link>
 				</Breadcrumbs>
 				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%"
 				     mb={ 4 } color="white" borderTop="2px solid gray">

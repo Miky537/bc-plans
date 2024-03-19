@@ -75,10 +75,9 @@ const MapComponent = ({
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const RoomHighlightGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const LabelsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
-	const [allFeatures, setAllFeatures] = useState<any>([]);
-	const [featureGraphicsLayer] = useState(new GraphicsLayer());
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const selectedFloorNumberRef = useRef(selectedFloorNumber);
+	const [allFeatures, setAllFeatures] = useState<any>([]);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogData, setDialogData] = useState<any>(null);
 
@@ -93,8 +92,8 @@ const MapComponent = ({
 	} = useMapContext();
 
 	useEffect(() => {
-		mapViewRef.current?.map.add(featureGraphicsLayer);
-	}, [featureGraphicsLayer, mapViewRef]);
+		mapViewRef.current?.map.add(FeaturesGraphicsLayerRef.current as GraphicsLayer);
+	}, [FeaturesGraphicsLayerRef.current, mapViewRef]);
 
 	const highlightSymbol = { // design one selected room
 		type: "simple-fill",
@@ -137,15 +136,14 @@ const MapComponent = ({
 		mapView.map.add(featureGraphicsLayer);
 		FeaturesGraphicsLayerRef.current = featureGraphicsLayer;
 
-		mapView.map.add(roomHighlightGraphicsLayer);
-		RoomHighlightGraphicsLayerRef.current = roomHighlightGraphicsLayer;
-
 		mapView.map.add(labelsGraphicsLayer);
 		LabelsGraphicsLayerRef.current = labelsGraphicsLayer;
 
 		mapView.map.add(iconsGraphicsLayer);
 		IconsGraphicsLayerRef.current = iconsGraphicsLayer;
 
+		mapView.map.add(roomHighlightGraphicsLayer);
+		RoomHighlightGraphicsLayerRef.current = roomHighlightGraphicsLayer;
 
 		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
 		const trackWidget = new Track({
@@ -178,7 +176,7 @@ const MapComponent = ({
 			mapView.on('click', async(event) => {
 				// Remove the current highlight if it exists
 				if (RoomHighlightGraphicsLayerRef.current) {
-					RoomHighlightGraphicsLayerRef.current!.removeAll();
+					// RoomHighlightGraphicsLayerRef.current!.removeAll();
 				}
 
 				const response = await mapView.hitTest(event);
@@ -472,7 +470,7 @@ const MapComponent = ({
 
 	useEffect(() => {
 		if (!mapViewRef.current || !featureLayersRef.current) return;
-		featureGraphicsLayer.removeAll();
+		FeaturesGraphicsLayerRef.current?.removeAll();
 		const fetchSome = async() => {
 			try {
 				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/rooms/${ selectedFaculty }/byFloor/${ selectedFloorNumber }`);
@@ -522,7 +520,7 @@ const MapComponent = ({
 			}
 		}
 		fetchSome();
-	}, [selectedFloor, allFeatures, featureGraphicsLayer]);
+	}, [selectedFloor, allFeatures, FeaturesGraphicsLayerRef.current]);
 
 
 	const debouncedAdjustLabelVisibility = debounce(adjustLabelVisibility, 50);
@@ -537,12 +535,15 @@ const MapComponent = ({
 	}, []);
 
 	useEffect(() => {
-		RoomHighlightGraphicsLayerRef.current?.removeAll();
+		// RoomHighlightGraphicsLayerRef.current?.removeAll();
 	}, [selectedFloor, selectedFloorNumber]);
 
 	useEffect(() => {
 		if (!selectedRoom || allFeatures.length === 0) return;
-		RoomHighlightGraphicsLayerRef.current!.removeAll();
+		console.log("Selected floor number changed", selectedFloorNumber);
+		// RoomHighlightGraphicsLayerRef.current!.removeAll();
+
+
 
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
 		if (!roomFeature) {
@@ -557,12 +558,14 @@ const MapComponent = ({
 				symbol: highlightSymbol // Make sure 'highlightSymbol' is defined
 			});
 			RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic)
+			console.log("Room feature", RoomHighlightGraphicsLayerRef.current?.graphics)
 			abortControllerRef.current = new AbortController();
 			if (roomFeature.geometry.extent) {
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
 					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
+					console.log("Aborted here", RoomHighlightGraphicsLayerRef.current?.graphics.length)
 					if (!mapViewRef.current) return;
 				}).catch(function(error) {
 					if (error.name !== "AbortError") {
@@ -574,6 +577,7 @@ const MapComponent = ({
 					{ target: roomFeature.geometry, zoom: 19 },
 					{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
+					console.log("Aborted there")
 					if (!mapViewRef.current) return;
 				}).catch(function(error) {
 					if (!isMapLoaded) return;
@@ -600,6 +604,7 @@ const MapComponent = ({
 				zoom: zoom
 			}, { duration: 500, easing: "ease-out" })
 				.then(() => {
+					console.log("Animation finished123");
 					setActivateAnimation(false);
 				})
 				.catch(err => {
@@ -635,7 +640,7 @@ const MapComponent = ({
 		};
 
 		fetchRoomId();
-	}, [faculty, building, floor, roomName, handleRoomSelection, selectedFloorNumber, setSelectedFaculty, setSelectedRoomId]);
+	}, [faculty, building, floor, roomName, selectedFloorNumber]);
 
 
 	return (

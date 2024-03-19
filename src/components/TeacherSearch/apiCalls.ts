@@ -1,5 +1,3 @@
-import { serverAddress } from "../../config";
-
 export const login = async() => {
 	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/auth/login`, {
 		method: 'POST',
@@ -34,14 +32,14 @@ export const searchTeacher = async(name: any) => {
 	return await response.json();
 };
 
-export const getRoomPhoto = async (roomId: number)=> {
+export const getRoomPhoto = async(roomId: number) => {
 	const token = sessionStorage.getItem('sessionToken');
 	const headers: HeadersInit = {};
 
 	if (token) {
 		headers['Authorization'] = token;
 	}
-	const response = await fetch(`${serverAddress}/api/photo/${roomId}`, {
+	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
 		method: 'GET',
 		headers: headers,
 	});

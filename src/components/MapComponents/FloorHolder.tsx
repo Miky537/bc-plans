@@ -41,6 +41,7 @@ const FloorHolder = () => {
 		     position="absolute"
 		     top="4em"
 		     right="1em"
+		     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
 		     bgcolor="#DBDBDB"
 		     maxHeight="19.5em"
 		     overflow="scroll">

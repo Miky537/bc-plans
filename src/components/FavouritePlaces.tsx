@@ -19,11 +19,10 @@ function FavouritePlaces() {
 		handleRoomSelection,
 		setSelectedRoomId,
 		selectedFloor,
-		selectedFaculty,
 		setSelectedFloor,
 		setSelectedFloorNumber,
 		setSelectedBuilding,
-		selectedRoomDetail,
+		setSelectedFaculty,
 	} = useFacultyContext();
 
 	useEffect(() => {
@@ -32,15 +31,16 @@ function FavouritePlaces() {
 			setMappedItems(JSON.parse(items));
 		}
 	}, []);
-	const handleRoomClick = async({ roomName, roomId, buildingName, floorName }: FavouritePlacesLocalStorage) => {
+	const handleRoomClick = async({ roomName, roomId, buildingName, floorName, faculty }: FavouritePlacesLocalStorage) => {
 		await handleRoomSelection(roomId);
 		setSelectedRoomId(roomId);
 		setSelectedFloor(selectedFloor);
 		setSelectedFloorNumber(Number(floorName.split(" ")[1]));
 		setSelectedBuilding(buildingName);
+		setSelectedFaculty(faculty);
 		const normalizedBuildingName = replaceCzechChars(buildingName).replace(/\s/g, "_");
 		const normalizedFloorName = replaceCzechChars(floorName).replace(/\s/g, "_");
-		navigate(`/map/${ selectedFaculty }/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
+		navigate(`/map/${ faculty }/${ normalizedBuildingName }/${ normalizedFloorName }/${ roomName }`);
 	};
 
 	const removeFavoriteRoom = (roomId: number) => {

@@ -17,6 +17,7 @@ export interface InfoState {
 const MapHolder = () => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
+	const { selectedFaculty } = useFacultyContext();
 
 	const {
 		selectedRoomId,
@@ -64,6 +65,7 @@ const MapHolder = () => {
 			                          onOpen={ handleOpen }
 			                          roomData={ roomData } />
 			<Box width="35%"
+			     maxWidth="10em"
 			     position="absolute"
 			     top="4em"
 			     right={ 0 }
@@ -75,7 +77,7 @@ const MapHolder = () => {
 			     color="white"
 			     px="1em"
 			     py="0.3em"
-			     display={ areFeaturesLoading? "flex" : "none" }
+			     display={ areFeaturesLoading && selectedFaculty !== undefined ? "flex" : "none" }
 			     borderRadius="20px"
 			     justifyContent="space-around"
 			     zIndex={ 100 }>

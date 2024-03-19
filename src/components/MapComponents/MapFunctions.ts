@@ -242,7 +242,7 @@ export function getRoomCenter(allFeatures: any, RoomID: number) {
 }
 
 export const displayPinsWhenZoomChange = (mapView: MapView, RoomHighlightGraphicsLayerRef: any, FeaturesGraphicsLayerRef: any) => {
-	RoomHighlightGraphicsLayerRef.current?.removeAll();
+	// RoomHighlightGraphicsLayerRef.current?.removeAll();
 	FeaturesGraphicsLayerRef.current?.graphics.removeAll()
 	Object.entries(facultyInfo).forEach(([faculty, data]) => {
 		if (faculty === "USI") return;

@@ -9,7 +9,7 @@ import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
 import { useMapContext } from "./MapContext";
 import { adjustMapHeight, getRoomCenter, debounce, displayPinsWhenZoomChange } from "./MapFunctions";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFacultyContext } from "../FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
@@ -81,6 +81,7 @@ const MapComponent = ({
 	const selectedFloorNumberRef = useRef(selectedFloorNumber);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogData, setDialogData] = useState<any>(null);
+	const navigate = useNavigate();
 
 	const {
 		centerCoordinates,
@@ -129,10 +130,10 @@ const MapComponent = ({
 		});
 		mapViewRef.current = mapView;
 
-		const iconsGraphicsLayer = new GraphicsLayer();
 		const featureGraphicsLayer = new GraphicsLayer();
-		const labelsGraphicsLayer = new GraphicsLayer();
 		const roomHighlightGraphicsLayer = new GraphicsLayer();
+		const labelsGraphicsLayer = new GraphicsLayer();
+		const iconsGraphicsLayer = new GraphicsLayer();
 
 		mapView.map.add(featureGraphicsLayer);
 		FeaturesGraphicsLayerRef.current = featureGraphicsLayer;
@@ -187,8 +188,6 @@ const MapComponent = ({
 
 					if (firstHit && "graphic" in firstHit) {
 						const clickedGraphic = firstHit.graphic;
-
-
 						if (clickedGraphic.attributes?.type === "facultyAddressPin") {
 							setDialogData({
 								faculty: clickedGraphic.attributes.faculty,
@@ -635,7 +634,7 @@ const MapComponent = ({
 		};
 
 		fetchRoomId();
-	}, [faculty, building, floor, roomName, handleRoomSelection, selectedFloorNumber, setSelectedFaculty, setSelectedRoomId]);
+	}, [faculty, building, floor, roomName, selectedFloorNumber, setSelectedFaculty, setSelectedRoomId]);
 
 
 	return (

@@ -1,7 +1,7 @@
 import { serverAddress } from "../../config";
 
 export const login = async() => {
-	const response = await fetch(`${ serverAddress }/api/auth/login`, {
+	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/auth/login`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export const login = async() => {
 
 export const searchTeacher = async(name: any) => {
 	const token = sessionStorage.getItem('sessionToken');
-	const response = await fetch(`${ serverAddress }/api/search/teacher/${ name }`, {
+	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/search/teacher/${ name }`, {
 		method: 'GET',
 		headers: {
 			'Authorization': `${ token }`,

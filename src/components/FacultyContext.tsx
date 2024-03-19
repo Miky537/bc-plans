@@ -88,6 +88,7 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedRoomOriginal, setSelectedRoomOriginal] = useState<string | undefined>(undefined);
 
 	const handleRoomSelection = async(roomId?: number) => {
+
 		if (roomId === undefined) {
 			return;
 		}

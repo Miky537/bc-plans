@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
-import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper } from "@mui/material";
+import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper, Button } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import { useNavigate } from "react-router-dom";
 
-export interface BuildingSelection {
+export interface BuildingSelectionInt {
 	name: string;
 	address: string;
 	building_id: number;
@@ -55,12 +55,12 @@ function BuildingSelection() {
 					                                   color="#61677A">{ selectedFaculty }</Typography></Link>
 				</Breadcrumbs>
 				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%"
-				     mb={ 4 } color="white" borderTop="2px solid gray">
+				     pb="4.2em" color={palette.text.primary} borderTop="2px solid gray">
 					{ buildings.length > 0 && !isLoading? ( //first sort the buildings by name, then map them to a list
 						buildings
-							.filter((building: BuildingSelection) => building.building_id !== 39)
-							.sort((a: BuildingSelection, b: BuildingSelection) => a.name.localeCompare(b.name))
-							.map((building: BuildingSelection) => (
+							.filter((building: BuildingSelectionInt) => building.building_id !== 39)
+							.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
+							.map((building: BuildingSelectionInt) => (
 								<Box key={ building.building_id }
 								     width="100%"
 								     pt="0.7em"
@@ -79,7 +79,22 @@ function BuildingSelection() {
 					) }
 				</Box>
 			</Paper>
-
+			<Button sx={ {
+				        position: "fixed",
+				        bottom: 0,
+				        height: "5em",
+				        bgcolor: palette.background.default,
+				        boxShadow: "rgba(255, 255, 255, 0.35) 0px 5px 15px;",
+				        width: "100%",
+				        display: "flex",
+				        alignItems: "center",
+				        justifyContent: "center",
+						border: "2px solid gray",
+			        } }
+			        onClick={ () => navigate(`/map/${ selectedFaculty }`) }
+			>
+				<Typography variant="h4" color={palette.text.primary}>Go to map</Typography>
+			</Button>
 		</Main>
 	);
 }

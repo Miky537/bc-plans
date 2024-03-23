@@ -9,7 +9,7 @@ import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
 import { useMapContext } from "./MapContext";
 import { adjustMapHeight, getRoomCenter, debounce, displayPinsWhenZoomChange } from "./MapFunctions";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useFacultyContext } from "../FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
@@ -30,8 +30,6 @@ interface MapComponentProps {
 	onRoomSelection: (roomId: number | undefined) => void;
 	selectedFloor: number;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
-	selectedRoom: number | undefined;
-	setSelectedRoom: (roomId: number | undefined) => void;
 	setAreFeaturesLoading: (areFeaturesLoading: boolean) => void;
 }
 
@@ -57,8 +55,6 @@ const MapComponent = ({
 	                      onRoomSelection,
 	                      selectedFloor,
 	                      setIsDrawerOpen,
-	                      selectedRoom,
-	                      setSelectedRoom,
 	                      setAreFeaturesLoading
                       }: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
@@ -70,6 +66,7 @@ const MapComponent = ({
 		selectedFaculty,
 		setSelectedFaculty,
 		selectedFloorNumber,
+		selectedRoomId,
 	} = useFacultyContext()
 	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
@@ -81,7 +78,6 @@ const MapComponent = ({
 	const selectedFloorNumberRef = useRef(selectedFloorNumber);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogData, setDialogData] = useState<any>(null);
-	const navigate = useNavigate();
 
 	const {
 		centerCoordinates,
@@ -536,27 +532,30 @@ const MapComponent = ({
 	}, []);
 
 	useEffect(() => {
-		RoomHighlightGraphicsLayerRef.current?.removeAll();
-	}, [selectedFloor, selectedFloorNumber]);
+		if (selectedRoomId !== undefined) {
+			RoomHighlightGraphicsLayerRef.current?.removeAll();
+		}
+	}, [selectedFloorNumber]);
 
 	useEffect(() => {
-		if (!selectedRoom || allFeatures.length === 0) return;
+		if (selectedRoomId === undefined || allFeatures.length === 0) return;
+		console.log("Selected room changed:", selectedRoomId);
 		RoomHighlightGraphicsLayerRef.current!.removeAll();
 
-		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoom);
+		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoomId);
 		if (!roomFeature) {
 			return;
 		}
 
-		if (roomFeature && mapViewRef.current) { //removing existing highlight
+		if (roomFeature && mapViewRef.current) {
 			// Zoom to the selected room
-
 			const highlightGraphic = new Graphic({
 				geometry: roomFeature.geometry,
-				symbol: highlightSymbol // Make sure 'highlightSymbol' is defined
+				symbol: highlightSymbol
 			});
 			RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic)
 			abortControllerRef.current = new AbortController();
+			console.log("Animation got called.")
 			if (roomFeature.geometry.extent) {
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
@@ -587,9 +586,9 @@ const MapComponent = ({
 
 		return () => {
 			abortControllerRef.current!.abort();
-			setSelectedRoom(undefined);
+			setSelectedRoomId(undefined);
 		};
-	}, [selectedRoom, allFeatures, setSelectedRoom]);
+	}, [selectedRoomId, allFeatures, setSelectedRoomId]);
 
 	useEffect(() => {
 		if (activateAnimation) {
@@ -625,6 +624,7 @@ const MapComponent = ({
 					throw new Error('Failed to fetch room ID');
 				}
 				const data = await response.json();
+				console.log("Fetched room ID:", data.room_id)
 				setSelectedRoomId(data.room_id);
 				await handleRoomSelection(data.room_id);
 			} catch (error) {
@@ -634,7 +634,7 @@ const MapComponent = ({
 		};
 
 		fetchRoomId();
-	}, [faculty, building, floor, roomName, selectedFloorNumber, setSelectedFaculty, setSelectedRoomId]);
+	}, [faculty, building, floor, roomName, setSelectedFaculty, setSelectedRoomId]);
 
 
 	return (

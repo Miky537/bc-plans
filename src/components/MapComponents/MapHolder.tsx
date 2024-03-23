@@ -56,8 +56,6 @@ const MapHolder = () => {
 			<MapComponent onRoomSelection={ handleRoomSelection }
 			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
-			              selectedRoom={ selectedRoomId }
-			              setSelectedRoom={ setSelectedRoomId }
 			              setAreFeaturesLoading={ setAreFeaturesLoading }
 			/>
 			<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }

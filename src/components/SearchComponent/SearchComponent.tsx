@@ -10,6 +10,46 @@ import { Typography, Divider } from "@mui/material";
 import HistoryIcon from '@mui/icons-material/History';
 import PlaceIcon from '@mui/icons-material/Place';
 import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
+import StarIcon from '@mui/icons-material/Star';
+
+const searchBoxStyle = {
+	display: "flex",
+	override: "hidden",
+	alignItems: "center",
+	padding: "10px",
+	color: "white",
+	gap: 1,
+	flexDirection: "row",
+}
+const InputBaseStyle = {
+	color: "white",
+	width: "100%",
+	'.MuiInputBase-input': {
+		padding: "10px 0",
+		pl: "1em",
+	},
+}
+
+const SearchBoxContainer = (isExpanded: boolean) => ({
+		width: isExpanded? "95%" : "3em",
+		height: "3em",
+		bgcolor: "black",
+		borderRadius: isExpanded? "10px" : "50%",
+		borderBottomLeftRadius: isExpanded? "0" : "50%",
+		borderBottomRightRadius: isExpanded? "0" : "50%",
+		transition: "all 0.3s ease",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		position: "absolute",
+		top: "4em",
+		left: "0.5em",
+		zIndex: 3,
+	}
+
+)
+
 
 interface RoomNames {
 	nazev: string;
@@ -27,6 +67,7 @@ interface SearchComponentProps {
 export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawerOpen }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [rooms, setRooms] = useState<RoomNames[]>([]);
+	const [favouriteRooms, setFavouriteRooms] = useState<FavouritePlacesLocalStorage[]>([]);
 	const [query, setQuery] = useState("");
 	const [filteredRooms, setFilteredRooms] = useState<RoomNames[]>([]);
 	const {
@@ -59,15 +100,19 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		};
 		const fuse = new Fuse(rooms, options);
 		const result = query? fuse.search(query).map(result => result.item) : [];
-		setFilteredRooms(result.slice(0, 5)); // Take the top 4 results
+		setFilteredRooms(result.slice(0, 5)); // Take the top 5 results
 	}, [query, rooms]);
 
 	const handleExpand = () => {
 		setIsExpanded(true);
 		setIsWriting(false);
 		const storedRooms = localStorage.getItem('previouslySearched');
+		const favouriteRooms = localStorage.getItem('favoriteRooms');
 		if (storedRooms) {
 			setPreviouslySearchedRooms(JSON.parse(storedRooms));
+		}
+		if (favouriteRooms) {
+			setFavouriteRooms(JSON.parse(favouriteRooms));
 		}
 	};
 
@@ -132,24 +177,20 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		setSelectedFaculty(room.faculty);
 	}
 
+	const handleFavouriteRoomClick = (room: FavouritePlacesLocalStorage, event: any) => {
+		setIsWriting(false);
+		setSelectedRoom(room.roomId);
+		setSelectedFloor(room.floorNumber);
+		handleRoomSelection(room.roomId);
+		setIsExpanded(false);
+		setIsDrawerOpen(true);
+		setSelectedFaculty(room.faculty);
+	}
+
+
 	return (
 		<Box
-			sx={ {
-				width: isExpanded? "95%" : "3em",
-				height: "3em",
-				bgcolor: "black",
-				borderRadius: isExpanded? "10px" : "50%",
-				borderBottomLeftRadius: isExpanded? "0" : "50%",
-				borderBottomRightRadius: isExpanded? "0" : "50%",
-				transition: "all 0.3s ease",
-				display: "flex",
-				alignItems: "center",
-				justifyContent: "center",
-				position: "absolute",
-				top: "4em",
-				left: "0.5em",
-				zIndex: 3,
-			} }
+			sx={ SearchBoxContainer(isExpanded) }
 			onClick={ handleExpand }
 		>
 			{ isExpanded? (
@@ -160,84 +201,95 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 						inputProps={ { "aria-label": "search" } }
 						onBlur={ handleCollapse }
 						onChange={ handleSearch }
-						sx={ {
-							color: "white",
-							width: "100%",
-							'.MuiInputBase-input': {
-								padding: "10px 0",
-								pl: "1em",
-							},
-						} }
+						sx={ InputBaseStyle }
 					/>
 					{ isWriting? <Box sx={ {
-						position: "absolute",
-						top: "100%",
-						color: "white",
-						transition: "max-height 1s ease-out", // Transition for the roll-down effect
-						overflow: "hidden",
-						maxHeight: isExpanded? "300px" : "0", // Adjust max-height accordingly
-						width: "100%",
-						borderBottomLeftRadius: 10,
-						borderBottomRightRadius: 10,
-						bgcolor: "background.paper"
-					} }>
-						{ filteredRooms.map((room, index) => (
-							<React.Fragment key={ index }>
-								<Box display="flex"
-								     alignItems="center"
-								     sx={ { padding: "10px" } }
-								     color="white"
-								     gap={ 1 }
-								     flexDirection="row"
-								     onClick={ (event) => handleRoomSearchClick(room, event) }>
-									<PlaceIcon color="info" />
-									<Typography>{ room.nazev } - Podlaží: { room.floor_number } -
-										Fakulta: { room.faculty }</Typography>
-								</Box>
-								<Divider flexItem
-								         variant="middle"
-								         color="#FFFFF"
-								         sx={ {
-									         backgroundColor: "gray",
-									         display: index === filteredRooms.length - 1? "none" : "block"
-								         } } />
-							</React.Fragment>
-						)) }
-					</Box> : <Box sx={ {
-						position: "absolute",
-						top: "100%",
-						width: "100%",
-						bgcolor: "background.paper",
-						color: "black",
-						borderBottomLeftRadius: 10,
-						borderBottomRightRadius: 10
-					} }>
+							position: "absolute",
+							top: "100%",
+							color: "white",
+							transition: "max-height 1s ease-out", // Transition for the roll-down effect
+							overflow: "hidden",
+							maxHeight: isExpanded? "300px" : "0", // Adjust max-height accordingly
+							width: "100%",
+							borderBottomLeftRadius: 10,
+							borderBottomRightRadius: 10,
+							bgcolor: "background.paper"
+						} }>
+							{ filteredRooms.map((room, index) => (
+								<React.Fragment key={ index }>
+									<Box sx={ searchBoxStyle }
+									     onClick={ (event) => handleRoomSearchClick(room, event) }>
+										<PlaceIcon color="info" />
+										<Typography>{ room.nazev } - Podlaží: { room.floor_number } -
+											Fakulta: { room.faculty }</Typography>
+									</Box>
+									<Divider flexItem
+									         variant="middle"
+									         color="#FFFFF"
+									         sx={ {
+										         backgroundColor: "gray",
+										         display: index === filteredRooms.length - 1? "none" : "block"
+									         } } />
+								</React.Fragment>
+							)) }
+						</Box>
+						:
+						<Box sx={ {
+							position: "absolute",
+							top: "100%",
+							width: "100%",
+							bgcolor: "background.paper",
+							color: "black",
+							borderBottomLeftRadius: 10,
+							borderBottomRightRadius: 10
+						} }>
 
-						{ previouslySearchedRooms.slice().reverse().map((room, index) => (
-							<React.Fragment key={ index }>
-								<Box display="flex"
-								     overflow="hidden"
-								     alignItems="center"
-								     sx={ { padding: "10px" } }
-								     color="white"
-								     gap={ 1 }
-								     flexDirection="row"
-								     onClick={ (event) => handleRoomSearchClick(room, event) }>
-									<HistoryIcon color="info" />
-									<Typography overflow="hidden" whiteSpace="nowrap">
-										{ room.nazev } - Podlaží: { room.floor_number } - Fakulta: { room.faculty }
-									</Typography>
-								</Box>
-								<Divider flexItem
-								         variant="middle"
-								         color="#FFFFF"
-								         sx={ {
-									         backgroundColor: "gray",
-									         display: index === previouslySearchedRooms.length - 1? "none" : "block"
-								         } } />
-							</React.Fragment>
-						)) }
-					</Box> }
+							{ previouslySearchedRooms.slice().reverse().map((room, index) => (
+								<React.Fragment key={ index }>
+									<Box sx={ searchBoxStyle }
+									     onClick={ (event) => handleRoomSearchClick(room, event) }>
+										<HistoryIcon color="info" />
+										<Typography overflow="hidden" whiteSpace="nowrap">
+											{ room.nazev } - Podlaží: { room.floor_number } - Fakulta: { room.faculty }
+										</Typography>
+									</Box>
+									<Divider flexItem
+									         variant="middle"
+									         color="#FFFFF"
+									         sx={ {
+										         backgroundColor: "gray",
+										         display: index === previouslySearchedRooms.length - 1 && favouriteRooms.length === 0? "none" : "block"
+									         } } />
+								</React.Fragment>
+							)) }
+							<Box>{ favouriteRooms.map((roomObject, index) => (
+									<React.Fragment key={ index }>
+										<Divider flexItem
+										         variant="middle"
+										         color="#FFFFF"
+										         sx={ {
+											         backgroundColor: "gray",
+											         display: index === 0? "block" : "none"
+										         } } />
+										<Box sx={ searchBoxStyle }
+										     onClick={ (event) => handleFavouriteRoomClick(roomObject, event) }>
+											<StarIcon color="info" />
+											<Typography overflow="hidden" whiteSpace="nowrap">
+												{ roomObject.roomName } - Podlaží: { roomObject.floorName } -
+												Fakulta: { roomObject.faculty }
+											</Typography>
+										</Box>
+										<Divider flexItem
+										         variant="middle"
+										         color="#FFFFF"
+										         sx={ {
+											         backgroundColor: "gray",
+											         display: index === favouriteRooms.length - 1? "none" : "block"
+										         } } />
+									</React.Fragment>
+								)
+							) }</Box>
+						</Box> }
 				</>
 			) : (
 				<IconButton sx={ { color: "white", padding: 0 } }>

@@ -9,7 +9,7 @@ import {
 	Breadcrumbs,
 	Link,
 	useTheme,
-	CircularProgress
+	CircularProgress, Theme
 } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -22,7 +22,7 @@ export interface FetchedFloor {
 	building_name: string;
 	floor_id: number;
 	floor_name: string;
-	floor_number?: number;
+	floor_number: number;
 	rooms?: any;
 	roomId?: number;
 }
@@ -42,15 +42,15 @@ export const replaceCzechChars = (str: string | undefined): string => {
 	return str.split('').map((char: string) => czechCharMap[char] || char).join('');
 };
 
-const accordionStyles = {
+const accordionStyles = (theme: Theme) => ({
 	'& .MuiAccordionSummary-expandIconWrapper': {
-		color: 'white',
+		color: theme.palette.text.primary,
 	}
-};
+});
 
 
 function FloorSelection() {
-	const { palette } = useTheme();
+	const theme = useTheme();
 	const [floors, setFloors] = useState<FetchedFloor[]>([]);
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -81,7 +81,7 @@ function FloorSelection() {
 				navigate(`/${ selectedFaculty }/${ building }`, { replace: true });
 			}
 		},
-		[navigate, selectedFaculty, building] // Ensure all dependencies are listed here
+		[navigate, selectedFaculty, building]
 	);
 
 
@@ -134,7 +134,7 @@ function FloorSelection() {
 	return (
 		<Main topBarSelectedDisabled>
 			<Breadcrumbs separator={ <NavigateNextIcon fontSize="medium" /> }
-			             sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
+			             sx={ { bgcolor: theme.palette.background.default, py: 1, pl: 2 } }>
 				<Link underline="none" onClick={ handleGoBuildingSelection }>
 					<Typography variant="h5" color="#61677A">{ selectedFaculty }</Typography>
 				</Link>
@@ -153,13 +153,13 @@ function FloorSelection() {
 			     pb={ 4 }
 			     bgcolor="#323232"
 			     borderTop="2px solid gray"
-			     color="white">
+			     color={theme.palette.text.primary}>
 				{ floors.length > 0 && !isLoading? (
-					floors.map((floor: FetchedFloor, index: number) => (
+					floors.map((floor: FetchedFloor) => (
 						<Accordion key={ floor.floor_id }
 						           expanded={ expanded === floor.floor_name }
 						           onChange={ handleChange(floor.floor_name) }
-						           sx={ accordionStyles }
+						           sx={ accordionStyles(theme) }
 						           disableGutters
 						>
 							<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
@@ -177,6 +177,7 @@ function FloorSelection() {
 														floorName={ floor.floor_name }
 														roomName={ room.room_number }
 														roomId={ room.room_id }
+														floorNumber={ floor.floor_number }
 													/>
 												</Box>
 											);

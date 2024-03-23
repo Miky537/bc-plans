@@ -3,7 +3,6 @@ import FacultyItem from "./FacultyItem";
 import Box from "@mui/material/Box";
 import { useMapContext } from "../MapComponents/MapContext";
 import { useNavigate } from "react-router-dom";
-import { useFacultyContext } from "../FacultyContext";
 import { ReactComponent as CesaLogo } from "../../FacultyLogos/cesa-logo.svg";
 import { ReactComponent as FaLogo } from "../../FacultyLogos/fa-logo.svg";
 import { ReactComponent as FpLogo } from "../../FacultyLogos/fbm-logo.svg";
@@ -17,16 +16,18 @@ import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
 import { Typography, Paper } from "@mui/material";
 
 export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | "CESA" | undefined;
+
 function FacultySelection() {
 
-	const {setMapVisibility} = useMapContext();
-	const {setSelectedFaculty} = useFacultyContext();
+	const { setMapVisibility } = useMapContext();
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		setMapVisibility(false);
 
-		return () => { setMapVisibility(true); };
+		return () => {
+			setMapVisibility(true);
+		};
 	}, [setMapVisibility]);
 
 	const handleFavPlacesClick = () => {
@@ -40,28 +41,29 @@ function FacultySelection() {
 			     gridTemplateColumns="repeat(2, 1fr)" // Create two columns
 			     rowGap={ 4 } columnGap={ 0 }
 			     height="100%" justifyContent="flex-end"
-			     pt={ 4 } pb={ 4 }  color="white" overflow="scroll">
-				<Box mt="1em"
-				     display="flex"
-				     alignItems="center"
-				     justifyContent="center"
-				     gridColumn="1 / span 2"
-				     width="80%"
-				     margin="auto"
-				     onClick={() => handleFavPlacesClick()}>
-					<Paper elevation={0} sx={{width: "100%", height: "100%", py: 3, textAlign: "center", borderRadius: 3}}>
-						<Typography variant="h5">Favourite places</Typography>
-					</Paper>
-				</Box>
-				<FacultyItem name="FIT" Image={FitLogo} />
-				<FacultyItem name="FAST" Image={FastLogo} />
-				<FacultyItem name="FSI" Image={FsiLogo}/>
-				<FacultyItem name="FEKT" Image={FektLogo}/>
-				<FacultyItem name="FAVU" Image={FavuLogo}/>
-				<FacultyItem name="FCH" Image={FchLogo}/>
-				<FacultyItem name="USI" Image={UsiLogo}/>
-				<FacultyItem name="FP" Image={FpLogo}/>
-				<FacultyItem name="FA" Image={FaLogo}/>
+			     pt={ 4 } pb={ 4 } color="white" overflow="scroll">
+				{/*<Box mt="1em"*/}
+				{/*     display="flex"*/}
+				{/*     alignItems="center"*/}
+				{/*     justifyContent="center"*/}
+				{/*     gridColumn="1 / span 2"*/}
+				{/*     width="80%"*/}
+				{/*     margin="auto"*/}
+				{/*     onClick={ () => handleFavPlacesClick() }>*/}
+				{/*	<Paper elevation={ 0 }*/}
+				{/*	       sx={ { width: "100%", height: "100%", py: 3, textAlign: "center", borderRadius: 3 } }>*/}
+				{/*		<Typography variant="h5">Favourite places</Typography>*/}
+				{/*	</Paper>*/}
+				{/*</Box>*/}
+				<FacultyItem name="FIT" Image={ FitLogo } />
+				<FacultyItem name="FAST" Image={ FastLogo } />
+				<FacultyItem name="FSI" Image={ FsiLogo } />
+				<FacultyItem name="FEKT" Image={ FektLogo } />
+				<FacultyItem name="FAVU" Image={ FavuLogo } />
+				<FacultyItem name="FCH" Image={ FchLogo } />
+				<FacultyItem name="USI" Image={ UsiLogo } />
+				<FacultyItem name="FP" Image={ FpLogo } />
+				<FacultyItem name="FA" Image={ FaLogo } />
 				<FacultyItem name="CESA" Image={ CesaLogo } />
 			</Box>
 		</Box>

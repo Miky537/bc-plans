@@ -9,6 +9,7 @@ export interface FavouritePlacesLocalStorage {
 	roomName: string;
 	roomId: number;
 	floorName: string;
+	floorNumber: number;
 	buildingName: string;
 	faculty: FacultyType;
 }
@@ -17,11 +18,12 @@ interface RoomSelectionItemProps {
 	roomName: string;
 	roomId: number;
 	floorName: string;
+	floorNumber: number;
 	buildingName: string;
 	handleRoomClick: (roomName: string, roomId: number) => void;
 }
 
-const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, handleRoomClick }: RoomSelectionItemProps) => {
+const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, floorNumber, handleRoomClick }: RoomSelectionItemProps) => {
 	const [isFav, setIsFav] = useState<boolean>(false);
 	const { selectedFaculty: faculty } = useFacultyContext();
 
@@ -62,7 +64,14 @@ const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, handleRo
 			<Typography variant="h6"
 			            width="100%"
 			            onClick={ () => handleRoomClick(roomName, roomId) }>{ roomName }</Typography>
-			<IconButton onClick={ () => toggleFavoriteRoom({ roomName, roomId, floorName, buildingName, faculty }) }>
+			<IconButton onClick={ () => toggleFavoriteRoom({
+				roomName,
+				roomId,
+				floorName,
+				buildingName,
+				faculty,
+				floorNumber
+			}) }>
 				<FavoriteBorderIcon color="error"
 				                    style={ {
 					                    fontSize: "1.8rem",

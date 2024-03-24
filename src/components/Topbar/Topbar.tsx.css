@@ -18,5 +18,17 @@
 .MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-root {
     margin-bottom: 0.2em;
     max-width: 10em;
+    background-color: #40444f !important;
+    display: flex!important;
+    justify-content: flex-start !important;
+}
+.MuiSelect-select.MuiSelect-outlined.MuiInputBase-input.MuiOutlinedInput-input {
+    background-color: #40444f !important;
+    display: flex!important;
+    justify-content: flex-start!important;
+}
+
+.MuiList-root.MuiMenu-list {
+    background-color: #40444f !important;
 }
 

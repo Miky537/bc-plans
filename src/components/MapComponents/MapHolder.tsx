@@ -17,6 +17,8 @@ export interface InfoState {
 const MapHolder = () => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
+	const [allFeatures, setAllFeatures] = useState<any>([]);
+	const [areFeaturesEmpty, setAreFeaturesEmpty] = useState(true);
 	const { selectedFaculty } = useFacultyContext();
 
 	const {
@@ -42,6 +44,10 @@ const MapHolder = () => {
 		selectedRoomIdRef.current = selectedRoomId;
 	}, [selectedRoomId]);
 
+	useEffect(() => {
+		console.log("loading, empty", areFeaturesLoading, areFeaturesEmpty);
+	}, [areFeaturesLoading, areFeaturesEmpty]);
+
 	return (
 		<Box className="Map-Holder">
 			<Box display={ areFeaturesLoading? "none" : "block" }>
@@ -57,6 +63,9 @@ const MapHolder = () => {
 			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
 			              setAreFeaturesLoading={ setAreFeaturesLoading }
+			              allFeatures={ allFeatures }
+			              setAllFeatures={ setAllFeatures }
+			              setAreFeaturesEmpty={ setAreFeaturesEmpty }
 			/>
 			<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
 			                          onClose={ handleClose }
@@ -75,12 +84,31 @@ const MapHolder = () => {
 			     color="white"
 			     px="1em"
 			     py="0.3em"
-			     display={ areFeaturesLoading && selectedFaculty !== undefined ? "flex" : "none" }
+			     display={ areFeaturesLoading && selectedFaculty !== undefined? "flex" : "none" }
 			     borderRadius="20px"
 			     justifyContent="space-around"
 			     zIndex={ 100 }>
 				<Typography>Loading..</Typography>
 				<CircularProgress size={ 27 } thickness={ 5 } />
+			</Box>
+			<Box width="60%"
+			     maxWidth="20em"
+			     position="absolute"
+			     top="4em"
+			     right={ 0 }
+			     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
+			     left={ 0 }
+			     marginLeft="auto"
+			     marginRight="auto"
+			     bgcolor="background.paper"
+			     color="white"
+			     px="1em"
+			     py="0.3em"
+			     display={ areFeaturesEmpty && selectedFaculty !== undefined && !areFeaturesLoading ? "flex" : "none" }
+			     borderRadius="20px"
+			     justifyContent="space-around"
+			     zIndex={ 100 }>
+				<Typography>Faculty is yet to be added!</Typography>
 			</Box>
 		</Box>
 	);

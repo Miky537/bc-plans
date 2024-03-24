@@ -31,6 +31,9 @@ interface MapComponentProps {
 	selectedFloor: number;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
 	setAreFeaturesLoading: (areFeaturesLoading: boolean) => void;
+	allFeatures: any;
+	setAllFeatures: (allFeatures: any) => void;
+	setAreFeaturesEmpty: (areFeaturesEmpty: boolean) => void;
 }
 
 const layerConfigs = [
@@ -55,7 +58,10 @@ const MapComponent = ({
 	                      onRoomSelection,
 	                      selectedFloor,
 	                      setIsDrawerOpen,
-	                      setAreFeaturesLoading
+	                      setAreFeaturesLoading,
+	                      allFeatures,
+	                      setAllFeatures,
+	                      setAreFeaturesEmpty,
                       }: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
@@ -72,7 +78,7 @@ const MapComponent = ({
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const RoomHighlightGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const LabelsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
-	const [allFeatures, setAllFeatures] = useState<any>([]);
+
 	const [featureGraphicsLayer] = useState(new GraphicsLayer());
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const selectedFloorNumberRef = useRef(selectedFloorNumber);
@@ -303,6 +309,8 @@ const MapComponent = ({
 		if (featureLayersRef.current) {
 			const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 			if (!selectedLayer) {
+				setAreFeaturesEmpty(true);
+				setAreFeaturesLoading(false);
 				return;
 			}
 			const query = new Query();
@@ -313,9 +321,17 @@ const MapComponent = ({
 			selectedLayer.queryFeatures(query, { signal: abortController.signal })
 				.then((results) => {
 					setAllFeatures(results.features);
-					setAreFeaturesLoading(false);
+					console.log(results)
+					if (results.features.length === 0) {
+						setAreFeaturesEmpty(true);
+						setAreFeaturesLoading(false);
+					} else {
+						setAreFeaturesEmpty(false);
+						setAreFeaturesLoading(false);
+					}
 				})
 				.catch((error) => {
+
 					setAreFeaturesLoading(false);
 					if (error.name === "AbortError") {
 						// console.log("Found abortError!")

@@ -35,6 +35,7 @@ function BuildingSelection() {
 				return response.json();
 			})
 			.then(data => {
+				console.log("data", data)
 				setBuildings(data)
 			})
 			.catch(error => console.log("Fetching buildings failed: ", error))
@@ -56,27 +57,31 @@ function BuildingSelection() {
 				</Breadcrumbs>
 				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%"
 				     pb="4.2em" color={palette.text.primary} borderTop="2px solid gray">
-					{ buildings.length > 0 && !isLoading? ( //first sort the buildings by name, then map them to a list
-						buildings
-							.filter((building: BuildingSelectionInt) => building.building_id !== 39)
-							.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
-							.map((building: BuildingSelectionInt) => (
-								<Box key={ building.building_id }
-								     width="100%"
-								     pt="0.7em"
-								     pb="0.7em"
-								     bgcolor={ "background.paper" }
-								     borderBottom="1px solid white"
-								     onClick={ () => handleBuildingClick(building.building_id, building.name) }
-								>
-									<Typography variant="h5" ml="0.7em">{ building.name }</Typography>
-								</Box>
-							))
-					) : (
-						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
-							<CircularProgress thickness={ 3 } size="5rem" />
-						</Box>
-					) }
+					{isLoading ? (
+							<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+								<CircularProgress thickness={3} size="5rem" />
+							</Box>
+						) : buildings.length > 0 ? (
+							buildings
+								.filter((building: BuildingSelectionInt) => building.building_id !== 39)
+								.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
+								.map((building: BuildingSelectionInt) => (
+									<Box key={building.building_id}
+									     width="100%"
+									     pt="0.7em"
+									     pb="0.7em"
+									     bgcolor={"background.paper"}
+									     borderBottom="1px solid white"
+									     onClick={() => handleBuildingClick(building.building_id, building.name)}>
+										<Typography variant="h5" ml="0.7em">{building.name}</Typography>
+									</Box>
+								))
+						) : (
+							<Box width="100%" height="80%" display="flex" pt={5} justifyContent="center" alignItems="center">
+								<Typography variant="h4">No buildings available</Typography>
+							</Box>
+						)
+					}
 				</Box>
 			</Paper>
 			<Button sx={ {

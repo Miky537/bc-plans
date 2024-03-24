@@ -31,9 +31,11 @@ export const SelectStyles = ({palette}: Theme) => ({
 		paddingTop: "0.2em",
 		paddingBottom: "0.2em",
 	},
+
 	"&.faculty-select-topbar .MuiSelect-select": {
 		height: "2.5em",
-		width: "9em",
+		width: "10em",
+		maxWidth: "10em",
 		padding: 0,
 
 	},

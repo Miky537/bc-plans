@@ -1,16 +1,22 @@
 .Topbar {
-     align-items: center;
-     background-color: #262626;
-     color: #fff;
-     display: flex;
-     font-family: Roboto, serif;
-     font-size: 20px;
-     font-weight: 500;
-     height: 2.5em;
-     flex-shrink: 0;
-     justify-content: center;
-     overflow: hidden;
-     text-transform: capitalize;
-     width: 100%;
-     position: relative;
+    align-items: center;
+    background-color: #262626;
+    color: #fff;
+    display: flex;
+    font-family: Roboto, serif;
+    font-size: 20px;
+    font-weight: 500;
+    height: 2.5em;
+    flex-shrink: 0;
+    justify-content: center;
+    overflow: hidden;
+    text-transform: capitalize;
+    width: 100%;
+    position: relative;
 }
+
+.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-root {
+    margin-bottom: 0.2em;
+    max-width: 10em;
+}
+

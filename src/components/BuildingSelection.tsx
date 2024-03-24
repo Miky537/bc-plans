@@ -35,7 +35,6 @@ function BuildingSelection() {
 				return response.json();
 			})
 			.then(data => {
-				console.log("data", data)
 				setBuildings(data)
 			})
 			.catch(error => console.log("Fetching buildings failed: ", error))

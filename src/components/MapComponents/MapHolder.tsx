@@ -44,10 +44,6 @@ const MapHolder = () => {
 		selectedRoomIdRef.current = selectedRoomId;
 	}, [selectedRoomId]);
 
-	useEffect(() => {
-		console.log("loading, empty", areFeaturesLoading, areFeaturesEmpty);
-	}, [areFeaturesLoading, areFeaturesEmpty]);
-
 	return (
 		<Box className="Map-Holder">
 			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) ? "none" : "block" }>

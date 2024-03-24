@@ -321,7 +321,6 @@ const MapComponent = ({
 			selectedLayer.queryFeatures(query, { signal: abortController.signal })
 				.then((results) => {
 					setAllFeatures(results.features);
-					console.log(results)
 					if (results.features.length === 0) {
 						setAreFeaturesEmpty(true);
 						setAreFeaturesLoading(false);
@@ -555,7 +554,6 @@ const MapComponent = ({
 
 	useEffect(() => {
 		if (selectedRoomId === undefined || allFeatures.length === 0) return;
-		console.log("Selected room changed:", selectedRoomId);
 		RoomHighlightGraphicsLayerRef.current!.removeAll();
 
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoomId);

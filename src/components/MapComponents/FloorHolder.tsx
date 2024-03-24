@@ -36,7 +36,7 @@ const FloorHolder = () => {
 	return (
 		<Box zIndex="2"
 		     gap="0.2em"
-		     display="flex"
+		     display={ floors.length === 0 ? "none" : "flex" }
 		     flexDirection="column"
 		     position="absolute"
 		     top="4em"

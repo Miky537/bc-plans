@@ -50,13 +50,13 @@ const MapHolder = () => {
 
 	return (
 		<Box className="Map-Holder">
-			<Box display={ areFeaturesLoading? "none" : "block" }>
+			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) ? "none" : "block" }>
 				<SearchComponent setSelectedRoom={ setSelectedRoomId }
 				                 setSelectedFloor={ setSelectedFloorNumber }
 				                 setIsDrawerOpen={ setIsDrawerOpen } />
 			</Box>
 
-			<Box display={ areFeaturesLoading? "none" : "block" }>
+			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading)? "none" : "block" }>
 				<FloorHolder />
 			</Box>
 			<MapComponent onRoomSelection={ handleRoomSelection }

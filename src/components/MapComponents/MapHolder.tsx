@@ -7,6 +7,7 @@ import { useFacultyContext } from "../FacultyContext";
 import { SwipeableDrawerComponent } from "../SwipeableDrawer/SwipeableDrawerComponent";
 import { CircularProgress, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import { useMapContext } from "./MapContext";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -18,8 +19,9 @@ const MapHolder = () => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
 	const [allFeatures, setAllFeatures] = useState<any>([]);
-	const [areFeaturesEmpty, setAreFeaturesEmpty] = useState(true);
+	const [areFeaturesEmpty, setAreFeaturesEmpty] = useState(false);
 	const { selectedFaculty } = useFacultyContext();
+	const { zoom, arePinsVisible } = useMapContext();
 
 	const {
 		selectedRoomId,
@@ -27,7 +29,7 @@ const MapHolder = () => {
 		handleRoomSelection,
 		roomData,
 		selectedFloorNumber,
-		setSelectedFloorNumber
+		setSelectedFloorNumber,
 	} = useFacultyContext();
 	const selectedRoomIdRef = useRef(selectedRoomId);
 
@@ -46,17 +48,17 @@ const MapHolder = () => {
 
 	return (
 		<Box className="Map-Holder">
-			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) ? "none" : "block" }>
+			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible ? "none" : "block" }>
 				<SearchComponent setSelectedRoom={ setSelectedRoomId }
 				                 setSelectedFloor={ setSelectedFloorNumber }
 				                 setIsDrawerOpen={ setIsDrawerOpen } />
 			</Box>
 
-			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading)? "none" : "block" }>
+			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible ? "none" : "block" }>
 				<FloorHolder />
 			</Box>
-			<MapComponent onRoomSelection={ handleRoomSelection }
-			              selectedFloor={ selectedFloorNumber }
+			<MapComponent isDrawerOpen={ isDrawerOpen }
+				selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
 			              setAreFeaturesLoading={ setAreFeaturesLoading }
 			              allFeatures={ allFeatures }

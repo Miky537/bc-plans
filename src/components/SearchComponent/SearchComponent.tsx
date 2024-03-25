@@ -178,6 +178,8 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	}
 
 	const handleFavouriteRoomClick = (room: FavouritePlacesLocalStorage, event: any) => {
+		event.stopPropagation();
+		setFacultyChangeSource('search');
 		setIsWriting(false);
 		setSelectedRoom(room.roomId);
 		setSelectedFloor(room.floorNumber);
@@ -262,7 +264,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 									         } } />
 								</React.Fragment>
 							)) }
-							<Box>{ favouriteRooms.map((roomObject, index) => (
+							<Box maxHeight="60dvh" overflow="scroll">{ favouriteRooms.map((roomObject, index) => (
 									<React.Fragment key={ index }>
 										<Divider flexItem
 										         variant="middle"

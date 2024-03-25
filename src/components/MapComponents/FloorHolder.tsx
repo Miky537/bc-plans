@@ -43,7 +43,7 @@ const FloorHolder = () => {
 		     right="1em"
 		     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
 		     bgcolor="#DBDBDB"
-		     maxHeight="19.5em"
+		     maxHeight="18.5em"
 		     overflow="scroll">
 			{ floors.map((floor: number, index: number) => (
 				<React.Fragment key={ floor }>

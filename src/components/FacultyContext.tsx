@@ -92,7 +92,7 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 		if (roomId === undefined) {
 			return;
 		}
-		setSelectedRoomId(roomId); // Update state with selected room information
+		await setSelectedRoomId(roomId); // Update state with selected room information
 
 		let roomInfo: RoomDetails | undefined = await fetchRoomInfo(roomId);
 		if (roomInfo === undefined) {

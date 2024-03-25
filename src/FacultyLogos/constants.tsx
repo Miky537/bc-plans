@@ -31,7 +31,7 @@ export const facultyInfo = {
 		address: "Technická 3058/10, 616 00 Brno-Královo Pole",
 	},
 	"FAVU": {
-		width: 18.609,
+		width: 318.609,
 		logo: favuLogo,
 		address: "Údolní 244, 602 00 Brno-střed",
 	},

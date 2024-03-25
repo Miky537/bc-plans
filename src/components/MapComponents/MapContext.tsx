@@ -19,6 +19,8 @@ interface MapContextType {
 	mapViewRef: React.MutableRefObject<MapView | null>;
 	setActivateAnimation: (activate: boolean) => void;
 	activateAnimation: boolean;
+	setArePinsVisible: (visible: boolean) => void;
+	arePinsVisible: boolean;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -44,6 +46,7 @@ export const MapProvider = ({children}: any) => {
 	const [selectedFloorRoomsIds, setSelectedFloorRoomsIds] = useState<number[]>([]);
 	const mapViewRef = useRef<MapView | null>(null);
 	const [activateAnimation, setActivateAnimation] = useState<boolean>(false);
+	const [arePinsVisible, setArePinsVisible] = useState<boolean>(false);
 
 	return (
 		<MapContext.Provider value={ {
@@ -61,7 +64,9 @@ export const MapProvider = ({children}: any) => {
 			setSelectedFloorRoomsIds,
 			mapViewRef,
 			activateAnimation,
-			setActivateAnimation
+			setActivateAnimation,
+			arePinsVisible,
+			setArePinsVisible,
 		} }>
 			{ children }
 		</MapContext.Provider>

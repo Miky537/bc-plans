@@ -27,13 +27,13 @@ import { DividerStyles } from "../TeacherSearch/styles";
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
 interface MapComponentProps {
-	onRoomSelection: (roomId: number | undefined) => void;
 	selectedFloor: number;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
 	setAreFeaturesLoading: (areFeaturesLoading: boolean) => void;
 	allFeatures: any;
 	setAllFeatures: (allFeatures: any) => void;
 	setAreFeaturesEmpty: (areFeaturesEmpty: boolean) => void;
+	isDrawerOpen: boolean;
 }
 
 const layerConfigs = [
@@ -54,8 +54,7 @@ interface RoomIdWithType {
 	roomName: string;
 }
 
-const MapComponent = ({
-	                      onRoomSelection,
+const MapComponent = ({     isDrawerOpen,
 	                      selectedFloor,
 	                      setIsDrawerOpen,
 	                      setAreFeaturesLoading,
@@ -92,7 +91,8 @@ const MapComponent = ({
 		zoom,
 		mapViewRef,
 		activateAnimation,
-		setActivateAnimation
+		setActivateAnimation,
+		setZoom, setArePinsVisible
 	} = useMapContext();
 
 	useEffect(() => {
@@ -154,6 +154,7 @@ const MapComponent = ({
 		const trackWidget = new Track({
 			view: mapView,
 			rotationEnabled: false, // Disable the rotation of the view
+
 			goToLocationEnabled: true, // automatically moves the view to the user's location
 			geolocationOptions: {
 				maximumAge: 0,
@@ -161,6 +162,7 @@ const MapComponent = ({
 				enableHighAccuracy: true
 			},
 			goToOverride: (view, goToParams) => {
+				console.log("removing")
 				if (isFirstTrackingActivation) {
 					isFirstTrackingActivation = false; // Update the flag
 					return view.goTo(goToParams.target);
@@ -179,11 +181,11 @@ const MapComponent = ({
 		mapView.when(() => {
 			setIsMapLoaded(true);
 			mapView.on('click', async(event) => {
+
 				// Remove the current highlight if it exists
 				if (RoomHighlightGraphicsLayerRef.current) {
-					RoomHighlightGraphicsLayerRef.current!.removeAll();
+					RoomHighlightGraphicsLayerRef.current!.graphics.removeAll();
 				}
-
 				const response = await mapView.hitTest(event);
 				if (response.results.length > 0) {
 					const firstHit = response.results.find(result => result.type === "graphic");
@@ -202,17 +204,19 @@ const MapComponent = ({
 						if (clickedGraphic.attributes === null) {
 							return;
 						}
+
 						// Check if the graphic has an 'id' or 'RoomID' attribute
 						if ('id' in clickedGraphic.attributes || 'RoomID' in clickedGraphic.attributes) {
 							// Trigger any additional actions on room selection
 							if ('id' in clickedGraphic.attributes) {
-								onRoomSelection(clickedGraphic.attributes.id);
+								handleRoomSelection(clickedGraphic.attributes.id);
 							} else if ('RoomID' in clickedGraphic.attributes) {
-								onRoomSelection(clickedGraphic.attributes.RoomID);
+								handleRoomSelection(clickedGraphic.attributes.RoomID);
+
 							}
 							setIsDrawerOpen(true);
 						} else {
-							onRoomSelection(undefined);
+							handleRoomSelection(undefined);
 						}
 					}
 				}
@@ -237,10 +241,11 @@ const MapComponent = ({
 	useEffect(() => {
 		if (allFeatures.length > 0) {
 			const zoomWatch = mapViewRef.current?.watch("zoom", (zoom) => {
+				// setZoom(zoom);
 				if (zoom > 16) {
 					debouncedDisplayRoomWhenZoomChange();
 				} else {
-					debouncedDisplayPinsWhenZoomChange(mapViewRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef);
+					debouncedDisplayPinsWhenZoomChange(mapViewRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
 				}
 			});
 			return () => {
@@ -278,6 +283,7 @@ const MapComponent = ({
 		if (FeaturesGraphicsLayerRef.current?.graphics.length !== 0) { //already added
 			return;
 		}
+		setArePinsVisible(false);
 		mapViewRef.current?.graphics.removeAll();
 		fetchCurrentFloorRooms().then((rooms) => {
 			rooms.forEach((room: RoomIdWithType) => {
@@ -547,14 +553,12 @@ const MapComponent = ({
 	}, []);
 
 	useEffect(() => {
-		if (selectedRoomId !== undefined) {
-			RoomHighlightGraphicsLayerRef.current?.removeAll();
-		}
+		RoomHighlightGraphicsLayerRef.current?.graphics.removeAll();
 	}, [selectedFloorNumber]);
 
 	useEffect(() => {
 		if (selectedRoomId === undefined || allFeatures.length === 0) return;
-		RoomHighlightGraphicsLayerRef.current!.removeAll();
+		RoomHighlightGraphicsLayerRef.current!.graphics.removeAll();
 
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoomId);
 		if (!roomFeature) {
@@ -567,9 +571,14 @@ const MapComponent = ({
 				geometry: roomFeature.geometry,
 				symbol: highlightSymbol
 			});
-			RoomHighlightGraphicsLayerRef.current?.add(highlightGraphic)
+			console.log("Room found")
+			if (isDrawerOpen) {
+				RoomHighlightGraphicsLayerRef.current?.graphics.add(highlightGraphic)
+			} else {
+				return;
+			}
+
 			abortControllerRef.current = new AbortController();
-			console.log("Animation got called.")
 			if (roomFeature.geometry.extent) {
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
@@ -602,7 +611,7 @@ const MapComponent = ({
 			abortControllerRef.current!.abort();
 			setSelectedRoomId(undefined);
 		};
-	}, [selectedRoomId, allFeatures, setSelectedRoomId]);
+	}, [selectedRoomId, allFeatures, setSelectedRoomId, isDrawerOpen]);
 
 	useEffect(() => {
 		if (activateAnimation) {

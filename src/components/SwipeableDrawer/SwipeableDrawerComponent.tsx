@@ -5,6 +5,11 @@ import Box from "@mui/material/Box";
 import { RoomDetails } from "../MapComponents/tempFile";
 import { getRoomPhoto } from "../TeacherSearch/apiCalls";
 import { useFacultyContext } from "../FacultyContext";
+import IconButton from "@mui/material/IconButton";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
+import { FacultyType } from "../FacultySelection/FacultySelection";
 
 
 interface SwipeableDrawerComponentProps {
@@ -34,26 +39,17 @@ export function SwipeableDrawerComponent({
                                          }: SwipeableDrawerComponentProps) {
 	const { room_info, floor_info, areal_info, building_info } = roomData;
 	const [isImageZoomed, setIsImageZoomed] = useState(false);
-	const nazev = room_info?.nazev;
-	const mistnostid = room_info?.mistnost_id;
-	const podlazi_id = floor_info?.podlazi_id;
-	const roomType = room_info?.mistnost_typ_id;
-	const label = room_info?.label;
-	const areal_name = areal_info?.nazev_puvodni;
-	const { selectedRoomId } = useFacultyContext()
+	const { selectedFaculty, selectedRoomId } = useFacultyContext()
+	const faculty = selectedFaculty as FacultyType;
+	const [isFav, setIsFav] = useState<boolean>(false);
+	const { cislo: roomName, mistnost_id: roomId, mistnost_typ_id: roomType, label: roomLabel } = room_info
+	const { podlazi_id: floorId, cislo: floorNumber, nazev: floorName } = floor_info
+	const { zkratka_prezentacni: buildingName } = building_info
+	const { nazev_puvodni: arealName} = areal_info
 	const [photoUrl, setPhoto] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
-
-	// const { data: photoUrl, isError, isLoading, isFetching, error } = useQuery(
-	// 	['roomPhoto', selectedRoomId],
-	// 	() => getRoomPhoto(selectedRoomId),
-	// 	{
-	// 		enabled: !!selectedRoomId, // Only run if selectedRoomId is not nully
-	// 	}
-	// );
-
 
 	useEffect(() => {
 		setIsError(false);
@@ -81,6 +77,33 @@ export function SwipeableDrawerComponent({
 	const handleImageClick = () => {
 		setIsImageZoomed(!isImageZoomed);
 	};
+	const toggleFavoriteRoom = (roomToToggle: FavouritePlacesLocalStorage) => {
+		const storageKey = 'favoriteRooms';
+
+		const favoriteRoomsString = localStorage.getItem(storageKey);
+		let favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
+
+		const index = favoriteRooms.findIndex(room => room.roomId === roomToToggle.roomId);
+
+		if (index !== -1) {
+			// Room is already a favorite, remove it
+			favoriteRooms.splice(index, 1);
+			setIsFav(false);
+		} else {
+			// Room is not a favorite, add it
+			favoriteRooms.push(roomToToggle);
+			setIsFav(true);
+		}
+		localStorage.setItem(storageKey, JSON.stringify(favoriteRooms));
+	};
+	useEffect(() => {
+		setIsFav(false);
+		const storageKey = 'favoriteRooms';
+		const favoriteRoomsString = localStorage.getItem(storageKey);
+		const favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
+		const isFavorite = favoriteRooms.some(room => room.roomId === roomId);
+		setIsFav(isFavorite);
+		}, [roomId, isDrawerOpen]);
 
 	return (
 		<SwipeableDrawer
@@ -88,6 +111,7 @@ export function SwipeableDrawerComponent({
 			open={ isDrawerOpen }
 			onClose={ onClose }
 			onOpen={ onOpen }
+			transitionDuration={ { enter: 500, exit: 200 } }
 			sx={ mergeStylesWithTheme(theme) }
 		>
 			<Box position="absolute"
@@ -108,7 +132,7 @@ export function SwipeableDrawerComponent({
 					width: '55%',
 					maxWidth: '55%',
 					height: '100%',
-					maxHeight: '45vh',
+					maxHeight: '45dvh',
 					cursor: 'pointer',
 				} }>{ isError? "No photo yet" : "Loading.." }</Box> : <Box
 					component="img"
@@ -117,19 +141,43 @@ export function SwipeableDrawerComponent({
 					sx={ {
 						borderRadius: '10px',
 						maxWidth: isImageZoomed? '100%' : '55%',
-						maxHeight: isImageZoomed? '90vh' : '45vh',
+						maxHeight: isImageZoomed? '90dvh' : '45dvh',
 						cursor: 'pointer',
 						transition: 'max-width 0.3s ease-in-out, max-height 0.3s ease-in-out',
 					} }
 					onClick={ handleImageClick }
 				/> }
-
+				<IconButton onClick={ () => toggleFavoriteRoom({
+					roomName,
+					roomId,
+					floorName,
+					floorNumber,
+					buildingName,
+					faculty
+				}) } sx={ { position: "absolute", top: 0, right: 0 } }>
+					<FavoriteBorderIcon color="error"
+					                    style={ {
+						                    fontSize: "3rem",
+						                    opacity: isFav? 0 : 1,
+						                    transition: 'opacity 0.2s',
+						                    zIndex: 4
+					                    } } />
+					<FavoriteIcon color="error"
+					              style={ {
+						              fontSize: "3rem",
+						              opacity: isFav? 1 : 0,
+						              transition: 'opacity 0.2s',
+						              position: 'absolute',
+						              zIndex: 4
+					              } } />
+				</IconButton>
 				<Box sx={ {
 					opacity: isImageZoomed? 0 : 1,
 					display: isImageZoomed? 'none' : 'block',
 					cursor: 'pointer',
 					transition: 'opacity 0.05s ease-in-out, display 0.05s ease-in-out',
 				} }>
+
 					<Typography variant="h6">Room: { room_info.cislo }</Typography>
 					<Typography variant="h6">Floor: { floor_info.cislo }</Typography>
 					<Typography variant="h6">Building: { building_info.zkratka_prezentacni }</Typography>
@@ -138,19 +186,19 @@ export function SwipeableDrawerComponent({
 
 
 			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">name:</Typography><Typography variant="h6">{ nazev }</Typography></Box>
+			                                variant="h6">name:</Typography><Typography variant="h6">{ roomName }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">popis:</Typography><Typography variant="h6">{ room_info.popis }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">podlazi_id:</Typography><Typography variant="h6">{ podlazi_id }</Typography></Box>
+			                                variant="h6">podlazi_id:</Typography><Typography variant="h6">{ floorId }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">label:</Typography><Typography variant="h6">{ label }</Typography></Box>
+			                                variant="h6">label:</Typography><Typography variant="h6">{ roomLabel }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">Areal
-				name:</Typography><Typography variant="h6">{ areal_name }</Typography></Box>
+				name:</Typography><Typography variant="h6">{ arealName }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">Room
-				Id:</Typography><Typography variant="h6">{ mistnostid }</Typography></Box>
+				Id:</Typography><Typography variant="h6">{ roomId }</Typography></Box>
 			<Box display="flex"><Typography flexGrow="1"
 			                                variant="h6">roomType</Typography><Typography variant="h6">{ roomType }</Typography></Box>
 		</SwipeableDrawer>

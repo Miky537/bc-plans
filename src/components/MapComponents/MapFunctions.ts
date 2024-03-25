@@ -78,7 +78,7 @@ export const addPinMarkerWithSvg = (mapView: MapView, latitude: number, longitud
 	const pinSymbol = new PictureMarkerSymbol({
 		url: "https://static.arcgis.com/images/Symbols/Shapes/RedPin1LargeB.png",
 		width: "54px",
-		height: "54px"
+		height: "54px",
 	});
 
 	const pinGraphic = new Graphic({
@@ -241,8 +241,10 @@ export function getRoomCenter(allFeatures: any, RoomID: number) {
 	}
 }
 
-export const displayPinsWhenZoomChange = (mapView: MapView, RoomHighlightGraphicsLayerRef: any, FeaturesGraphicsLayerRef: any) => {
+export const displayPinsWhenZoomChange = (mapView: MapView, RoomHighlightGraphicsLayerRef: any,
+                                          FeaturesGraphicsLayerRef: any, setArePinsVisible: any) => {
 	// RoomHighlightGraphicsLayerRef.current?.removeAll();
+	setArePinsVisible(true);
 	FeaturesGraphicsLayerRef.current?.graphics.removeAll()
 	Object.entries(facultyInfo).forEach(([faculty, data]) => {
 		if (faculty === "USI") return;

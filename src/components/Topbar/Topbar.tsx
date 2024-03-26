@@ -39,6 +39,12 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
 	const isOnTeacherPage = location.pathname === '/teacher';
+
+	function isFacultyType(value: any): value is FacultyType {
+		return ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP",  "FA", "CESA",  undefined].includes(value);
+	}
+
+
 	useEffect(() => {
 		if (isOnFavPlacesPage) {
 			setDisplayTitle("Favourite places");
@@ -62,9 +68,9 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 		if (urlFaculty === null) { return }
 		// Convert URL segment to faculty type
 		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
-
 		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {
 			if (facultyChangeSource === "url") {
+
 				setSelectedFaculty(facultyFromUrl);
 				setCenterCoordinates(getFacultyCoordinates(facultyFromUrl));
 			}
@@ -110,6 +116,12 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 			navigate(`/map/${ selectedFaculty }`)
 		}
 	}
+	useEffect(() => {
+		if (!isFacultyType(selectedFaculty)) {
+			setSelectedFaculty(undefined);
+			navigate(`/map`)
+		}
+	}, [selectedFaculty])
 	const handleItemClick = (clickedFaculty: string) => {
 		if (clickedFaculty === faculty) {
 			setZoom(18);

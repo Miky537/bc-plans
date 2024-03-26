@@ -32,7 +32,6 @@ const MapHolder = () => {
 	} = useFacultyContext();
 	const selectedRoomIdRef = useRef(selectedRoomId);
 
-	console.log("sss", areFeaturesLoading, (areFeaturesEmpty && !areFeaturesLoading), arePinsVisible)
 	const handleOpen = useCallback(() => {
 		setIsDrawerOpen(true);
 	}, [setIsDrawerOpen]);

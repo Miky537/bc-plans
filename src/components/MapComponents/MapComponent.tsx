@@ -15,7 +15,7 @@ import {
 	displayPinsWhenZoomChange,
 	getFacultyCoordinates
 } from "./MapFunctions";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useFacultyContext } from "../FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
@@ -93,6 +93,7 @@ const MapComponent = ({
 	const [dialogData, setDialogData] = useState<any>(null);
 
 	const location = useLocation()
+	const navigate = useNavigate();
 
 	const {
 		centerCoordinates,

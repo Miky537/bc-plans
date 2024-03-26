@@ -42,19 +42,6 @@ function FacultySelection() {
 			     rowGap={ 4 } columnGap={ 0 }
 			     height="100%" justifyContent="flex-end"
 			     pt={ 4 } pb={ 4 } color="white" overflow="scroll">
-				{/*<Box mt="1em"*/}
-				{/*     display="flex"*/}
-				{/*     alignItems="center"*/}
-				{/*     justifyContent="center"*/}
-				{/*     gridColumn="1 / span 2"*/}
-				{/*     width="80%"*/}
-				{/*     margin="auto"*/}
-				{/*     onClick={ () => handleFavPlacesClick() }>*/}
-				{/*	<Paper elevation={ 0 }*/}
-				{/*	       sx={ { width: "100%", height: "100%", py: 3, textAlign: "center", borderRadius: 3 } }>*/}
-				{/*		<Typography variant="h5">Favourite places</Typography>*/}
-				{/*	</Paper>*/}
-				{/*</Box>*/}
 				<FacultyItem name="FIT" Image={ FitLogo } />
 				<FacultyItem name="FAST" Image={ FastLogo } />
 				<FacultyItem name="FSI" Image={ FsiLogo } />

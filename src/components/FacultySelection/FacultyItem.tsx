@@ -19,7 +19,7 @@ function FacultyItem({ name, Image }: FacultyItemProps) {
 	const { setSelectedFaculty } = useFacultyContext();
 
 	const handleFacultyClick = (facultyName: FacultyType, coordinates: Coordinates) => {
-		setCenterCoordinates(coordinates);
+		// setCenterCoordinates(coordinates);
 		setSelectedFaculty(facultyName);
 		navigate(`/${ facultyName }`)
 	}

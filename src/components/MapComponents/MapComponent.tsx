@@ -8,8 +8,14 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
 import { useMapContext } from "./MapContext";
-import { adjustMapHeight, getRoomCenter, debounce, displayPinsWhenZoomChange } from "./MapFunctions";
-import { useParams } from "react-router-dom";
+import {
+	adjustMapHeight,
+	getRoomCenter,
+	debounce,
+	displayPinsWhenZoomChange,
+	getFacultyCoordinates
+} from "./MapFunctions";
+import { useParams, useLocation } from "react-router-dom";
 import { useFacultyContext } from "../FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
@@ -54,7 +60,8 @@ interface RoomIdWithType {
 	roomName: string;
 }
 
-const MapComponent = ({     isDrawerOpen,
+const MapComponent = ({
+	                      isDrawerOpen,
 	                      selectedFloor,
 	                      setIsDrawerOpen,
 	                      setAreFeaturesLoading,
@@ -77,12 +84,15 @@ const MapComponent = ({     isDrawerOpen,
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const RoomHighlightGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const LabelsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
+	const PinsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 
 	const [featureGraphicsLayer] = useState(new GraphicsLayer());
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const selectedFloorNumberRef = useRef(selectedFloorNumber);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogData, setDialogData] = useState<any>(null);
+
+	const location = useLocation()
 
 	const {
 		centerCoordinates,
@@ -92,12 +102,15 @@ const MapComponent = ({     isDrawerOpen,
 		mapViewRef,
 		activateAnimation,
 		setActivateAnimation,
-		setZoom, setArePinsVisible
+		setCenterCoordinates,
+		setArePinsVisible,
+		setZoom,
 	} = useMapContext();
 
 	useEffect(() => {
 		mapViewRef.current?.map.add(featureGraphicsLayer);
 	}, [featureGraphicsLayer, mapViewRef]);
+
 
 	const highlightSymbol = { // design one selected room
 		type: "simple-fill",
@@ -136,6 +149,10 @@ const MapComponent = ({     isDrawerOpen,
 		const roomHighlightGraphicsLayer = new GraphicsLayer();
 		const labelsGraphicsLayer = new GraphicsLayer();
 		const iconsGraphicsLayer = new GraphicsLayer();
+		const pinsGraphicsLayer = new GraphicsLayer();
+
+		mapView.map.add(pinsGraphicsLayer);
+		PinsGraphicsLayerRef.current = pinsGraphicsLayer;
 
 		mapView.map.add(featureGraphicsLayer);
 		FeaturesGraphicsLayerRef.current = featureGraphicsLayer;
@@ -162,7 +179,6 @@ const MapComponent = ({     isDrawerOpen,
 				enableHighAccuracy: true
 			},
 			goToOverride: (view, goToParams) => {
-				console.log("removing")
 				if (isFirstTrackingActivation) {
 					isFirstTrackingActivation = false; // Update the flag
 					return view.goTo(goToParams.target);
@@ -239,24 +255,22 @@ const MapComponent = ({     isDrawerOpen,
 	}, [centerCoordinates]);
 
 	useEffect(() => {
-		if (allFeatures.length > 0) {
-			const zoomWatch = mapViewRef.current?.watch("zoom", (zoom) => {
-				// setZoom(zoom);
-				if (zoom > 16) {
-					debouncedDisplayRoomWhenZoomChange();
-				} else {
-					debouncedDisplayPinsWhenZoomChange(mapViewRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+		const zoomWatch = mapViewRef.current?.watch("zoom", (zoom) => {
+			if (zoom > 16 && allFeatures.length > 0) {
+				debouncedDisplayRoomWhenZoomChange();
+			} else {
+				debouncedDisplayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+			}
+		});
+		return () => {
+			if (zoomWatch) {
+				if ("remove" in zoomWatch) {
+					zoomWatch?.remove();
 				}
-			});
-			return () => {
-				if (zoomWatch) {
-					if ("remove" in zoomWatch) {
-						zoomWatch?.remove();
-					}
-				}
-			};
-		}
-	}, [allFeatures]); // Include other dependencies as needed
+			}
+		};
+
+	}, [allFeatures]);
 
 
 	useEffect(() => {
@@ -284,7 +298,7 @@ const MapComponent = ({     isDrawerOpen,
 			return;
 		}
 		setArePinsVisible(false);
-		mapViewRef.current?.graphics.removeAll();
+		PinsGraphicsLayerRef.current?.graphics.removeAll();
 		fetchCurrentFloorRooms().then((rooms) => {
 			rooms.forEach((room: RoomIdWithType) => {
 				const color = typeToColorMapping[room.roomType] || typeToColorMapping["Default"];
@@ -571,7 +585,7 @@ const MapComponent = ({     isDrawerOpen,
 				geometry: roomFeature.geometry,
 				symbol: highlightSymbol
 			});
-			console.log("Room found")
+
 			if (isDrawerOpen) {
 				RoomHighlightGraphicsLayerRef.current?.graphics.add(highlightGraphic)
 			} else {
@@ -584,6 +598,7 @@ const MapComponent = ({     isDrawerOpen,
 					{ target: roomFeature.geometry.extent.expand(1.5) },
 					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
+					console.log("Animation")
 					if (!mapViewRef.current) return;
 				}).catch(function(error) {
 					if (error.name !== "AbortError") {
@@ -611,7 +626,7 @@ const MapComponent = ({     isDrawerOpen,
 			abortControllerRef.current!.abort();
 			setSelectedRoomId(undefined);
 		};
-	}, [selectedRoomId, allFeatures, setSelectedRoomId, isDrawerOpen]);
+	}, [selectedRoomId, allFeatures, isDrawerOpen]);
 
 	useEffect(() => {
 		if (activateAnimation) {
@@ -630,35 +645,49 @@ const MapComponent = ({     isDrawerOpen,
 	}, [activateAnimation])
 
 	useEffect(() => {
-		if (faculty) {
-			setSelectedFaculty(faculty as FacultyType)
-		}
-		if (!faculty || !building || !floor || !roomName) {
-			return
-		}
 		const fetchRoomId = async() => {
 			try {
-				if (!faculty || !building || !selectedFloorNumber || !roomName) {
+				if (!faculty || !building || !floor || !roomName) {
 					console.log("Missing parameters for fetching room ID", faculty, building, selectedFloorNumber, roomName);
 					return
 				}
-				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/roomid/${ faculty }/${ building }/${ selectedFloorNumber }/${ roomName }`);
+				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/roomid/${ faculty }/${ building }/${ floor }/${ roomName }`)
 				if (!response.ok) {
 					throw new Error('Failed to fetch room ID');
 				}
+
 				const data = await response.json();
-				console.log("Fetched room ID:", data.room_id)
 				setSelectedRoomId(data.room_id);
 				await handleRoomSelection(data.room_id);
+				setIsDrawerOpen(true);
 			} catch (error) {
 				console.error('Error fetching room ID:', error);
 				setSelectedRoomId(undefined);
 			}
 		};
-
-		fetchRoomId();
-	}, [faculty, building, floor, roomName, setSelectedFaculty, setSelectedRoomId]);
-
+		if (faculty && building && floor && roomName) {
+			fetchRoomId();
+		} else if (faculty) {
+			setSelectedFaculty(faculty as FacultyType)
+			setCenterCoordinates(getFacultyCoordinates(faculty as FacultyType));
+		} else if (location.pathname === "/map" || location.pathname === "/" || location.pathname === "/map/") {
+			setCenterCoordinates({ lat: 16.58718904843347, lng: 49.217963479239316 });
+			setZoom(13);
+			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+			console.log("No specific path, use default map view.", PinsGraphicsLayerRef.current?.graphics);
+		} else {
+			console.log("No specific path, use default map view.");
+			return;
+		}
+	}, [faculty, building, floor, roomName]);
+	useEffect(() => {
+		if (!mapViewRef.current || !PinsGraphicsLayerRef.current) {
+			return;
+		}
+		if (location.pathname === "/map" || location.pathname === "/" || location.pathname === "/map/") {
+			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+		}
+	}, [location.pathname, mapViewRef.current, PinsGraphicsLayerRef.current]);
 
 	return (
 		<>

@@ -30,59 +30,6 @@ function App() {
                                   <MapHolder />
                               </Main> }
                           />
-                          <Route path="/map/FIT" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FAST" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FSI" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FEKT" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FAVU" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FCH" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/USI" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FP" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map/FA" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main>
-                          }
-                          />
-                          <Route path="/map/CESA" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main>
-                          }
-                          />
-
                           <Route path="/map" element={
                               <Main>
                                   <MapHolder />
@@ -101,6 +48,7 @@ function App() {
                           <Route path="/:faculty/:building" element={ <FloorSelection /> } />
                           <Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
                           <Route path="/map/:faculty/:building/:floor/:roomName" element={ <Main><MapHolder /></Main> } />
+                          <Route path="/map/:faculty" element={ <Main><MapHolder /></Main> } />
                           <Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
                           <Route path="*" element={ <Main><FacultySelection /></Main> } />
                       </Routes>

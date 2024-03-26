@@ -27,7 +27,7 @@ import { TopbarProps, FacultyIcons, Faculties } from "./types";
 export function Topbar({ goBack, disabled }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
-	const { setCenterCoordinates, setZoom, setActivateAnimation } = useMapContext();
+	const { setCenterCoordinates, setZoom, setActivateAnimation, setArePinsVisible } = useMapContext();
 	const { selectedFaculty, setSelectedFaculty, facultyChangeSource, setFacultyChangeSource } = useFacultyContext();
 	const navigate = useNavigate();
 	const pathParts = location.pathname.split('/').filter(Boolean);
@@ -84,6 +84,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 		setCenterCoordinates(getFacultyCoordinates(event.target.value as FacultyType));
 		setSelectedFaculty(event.target.value as FacultyType);
 		setZoom(17);
+		setArePinsVisible(false);
 		navigate(`/map/${ event.target.value.toUpperCase() }`)
 	};
 

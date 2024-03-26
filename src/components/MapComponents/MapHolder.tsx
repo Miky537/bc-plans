@@ -21,19 +21,18 @@ const MapHolder = () => {
 	const [allFeatures, setAllFeatures] = useState<any>([]);
 	const [areFeaturesEmpty, setAreFeaturesEmpty] = useState(false);
 	const { selectedFaculty } = useFacultyContext();
-	const { zoom, arePinsVisible } = useMapContext();
+	const { arePinsVisible } = useMapContext();
 
 	const {
 		selectedRoomId,
 		setSelectedRoomId,
-		handleRoomSelection,
 		roomData,
 		selectedFloorNumber,
 		setSelectedFloorNumber,
 	} = useFacultyContext();
 	const selectedRoomIdRef = useRef(selectedRoomId);
 
-
+	console.log("sss", areFeaturesLoading, (areFeaturesEmpty && !areFeaturesLoading), arePinsVisible)
 	const handleOpen = useCallback(() => {
 		setIsDrawerOpen(true);
 	}, [setIsDrawerOpen]);

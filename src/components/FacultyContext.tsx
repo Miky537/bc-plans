@@ -3,6 +3,7 @@ import { RoomDetails, fetchRoomInfo } from "./MapComponents/tempFile";
 import { defaultState } from "./MapComponents/constants";
 import { FacultyType } from "./FacultySelection/FacultySelection";
 import { replaceCzechChars } from "./FloorSelection";
+import { useNavigate } from "react-router-dom";
 
 interface FacultyTypeContext {
 	selectedBuildingId: number | null;
@@ -86,6 +87,24 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedBuildingOriginal, setSelectedBuildingOriginal] = useState<string | undefined>(undefined);
 	const [selectedFloorOriginal, setSelectedFloorOriginal] = useState<string | undefined>(undefined);
 	const [selectedRoomOriginal, setSelectedRoomOriginal] = useState<string | undefined>(undefined);
+	const navigate = useNavigate();
+
+	function transformString(s: string): string {
+		// Split the string into parts based on "_"
+		const parts = s.split('_');
+
+		// If there's only one part, return it as is but lowercased
+		if (parts.length === 1) {
+			return s.toLowerCase();
+		}
+
+		// Lowercase all parts except the last one
+		const allButLast = parts.slice(0, -1).map(part => part.toLowerCase());
+
+		// Combine everything, leaving the last part as it is
+		return [...allButLast, parts[parts.length - 1]].join('_');
+	}
+
 
 	const handleRoomSelection = async(roomId?: number) => {
 
@@ -105,6 +124,11 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			setSelectedFloor(random.replace(" ", "_"))
 			setSelectedFloorNumber(roomInfo.floor_info.cislo)
 			updateSelectedRoomDetail(roomInfo);
+			const faculty = roomInfo.building_info.zkratka_prezentacni.split(" ")[0];
+			const building = replaceCzechChars(roomInfo.building_info.nazev_prezentacni.replace(" ", "_"))
+			const correctBuilding = transformString(building)
+			const floor = replaceCzechChars(roomInfo.floor_info.nazev.replace(" ", "_")).toLowerCase()
+			navigate(`/map/${ faculty }/${ correctBuilding }/${ floor }/${ roomInfo.room_info.cislo }`);
 		}
 	};
 

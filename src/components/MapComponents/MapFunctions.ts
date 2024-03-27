@@ -77,9 +77,9 @@ export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, lo
 
 	// Pin symbol
 	const pinSymbol = new PictureMarkerSymbol({
-		url: "https://static.arcgis.com/images/Symbols/Shapes/RedPin1LargeB.png",
-		width: "54px",
-		height: "54px",
+		url: `${ process.env.REACT_APP_APP_URL }/Google_Maps_pin.svg`,
+		width: "20px",
+		height: "35px",
 	});
 
 	const pinGraphic = new Graphic({

@@ -28,6 +28,7 @@ import polylabel from "polylabel";
 import Point from "@arcgis/core/geometry/Point";
 import { Dialog, DialogContent, DialogActions, Button, Typography, Divider } from "@mui/material";
 import { DividerStyles } from "../TeacherSearch/styles";
+import LocationIcon from "./LocationIcon.svg";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
@@ -171,8 +172,8 @@ const MapComponent = ({
 		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
 		const trackWidget = new Track({
 			view: mapView,
+			icon: "", //adding custom icon in index.css
 			rotationEnabled: false, // Disable the rotation of the view
-
 			goToLocationEnabled: true, // automatically moves the view to the user's location
 			geolocationOptions: {
 				maximumAge: 0,

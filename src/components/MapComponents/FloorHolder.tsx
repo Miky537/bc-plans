@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
-import { Divider } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import { useMapContext } from "./MapContext";
 import { useFacultyContext } from "../FacultyContext";
 
-const FloorHolder = () => {
+const FloorButtonStyles = {
+	"&.FloorButton .MuiTouchRipple-root": {
+		width: "1em",
+	}
+}
 
+const FloorHolder = () => {
 	const { setFloors, floors } = useMapContext();
 	const { selectedFaculty, selectedFloorNumber, setSelectedFloorNumber } = useFacultyContext();
 
@@ -36,7 +41,8 @@ const FloorHolder = () => {
 	return (
 		<Box zIndex="2"
 		     gap="0.2em"
-		     display={ floors.length === 0 ? "none" : "flex" }
+		     borderRadius="3px"
+		     display={ floors.length === 0? "none" : "flex" }
 		     flexDirection="column"
 		     position="absolute"
 		     top="4em"
@@ -44,19 +50,24 @@ const FloorHolder = () => {
 		     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
 		     bgcolor="#DBDBDB"
 		     maxHeight="18.5em"
-		     overflow="scroll">
+		     overflow="auto">
 			{ floors.map((floor: number, index: number) => (
 				<React.Fragment key={ floor }>
-					<Box display="flex"
-					     justifyContent="center"
-					     alignItems="center"
-					     padding="0.5em"
-					     width="1em"
-					     fontWeight={ selectedFloorNumber === floor? "bolder" : "normal" }
-					     bgcolor={ selectedFloorNumber === floor? "#ABABAB" : "#DBDBDB" }
-					     onClick={ () => handleButtonClick(floor) }>
-						{ floor }
-					</Box>
+					<Button className="FloorButton" onClick={ () => handleButtonClick(floor) }
+					        sx={ {
+						        display: "flex",
+						        justifyContent: "center",
+						        alignItems: "center",
+						        padding: "0.5em",
+						        width: "1em",
+						        minWidth: "2.5em", // Control the minimum width of the button
+						        maxWidth: "2.5em",
+						        fontWeight: selectedFloorNumber === floor? "bolder" : "normal",
+						        bgcolor: selectedFloorNumber === floor? "#ABABAB" : "#DBDBDB",
+						        ...FloorButtonStyles,
+					        } }>
+						<Typography sx={{  fontWeight: selectedFloorNumber === floor? "900" : "normal"}}>{ floor }</Typography>
+					</Button>
 					{ index !== floors.length - 1 && <Divider flexItem /> }
 				</React.Fragment>
 			)) }

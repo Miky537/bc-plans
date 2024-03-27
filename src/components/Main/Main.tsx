@@ -22,7 +22,7 @@ export default function Main({children, topBarTitle, topBarSelectedDisabled}: Ma
 	}
 
 	return (
-		<Box display="flex" flexDirection="column" height="100dvh">
+		<Box display="flex" flexDirection="column" height="100dvh" bgcolor="background.paper" position="relative">
 			<Topbar title={topBarTitle} goBack={handleGoBack} disabled={topBarSelectedDisabled} />
 			<Content>{ children }</Content>
 		</Box>

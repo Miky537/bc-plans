@@ -13,4 +13,5 @@ export const TextFieldStyles = {
 export const DividerStyles = {
 	opacity: 0.5,
 	borderColor: "#FFFFFF",
+	maxWidth: "900px",
 }

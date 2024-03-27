@@ -12,7 +12,7 @@ function TabPanel(props: TabPanelProps) {
 			hidden={ value !== index }
 			id={ `full-width-tabpanel-${ index }` }
 			aria-labelledby={ `full-width-tab-${ index }` }
-			sx={ { width: "100%", height: "100%" } }
+			sx={ { width: "100%" } }
 		>
 			<Paper sx={ { height: "100%" } } square>
 				{ value === index && (

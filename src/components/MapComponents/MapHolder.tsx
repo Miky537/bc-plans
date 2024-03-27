@@ -8,6 +8,8 @@ import { SwipeableDrawerComponent } from "../SwipeableDrawer/SwipeableDrawerComp
 import { CircularProgress, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useMapContext } from "./MapContext";
+import MediaQuery from "react-responsive";
+import { DesktopDrawer } from "../SwipeableDrawer/DesktopDrawer";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -46,27 +48,36 @@ const MapHolder = () => {
 
 	return (
 		<Box className="Map-Holder">
-			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible ? "none" : "block" }>
+			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>
 				<SearchComponent setSelectedRoom={ setSelectedRoomId }
 				                 setSelectedFloor={ setSelectedFloorNumber }
 				                 setIsDrawerOpen={ setIsDrawerOpen } />
 			</Box>
 
-			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible ? "none" : "block" }>
+			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>
 				<FloorHolder />
 			</Box>
 			<MapComponent isDrawerOpen={ isDrawerOpen }
-				selectedFloor={ selectedFloorNumber }
+			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
 			              setAreFeaturesLoading={ setAreFeaturesLoading }
 			              allFeatures={ allFeatures }
 			              setAllFeatures={ setAllFeatures }
 			              setAreFeaturesEmpty={ setAreFeaturesEmpty }
 			/>
-			<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
-			                          onClose={ handleClose }
-			                          onOpen={ handleOpen }
-			                          roomData={ roomData } />
+			<MediaQuery maxWidth={ 600 }>
+				<SwipeableDrawerComponent isDrawerOpen={ isDrawerOpen }
+				                          onClose={ handleClose }
+				                          onOpen={ handleOpen }
+				                          roomData={ roomData } />
+			</MediaQuery>
+			<MediaQuery minWidth={ 600 }>
+				<DesktopDrawer isDrawerOpen={ isDrawerOpen }
+				               onClose={ handleClose }
+				               onOpen={ handleOpen }
+				               roomData={ roomData } />
+			</MediaQuery>
+
 			<Box width="35%"
 			     maxWidth="10em"
 			     position="absolute"
@@ -100,7 +111,7 @@ const MapHolder = () => {
 			     color="white"
 			     px="1em"
 			     py="0.3em"
-			     display={ areFeaturesEmpty && selectedFaculty !== undefined && !areFeaturesLoading ? "flex" : "none" }
+			     display={ areFeaturesEmpty && selectedFaculty !== undefined && !areFeaturesLoading? "flex" : "none" }
 			     borderRadius="20px"
 			     justifyContent="space-around"
 			     zIndex={ 100 }>

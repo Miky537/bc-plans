@@ -49,56 +49,65 @@ function BuildingSelection() {
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Paper sx={ { height: "100%" } }>
+			<Paper sx={ { height: "100%", width: "100%", maxWidth: "1440px", margin: "auto" } }>
 				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
-					<Link underline="none"><Typography variant="h5"
-					                                   color="#61677A">{ selectedFaculty }</Typography></Link>
+					<Link underline="hover"><Typography variant="h5"
+					>{ selectedFaculty }</Typography></Link>
 				</Breadcrumbs>
-				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%"
-				     pb="4.2em" color={palette.text.primary} borderTop="2px solid gray">
-					{isLoading ? (
-							<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
-								<CircularProgress thickness={3} size="5rem" />
-							</Box>
-						) : buildings.length > 0 ? (
-							buildings
-								.filter((building: BuildingSelectionInt) => building.building_id !== 39)
-								.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
-								.map((building: BuildingSelectionInt) => (
-									<Box key={building.building_id}
-									     width="100%"
-									     pt="0.7em"
-									     pb="0.7em"
-									     bgcolor={"background.paper"}
-									     borderBottom="1px solid white"
-									     onClick={() => handleBuildingClick(building.building_id, building.name)}>
-										<Typography variant="h5" ml="0.7em">{building.name}</Typography>
-									</Box>
-								))
-						) : (
-							<Box width="100%" height="80%" display="flex" pt={5} justifyContent="center" alignItems="center">
-								<Typography variant="h4">No buildings available</Typography>
-							</Box>
-						)
+				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%" margin="auto"
+				     pb="4.2em" color={ palette.text.primary } borderTop="2px solid gray">
+					{ isLoading? (
+						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+							<CircularProgress thickness={ 3 } size="5rem" />
+						</Box>
+					) : buildings.length > 0? (
+						buildings
+							.filter((building: BuildingSelectionInt) => building.building_id !== 39)
+							.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
+							.map((building: BuildingSelectionInt) => (
+								<Box key={ building.building_id }
+								     width="100%"
+								     pt="0.7em"
+								     pb="0.7em"
+								     bgcolor={ "background.paper" }
+								     borderBottom="1px solid white"
+								     onClick={ () => handleBuildingClick(building.building_id, building.name) }>
+									<Typography variant="h5" ml="0.7em">{ building.name }</Typography>
+								</Box>
+							))
+					) : (
+						<Box width="100%"
+						     height="80%"
+						     display="flex"
+						     pt={ 5 }
+						     justifyContent="center"
+						     alignItems="center">
+							<Typography variant="h4">No buildings available</Typography>
+						</Box>
+					)
 					}
 				</Box>
 			</Paper>
-			<Button sx={ {
-				        position: "fixed",
-				        bottom: 0,
-				        height: "5em",
-				        bgcolor: palette.background.default,
-				        boxShadow: "rgba(255, 255, 255, 0.35) 0px 5px 15px;",
-				        width: "100%",
-				        display: "flex",
-				        alignItems: "center",
-				        justifyContent: "center",
-						border: "2px solid gray",
-			        } }
-			        onClick={ () => navigate(`/map/${ selectedFaculty }`) }
-			>
+			<Button sx={{
+				position: "fixed",
+				bottom: 0,
+				left: 0,
+				right: 0,
+				marginLeft: "auto",
+				marginRight: "auto",
+				height: "5em",
+				bgcolor: palette.background.default,
+				boxShadow: "rgba(255, 255, 255, 0.35) 0px 5px 15px",
+				width: "100%",
+				maxWidth: "1440px",
+				display: "flex",
+				alignItems: "center",
+				justifyContent: "center",
+				border: "2px solid gray",
+			}} onClick={() => navigate(`/map/${selectedFaculty}`)}>
 				<Typography variant="h4" color={palette.text.primary}>Go to map</Typography>
 			</Button>
+
 		</Main>
 	);
 }

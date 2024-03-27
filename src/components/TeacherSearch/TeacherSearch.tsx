@@ -31,20 +31,26 @@ function TeacherSearch() {
 
 	return (
 		<Main>
-			<Box sx={ { borderBottom: 1, borderColor: 'divider' } }>
-				<Paper square>
-					<Tabs value={ value } onChange={ handleChange } variant="fullWidth">
-						<Tab label="Faculty selection" value={ 0 } sx={TabStyles} />
-						<Tab label="Teachers' offices" value={ 1 } sx={TabStyles}/>
-					</Tabs>
-				</Paper>
+			<Box>
+				<Box sx={ { borderBottom: 1, borderColor: 'divider' } }>
+					<Paper square>
+						<Tabs value={ value }
+						      onChange={ handleChange }
+						      variant="fullWidth"
+						      sx={ { maxWidth: "900px", margin: "auto" } }>
+							<Tab label="Faculty selection" value={ 0 } sx={ TabStyles } />
+							<Tab label="Teachers' offices" value={ 1 } sx={ TabStyles } />
+						</Tabs>
+					</Paper>
+				</Box>
+				<TabPanel value={ value } index={ 0 }>
+					<FacultySelection />
+				</TabPanel>
+				<TabPanel value={ value } index={ 1 }>
+					<TeacherRooms />
+				</TabPanel>
 			</Box>
-			<TabPanel value={ value } index={ 0 }>
-				<FacultySelection />
-			</TabPanel>
-			<TabPanel value={ value } index={ 1 }>
-				<TeacherRooms />
-			</TabPanel>
+
 		</Main>
 	);
 }

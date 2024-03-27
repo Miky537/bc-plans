@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Paper, TextField, Typography, Divider, InputAdornment, CircularProgress, debounce } from "@mui/material";
+import {
+	Paper,
+	TextField,
+	Typography,
+	Divider,
+	InputAdornment,
+	CircularProgress,
+	debounce,
+	useTheme
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import { useMutation, useQuery } from "react-query";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
@@ -16,6 +25,7 @@ function TeacherRooms() {
 	const [teacherName, setTeacherName] = useState('');
 	const [teachers, setTeachers] = useState<Teachers[] | null>(null);
 	const [roomId, setRoomId] = useState<number | null>(null);
+	const theme = useTheme();
 	const navigate = useNavigate();
 	const {
 		setSelectedFloorNumber,
@@ -99,8 +109,8 @@ function TeacherRooms() {
 	}
 
 	return (
-		<>
-			<Paper square>
+		<Box height="100vh">
+			<Paper sx={ { margin: "auto", maxWidth: "900px" } }>
 				<TextField
 					id="search-bar"
 					className="text"
@@ -112,12 +122,12 @@ function TeacherRooms() {
 					onChange={ handleInputChange }
 					autoComplete="off"
 					type="text"
-					sx={ TextFieldStyles }
+					sx={ { ...TextFieldStyles } }
 					disabled={ isLoading }
 					InputProps={ {
 						startAdornment: (
 							<InputAdornment position="start">
-								<SearchIcon color="primary" />
+								<SearchIcon color={ isLoading? "disabled" : "primary" } />
 							</InputAdornment>
 						),
 					} }
@@ -129,9 +139,11 @@ function TeacherRooms() {
 				</Box>
 				:
 				<Paper sx={ {
-					height: "100%",
+					height: "fit-content",
+					minHeight: "100vh",
 					width: "100%",
 					display: "flex",
+					margin: "auto",
 					alignItems: "center",
 					flexDirection: "column"
 				} } square>
@@ -139,6 +151,7 @@ function TeacherRooms() {
 					{ teachers?.map(({ label, mistnost, mistnost_id, email, fakulta_zkratka }, index) => (
 						<React.Fragment key={ index }>
 							<Box width="90%"
+							     maxWidth="900px"
 							     display="flex"
 							     flexDirection="column"
 							     justifyContent="flex-start"
@@ -161,31 +174,44 @@ function TeacherRooms() {
 								     alignItems="center"
 								     justifyContent="space-evenly"
 								     gap={ 1.5 }
-								     width="80%"
+								     width="90%"
 								     margin="auto"
 								>
-									<Typography variant="body2" sx={ { pl: 0 } }>
-										{ mistnost }
-									</Typography>
+									<Box width="25%" display="flex" justifyContent="center">
+										<Typography variant="body2" sx={ { textAlign: 'center' } }>
+											{ mistnost }
+										</Typography>
+									</Box>
 									<Divider flexItem orientation="vertical" sx={ DividerStyles } />
-									<Typography variant="body2" sx={ { pl: 0 } }>
-										{ email }
-									</Typography>
+									<Box width="50%" display="flex" justifyContent="center">
+										<Typography variant="body2"
+										            sx={ {
+											            textAlign: 'center',
+											            whiteSpace: 'nowrap',
+											            overflow: 'hidden',
+											            textOverflow: 'ellipsis'
+										            } }>
+											{ email }
+										</Typography>
+									</Box>
 									<Divider flexItem orientation="vertical" sx={ DividerStyles } />
-									<Typography variant="body2" sx={ { pl: 0 } }>
-										{ fakulta_zkratka }
-									</Typography>
-
+									<Box width="25%" display="flex" justifyContent="center">
+										<Typography variant="body2" sx={ { textAlign: 'center' } }>
+											{ fakulta_zkratka }
+										</Typography>
+									</Box>
 								</Box>
 							</Box>
-							<Divider flexItem
-							         variant="middle"
-							         sx={ DividerStyles } />
+							<Box display={ index === teachers?.length - 1? "none" : "block" }
+							     height={ 2 }
+							     bgcolor={ theme.palette.text.primary }
+							     width="70%"
+							     maxWidth="700px" />
 						</React.Fragment>
 					)) }
 				</Paper>
 			}
-		</>
+		</Box>
 	);
 }
 

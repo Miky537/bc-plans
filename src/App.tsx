@@ -12,53 +12,57 @@ import { FacultyProvider } from "./components/FacultyContext";
 import FavouritePlaces from "./components/FavouritePlaces";
 import TeacherSearch from "./components/TeacherSearch/TeacherSearch";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const queryClient = new QueryClient();
+
 function App() {
 
 
-    return (
-      <ThemeProvider theme={ theme }>
-          <QueryClientProvider client={ queryClient }>
-          <MapProvider>
-              <div className="App">
-                  <BrowserRouter>
-                      <FacultyProvider>
-                      <Routes>
-                          <Route path="/" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main> }
-                          />
-                          <Route path="/map" element={
-                              <Main>
-                                  <MapHolder />
-                              </Main>
-                          }
-                          />
-                          <Route path="/faculty" element={
-                              <TeacherSearch />
-                          }
-                          />
-                          <Route path="/teacher" element={ <TeacherSearch /> } />
-                          <Route path="/select" element={
-                              <BuildingSelection /> }
-                          />
-                          <Route path="/:faculty" element={ <BuildingSelection /> } />
-                          <Route path="/:faculty/:building" element={ <FloorSelection /> } />
-                          <Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
-                          <Route path="/map/:faculty/:building/:floor/:roomName" element={ <Main><MapHolder /></Main> } />
-                          <Route path="/map/:faculty" element={ <Main><MapHolder /></Main> } />
-                          <Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
-                          <Route path="*" element={ <Main><FacultySelection /></Main> } />
-                      </Routes>
-                      </FacultyProvider>
-                  </BrowserRouter>
-              </div>
-          </MapProvider>
-          </QueryClientProvider>
-      </ThemeProvider>
-  );
+	return (
+		<ThemeProvider theme={ theme }>
+			<QueryClientProvider client={ queryClient }>
+				<MapProvider>
+					<div className="App">
+						<BrowserRouter>
+							<FacultyProvider>
+								<Routes>
+									<Route path="/" element={
+										<Main>
+											<MapHolder />
+										</Main> }
+									/>
+									<Route path="/map" element={
+										<Main>
+											<MapHolder />
+										</Main>
+									}
+									/>
+									<Route path="/faculty" element={
+										<TeacherSearch />
+									}
+									/>
+									<Route path="/teacher" element={ <TeacherSearch /> } />
+									<Route path="/select" element={
+										<BuildingSelection /> }
+									/>
+									<Route path="/:faculty" element={ <BuildingSelection /> } />
+									<Route path="/:faculty/:building" element={ <FloorSelection /> } />
+									<Route path="/:faculty/:building/:floor" element={ <FloorSelection /> } />
+									<Route path="/map/:faculty/:building/:floor/:roomName"
+									       element={ <Main><MapHolder /></Main> } />
+									<Route path="/map/:faculty" element={ <Main><MapHolder /></Main> } />
+									<Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
+									<Route path="*" element={ <Main><FacultySelection /></Main> } />
+								</Routes>
+								<SpeedInsights />
+							</FacultyProvider>
+						</BrowserRouter>
+					</div>
+				</MapProvider>
+			</QueryClientProvider>
+		</ThemeProvider>
+	);
 }
 
 export default App;

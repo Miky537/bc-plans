@@ -35,7 +35,7 @@ function FacultySelection() {
 		     flexDirection="column"
 		     justifyContent="center"
 		     bgcolor="background.paper"
-		     height={ "100vh" }
+		     height="100vh"
 		     maxWidth="1440px"
 		     margin="auto">
 			<Box display="grid"
@@ -45,7 +45,7 @@ function FacultySelection() {
 			     justifyContent="center"
 			     maxHeight="100%"
 			     pt={ 4 }
-			     pb={ 4 }
+			     mb={ 4 }
 			     color="white"
 			     >
 				<FacultyItem name="FIT" Image={ FitLogo } />

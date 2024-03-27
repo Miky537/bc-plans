@@ -49,7 +49,7 @@ function BuildingSelection() {
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Paper sx={ { height: "100%", width: "100%", maxWidth: "1440px", margin: "auto" } }>
+			<Paper sx={ { height: "100%", minHeight: "fit-content", width: "100%", maxWidth: "1440px", margin: "auto" } } className="nasnansnas">
 				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
 					<Link underline="hover"><Typography variant="h5"
 					>{ selectedFaculty }</Typography></Link>

@@ -9,7 +9,8 @@ import {
 	Breadcrumbs,
 	Link,
 	useTheme,
-	CircularProgress, Theme
+	CircularProgress,
+	Theme
 } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -133,66 +134,72 @@ function FloorSelection() {
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Breadcrumbs separator={ <NavigateNextIcon fontSize="medium" /> }
-			             sx={ { bgcolor: theme.palette.background.default, py: 1, pl: 2 } }>
-				<Link underline="none" onClick={ handleGoBuildingSelection }>
-					<Typography variant="h5" color="#61677A">{ selectedFaculty }</Typography>
-				</Link>
-				<Link underline="none" onClick={ handleGoFloorSelection }>
-					<Typography variant="h5" color="#61677A">{ selectedBuilding }</Typography>
-				</Link>
-				<Link underline="none">
-					<Typography variant="h5" color="#61677A">{ selectedFloor }</Typography>
-				</Link>
-			</Breadcrumbs>
-			<Box display="flex"
-			     flexDirection="column"
-			     justifyContent="flex-start"
-			     height="100%"
-			     width="100%"
-			     pb={ 4 }
-			     bgcolor="#323232"
-			     borderTop="2px solid gray"
-			     color={theme.palette.text.primary}>
-				{ floors.length > 0 && !isLoading? (
-					floors.map((floor: FetchedFloor) => (
-						<Accordion key={ floor.floor_id }
-						           expanded={ expanded === floor.floor_name }
-						           onChange={ handleChange(floor.floor_name) }
-						           sx={ accordionStyles(theme) }
-						           disableGutters
-						>
-							<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
-								<Typography variant="h5">{ floor.floor_name }</Typography>
-							</AccordionSummary>
-							<AccordionDetails>
-								<Box>
-									{
-										floor.rooms.map((room: any) => {
-											return (
-												<Box key={ room.room_id }>
-													<RoomSelectionItem
-														handleRoomClick={ handleRoomClick }
-														buildingName={ floor.building_name }
-														floorName={ floor.floor_name }
-														roomName={ room.room_number }
-														roomId={ room.room_id }
-														floorNumber={ floor.floor_number }
-													/>
-												</Box>
-											);
-										})
-									}
-								</Box>
-							</AccordionDetails>
-						</Accordion>
-					))
-				) : (
-					<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
-						<CircularProgress thickness={ 3 } size="5rem" />
-					</Box>
-				) }
+			<Box maxWidth="1440px" margin="auto" height="100%" width="100%">
+				<Breadcrumbs separator={ <NavigateNextIcon fontSize="medium" /> }
+				             sx={ {
+					             bgcolor: theme.palette.background.default,
+					             py: 1,
+					             pl: 2,
+				             } }>
+					<Link underline="hover" onClick={ handleGoBuildingSelection }>
+						<Typography variant="h5">{ selectedFaculty }</Typography>
+					</Link>
+					<Link underline="hover" onClick={ handleGoFloorSelection }>
+						<Typography variant="h5">{ selectedBuilding }</Typography>
+					</Link>
+					<Link underline="hover">
+						<Typography variant="h5">{ selectedFloor }</Typography>
+					</Link>
+				</Breadcrumbs>
+				<Box display="flex"
+				     flexDirection="column"
+				     justifyContent="flex-start"
+				     height="100%"
+				     maxWidth="1440px"
+				     pb={ 4 }
+				     borderTop="2px solid gray"
+				     color={ theme.palette.text.primary }>
+					{ floors.length > 0 && !isLoading? (
+						floors.map((floor: FetchedFloor) => (
+							<Accordion key={ floor.floor_id }
+							           expanded={ expanded === floor.floor_name }
+							           onChange={ handleChange(floor.floor_name) }
+							           sx={ accordionStyles(theme) }
+							           disableGutters
+							>
+								<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
+									<Typography variant="h5">{ floor.floor_name }</Typography>
+								</AccordionSummary>
+								<AccordionDetails>
+									<Box>
+										{
+											floor.rooms.map((room: any) => {
+												return (
+													<Box key={ room.room_id }>
+														<RoomSelectionItem
+															handleRoomClick={ handleRoomClick }
+															buildingName={ floor.building_name }
+															floorName={ floor.floor_name }
+															roomName={ room.room_number }
+															roomId={ room.room_id }
+															floorNumber={ floor.floor_number }
+														/>
+													</Box>
+												);
+											})
+										}
+									</Box>
+								</AccordionDetails>
+							</Accordion>
+						))
+					) : (
+						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+							<CircularProgress thickness={ 3 } size="5rem" />
+						</Box>
+					) }
+				</Box>
 			</Box>
+
 		</Main>
 	);
 }

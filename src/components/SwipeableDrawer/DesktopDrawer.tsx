@@ -12,6 +12,8 @@ import { FacultyType } from "../FacultySelection/FacultySelection";
 import DrawerListItem from "./DrawerListItem";
 import useAuthToken from "../../useAuthToken";
 import { useAuthContext } from "../AuthContext";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
 
 
 interface DrawerComponentProps {
@@ -177,14 +179,14 @@ export function DesktopDrawer({
 						buildingName,
 						faculty
 					}) }>
-						<FavoriteBorderIcon color="error"
+						<StarBorderIcon color="error"
 						                    style={ {
 							                    fontSize: "3rem",
 							                    opacity: isFav? 0 : 1,
 							                    transition: 'opacity 0.2s',
 							                    zIndex: 4
 						                    } } />
-						<FavoriteIcon color="error"
+						<StarIcon color="error"
 						              style={ {
 							              fontSize: "3rem",
 							              opacity: isFav? 1 : 0,

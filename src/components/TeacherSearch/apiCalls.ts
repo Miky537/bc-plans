@@ -7,7 +7,6 @@ export const login = async() => {
 	});
 
 	if (!response.ok) {
-		console.log("errrorr", response);
 		throw new Error('Authentication failed');
 	}
 	startTokenRefreshTimer();
@@ -45,7 +44,6 @@ export const getRoomPhoto = async(roomId: number) => {
 	if (token) {
 		headers['Authorization'] = token;
 	} else {
-		console.log("no token")
 		return "";
 	}
 	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {

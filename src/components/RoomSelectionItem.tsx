@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import { FacultyType } from "./FacultySelection/FacultySelection";
 import { useFacultyContext } from "./FacultyContext";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
 
 export interface FavouritePlacesLocalStorage {
 	roomName: string;
@@ -23,7 +23,14 @@ interface RoomSelectionItemProps {
 	handleRoomClick: (roomName: string, roomId: number) => void;
 }
 
-const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, floorNumber, handleRoomClick }: RoomSelectionItemProps) => {
+const RoomSelectionItem = ({
+	                           roomName,
+	                           roomId,
+	                           floorName,
+	                           buildingName,
+	                           floorNumber,
+	                           handleRoomClick
+                           }: RoomSelectionItemProps) => {
 	const [isFav, setIsFav] = useState<boolean>(false);
 	const { selectedFaculty: faculty } = useFacultyContext();
 
@@ -59,7 +66,8 @@ const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, floorNum
 		<Box display="flex"
 		     alignItems="center"
 		     justifyContent="space-between"
-		     borderTop="1px solid white"
+		     // borderTop="1px solid white"
+		     borderBottom="1px solid white"
 		     py={ 1 }>
 			<Typography variant="h6"
 			            width="100%"
@@ -72,21 +80,19 @@ const RoomSelectionItem = ({ roomName, roomId, floorName, buildingName, floorNum
 				faculty,
 				floorNumber
 			}) }>
-				<FavoriteBorderIcon color="error"
-				                    style={ {
-					                    fontSize: "1.8rem",
-					                    opacity: isFav? 0 : 1,
-					                    transition: 'opacity 0.5s',
-					                    zIndex: 4
-				                    } } />
-				<FavoriteIcon color="error"
-				              style={ {
-					              fontSize: "1.8rem",
-					              opacity: isFav? 1 : 0,
-					              transition: 'opacity 0.5s',
-					              position: 'absolute',
-					              zIndex: 4
-				              } } />
+				<StarBorderIcon color="primary"
+				                style={ {
+					                fontSize: "2rem",
+					                opacity: isFav? 0 : 1,
+					                transition: 'opacity 0.5s',
+				                } } />
+				<StarIcon color="primary"
+				          style={ {
+					          fontSize: "2rem",
+					          opacity: isFav? 1 : 0,
+					          transition: 'opacity 0.5s',
+					          position: 'absolute',
+				          } } />
 			</IconButton>
 		</Box>
 	);

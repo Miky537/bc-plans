@@ -3,9 +3,6 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { FacultyType } from "./FacultySelection";
 import { useNavigate } from "react-router-dom";
-import { useMapContext } from "../MapComponents/MapContext";
-import { Coordinates } from "../MapComponents/MapComponent";
-import { getFacultyCoordinates } from "../MapComponents/MapFunctions";
 import { useFacultyContext } from "../FacultyContext";
 
 interface FacultyItemProps {
@@ -15,11 +12,9 @@ interface FacultyItemProps {
 
 function FacultyItem({ name, Image }: FacultyItemProps) {
 	const navigate = useNavigate();
-	const { setCenterCoordinates } = useMapContext();
 	const { setSelectedFaculty } = useFacultyContext();
 
-	const handleFacultyClick = (facultyName: FacultyType, coordinates: Coordinates) => {
-		// setCenterCoordinates(coordinates);
+	const handleFacultyClick = (facultyName: FacultyType) => {
 		setSelectedFaculty(facultyName);
 		navigate(`/${ facultyName }`)
 	}
@@ -30,15 +25,21 @@ function FacultyItem({ name, Image }: FacultyItemProps) {
 		     justifyContent="center"
 		     alignItems="center"
 		     gap={ 2 }
-		     onClick={ () => handleFacultyClick(name, getFacultyCoordinates(name)) } sx={ { cursor: "pointer" } }>
-			<Box width="7em"
-			     height="7em"
-			     borderRadius="50%"
-			     bgcolor="#DEDEDE"
-			     display="flex"
-			     justifyContent="center"
-			     alignItems="center" overflow="hidden">
-				{ Image? <Image style={ { width: "8em" } } /> : null }
+		     onClick={ () => handleFacultyClick(name) } sx={ { cursor: "pointer" } }>
+			<Box
+
+				sx={ {
+					width: ['25vw', '17vw', '15vw'], // Responsive width across breakpoints
+					height: ['25vw', '17vw', '15vw'], // Responsive height across breakpoints
+					maxWidth: "10em",
+					maxHeight: "10em",
+				} }
+				borderRadius="50%"
+				bgcolor="#DEDEDE"
+				display="flex"
+				justifyContent="center"
+				alignItems="center" overflow="hidden">
+				{ Image? <Image style={ { width: "fit" } } /> : null }
 			</Box>
 
 			<Typography>{ name?.toString() }</Typography>

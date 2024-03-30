@@ -48,11 +48,11 @@ const MapHolder = () => {
 
 	return (
 		<Box className="Map-Holder">
-			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>
+			{/*<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>*/}
 				<SearchComponent setSelectedRoom={ setSelectedRoomId }
 				                 setSelectedFloor={ setSelectedFloorNumber }
 				                 setIsDrawerOpen={ setIsDrawerOpen } />
-			</Box>
+			{/*</Box>*/}
 
 			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>
 				<FloorHolder />

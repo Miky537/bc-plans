@@ -52,7 +52,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 				setSearchRooms([]);
 			}
 		};
-		console.log(sessionStorage.getItem("allRooms"));
 		if (sessionStorage.getItem("allRooms") === null)
 			fetchRooms();
 		else setSearchRooms(JSON.parse(sessionStorage.getItem("allRooms") as string));

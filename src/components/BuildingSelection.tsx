@@ -48,16 +48,33 @@ function BuildingSelection() {
 		setSelectedFloor(undefined)
 		navigate(`/${ selectedFaculty }/${ buildingName.replace(/\s/g, "_") }`)
 	}
+	const handleGoToMap = () => {
+		navigate(`/map/${ selectedFaculty }`)
+	}
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Paper sx={ { height: "100%", minHeight: "fit-content", width: "100%", maxWidth: "1440px", margin: "auto" } } className="nasnansnas">
-				<Breadcrumbs separator="›" sx={ { bgcolor: palette.background.default, py: 1, pl: 2 } }>
-					<Link underline="hover"><Typography variant="h5"
-					>{ selectedFaculty }</Typography></Link>
-				</Breadcrumbs>
+			<Paper sx={{
+				height: "100%",
+				minHeight: "fit-content",
+				width: "100%",
+				maxWidth: "1440px",
+				margin: "auto",
+				mb: "calc(5em - 12px)",
+				position: 'relative', // Ensures the Paper can correctly handle sticky children
+				overflow: 'auto' // Ensures Paper can scroll if content overflows
+			}}>
+				<Box sx={{ position: 'sticky', top: 0, zIndex: 1, borderBottom: "2px solid white" }}>
+					<Breadcrumbs separator="›" sx={{ bgcolor: 'background.default', py: 1, pl: 2 }}>
+						<Link underline="hover">
+							<Typography variant="h5">
+								{selectedFaculty}
+							</Typography>
+						</Link>
+					</Breadcrumbs>
+				</Box>
 				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%" margin="auto"
-				     pb="4.2em" color={ palette.text.primary } borderTop="2px solid gray">
+				     color={ palette.text.primary } borderTop="2px solid gray" overflow="auto">
 					{ isLoading? (
 						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
 							<CircularProgress thickness={ 3 } size="5rem" />
@@ -90,24 +107,19 @@ function BuildingSelection() {
 					}
 				</Box>
 			</Paper>
-			<Button sx={{
-				position: "fixed",
-				bottom: 0,
-				left: 0,
-				right: 0,
-				marginLeft: "auto",
-				marginRight: "auto",
-				height: "5em",
-				bgcolor: palette.background.default,
-				boxShadow: "rgba(255, 255, 255, 0.35) 0px 5px 15px",
-				width: "100%",
-				maxWidth: "1440px",
-				display: "flex",
-				alignItems: "center",
-				justifyContent: "center",
-				border: "2px solid gray",
-			}} onClick={() => navigate(`/map/${selectedFaculty}`)}>
-				<Typography variant="h4" color={palette.text.primary}>Go to map</Typography>
+			<Button variant="contained"
+			        onClick={ handleGoToMap }
+			        sx={ {
+				        position: "fixed",
+				        bottom: 0,
+				        width: "100%",
+				        maxWidth: "1440px",
+				        height: "5em"
+			        } }>
+				<Typography variant="h5" sx={ {
+					display: "flex",
+					alignItems: "center"
+				} }>Go to map</Typography>
 			</Button>
 
 		</Main>

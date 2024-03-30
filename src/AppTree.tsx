@@ -17,7 +17,6 @@ export default function AppTree() {
 	const { loginMutate } = useAuthToken();
 
 	useEffect(() => {
-		console.log('AppTree: Fetching token');
 		loginMutate(); // Fetch the token
 	}, [loginMutate]);
 
@@ -55,7 +54,7 @@ export default function AppTree() {
 							       element={ <Main><MapHolder /></Main> } />
 							<Route path="/map/:faculty" element={ <Main><MapHolder /></Main> } />
 							<Route path="/fvPlaces" element={ <Main><FavouritePlaces /></Main> } />
-							<Route path="*" element={ <Main><FacultySelection /></Main> } />
+							<Route path="*" element={ <Main><TeacherSearch /></Main> } />
 						</Routes>
 						<SpeedInsights />
 					</FacultyProvider>

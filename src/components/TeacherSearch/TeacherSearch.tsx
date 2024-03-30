@@ -31,24 +31,23 @@ function TeacherSearch() {
 
 	return (
 		<Main>
-			<Box>
-				<Box sx={ { borderBottom: 1, borderColor: 'divider' } }>
+			<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+				<Box sx={{ borderBottom: 1, borderColor: 'divider', position: "sticky", top: 0, zIndex: 1100 }}>
 					<Paper square>
-						<Tabs value={ value }
-						      onChange={ handleChange }
-						      variant="fullWidth"
-						      sx={ { maxWidth: "900px", margin: "auto" } }>
-							<Tab label="Faculty selection" value={ 0 } sx={ TabStyles } />
-							<Tab label="Teachers' offices" value={ 1 } sx={ TabStyles } />
+						<Tabs value={value} onChange={handleChange} variant="fullWidth" sx={{ maxWidth: "900px", margin: "auto" }}>
+							<Tab label="Faculty selection" value={0} />
+							<Tab label="Teachers' offices" value={1} />
 						</Tabs>
 					</Paper>
 				</Box>
-				<TabPanel value={ value } index={ 0 }>
-					<FacultySelection />
-				</TabPanel>
-				<TabPanel value={ value } index={ 1 }>
-					<TeacherRooms />
-				</TabPanel>
+				<Box sx={{ flexGrow: 1, overflowY: 'auto' }}> {/* This Box becomes the scroll container */}
+					<TabPanel value={value} index={0}>
+						<FacultySelection />
+					</TabPanel>
+					<TabPanel value={value} index={1}>
+						<TeacherRooms />
+					</TabPanel>
+				</Box>
 			</Box>
 
 		</Main>

@@ -13,13 +13,15 @@ import { ReactComponent as FavuLogo } from "../../FacultyLogos/ffa-logo.svg";
 import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
+import { Button, Typography } from "@mui/material";
+import { useFacultyContext } from "../FacultyContext";
 
 export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | "CESA" | undefined;
 
 function FacultySelection() {
 
 	const { setMapVisibility } = useMapContext();
-
+	const { selectedFaculty } = useFacultyContext();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -30,24 +32,35 @@ function FacultySelection() {
 		};
 	}, [setMapVisibility]);
 
+	const handleGoToMap = () => {
+		if (selectedFaculty) {
+			navigate(`/map/${ selectedFaculty }`);
+		} else {
+			navigate(`/map`);
+		}
+	}
+
 	return (
 		<Box display="flex"
 		     flexDirection="column"
 		     justifyContent="center"
 		     bgcolor="background.paper"
-		     height="100vh"
+		     height="fit-content"
+		     pt={ 4 }
+		     pb={ 7 }
 		     maxWidth="1440px"
 		     margin="auto">
 			<Box display="grid"
-			     gridTemplateColumns="repeat(2, minmax(200px, 0.3fr))" // Creates a two-column layout with equal column widths
+			     gridTemplateColumns="repeat(2, minmax(150px, 0.3fr))" // Creates a two-column layout with equal column widths
 			     rowGap={ 4 }
-			     columnGap={ { xs: '10px', sm: '15px', md: '20px' } } // Adjusts column gap based on breakpoints
+			     columnGap={ { xs: '0px', sm: '15px', md: '20px' } } // Adjusts column gap based on breakpoints
 			     justifyContent="center"
-			     maxHeight="100%"
-			     pt={ 4 }
+			     minHeight="fit-content"
+			     height="100%"
+			     // pt={ 4 }
 			     mb={ 4 }
 			     color="white"
-			     >
+			>
 				<FacultyItem name="FIT" Image={ FitLogo } />
 				<FacultyItem name="FAST" Image={ FastLogo } />
 				<FacultyItem name="FSI" Image={ FsiLogo } />
@@ -59,6 +72,20 @@ function FacultySelection() {
 				<FacultyItem name="FA" Image={ FaLogo } />
 				<FacultyItem name="CESA" Image={ CesaLogo } />
 			</Box>
+			<Button variant="contained"
+			        onClick={ handleGoToMap }
+			        sx={ {
+				        position: "fixed",
+				        bottom: 0,
+				        width: "100%",
+				        maxWidth: "1440px",
+				        height:"5em"
+			        } }>
+				<Typography variant="h5" sx={ {
+					display: "flex",
+					alignItems: "center"
+				} }>Go to map</Typography>
+			</Button>
 		</Box>
 
 	);

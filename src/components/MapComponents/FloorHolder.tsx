@@ -63,7 +63,7 @@ const FloorHolder = () => {
 						        minWidth: "2.5em", // Control the minimum width of the button
 						        maxWidth: "2.5em",
 						        fontWeight: selectedFloorNumber === floor? "bolder" : "normal",
-						        bgcolor: selectedFloorNumber === floor? "#ABABAB" : "#DBDBDB",
+						        bgcolor: selectedFloorNumber === floor? "#ABABAB !important" : "#DBDBDB",
 						        ...FloorButtonStyles,
 					        } }>
 						<Typography sx={{  fontWeight: selectedFloorNumber === floor? "900" : "normal"}}>{ floor }</Typography>

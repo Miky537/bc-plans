@@ -10,7 +10,8 @@ import {
 	Link,
 	useTheme,
 	CircularProgress,
-	Theme
+	Theme,
+	Button
 } from "@mui/material";
 import { useFacultyContext } from "./FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -131,26 +132,39 @@ function FloorSelection() {
 	const handleGoFloorSelection = () => {
 		setExpanded(false);
 	}
+	const handleGoToMap = () => {
+		navigate(`/map/${selectedFaculty}`)
+	}
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Box maxWidth="1440px" margin="auto" height="100%" width="100%">
-				<Breadcrumbs separator={ <NavigateNextIcon fontSize="medium" /> }
-				             sx={ {
-					             bgcolor: theme.palette.background.default,
-					             py: 1,
-					             pl: 2,
-				             } }>
-					<Link underline="hover" onClick={ handleGoBuildingSelection }>
-						<Typography variant="h5">{ selectedFaculty }</Typography>
-					</Link>
-					<Link underline="hover" onClick={ handleGoFloorSelection }>
-						<Typography variant="h5">{ selectedBuilding }</Typography>
-					</Link>
-					<Link underline="hover">
-						<Typography variant="h5">{ selectedFloor }</Typography>
-					</Link>
-				</Breadcrumbs>
+			<Box maxWidth="1440px"
+			     margin="auto"
+			     height="100%"
+			     minHeight="fit-content"
+			     width="100%"
+			     mb="calc(5em - 12px)"
+			     position="relative"
+			     overflow="auto">
+				<Box sx={ { position: 'sticky', top: 0, zIndex: 1, borderBottom: "2px solid white" } }>
+					<Breadcrumbs separator={ <NavigateNextIcon fontSize="medium" /> }
+					             sx={ {
+						             position: "sticky",
+						             bgcolor: theme.palette.background.default,
+						             py: 1,
+						             pl: 2,
+					             } }>
+						<Link underline="hover" onClick={ handleGoBuildingSelection }>
+							<Typography variant="h5">{ selectedFaculty }</Typography>
+						</Link>
+						<Link underline="hover" onClick={ handleGoFloorSelection }>
+							<Typography variant="h5">{ selectedBuilding }</Typography>
+						</Link>
+						<Link underline="hover">
+							<Typography variant="h5">{ selectedFloor }</Typography>
+						</Link>
+					</Breadcrumbs>
+				</Box>
 				<Box display="flex"
 				     flexDirection="column"
 				     justifyContent="flex-start"
@@ -160,38 +174,40 @@ function FloorSelection() {
 				     borderTop="2px solid gray"
 				     color={ theme.palette.text.primary }>
 					{ floors.length > 0 && !isLoading? (
-						floors.map((floor: FetchedFloor) => (
-							<Accordion key={ floor.floor_id }
-							           expanded={ expanded === floor.floor_name }
-							           onChange={ handleChange(floor.floor_name) }
-							           sx={ accordionStyles(theme) }
-							           disableGutters
-							>
-								<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
-									<Typography variant="h5">{ floor.floor_name }</Typography>
-								</AccordionSummary>
-								<AccordionDetails>
-									<Box>
-										{
-											floor.rooms.map((room: any) => {
-												return (
-													<Box key={ room.room_id }>
-														<RoomSelectionItem
-															handleRoomClick={ handleRoomClick }
-															buildingName={ floor.building_name }
-															floorName={ floor.floor_name }
-															roomName={ room.room_number }
-															roomId={ room.room_id }
-															floorNumber={ floor.floor_number }
-														/>
-													</Box>
-												);
-											})
-										}
-									</Box>
-								</AccordionDetails>
-							</Accordion>
-						))
+						floors
+							.sort((a: FetchedFloor, b: FetchedFloor) => a.floor_number - b.floor_number)
+							.map((floor: FetchedFloor) => (
+								<Accordion key={ floor.floor_id }
+								           expanded={ expanded === floor.floor_name }
+								           onChange={ handleChange(floor.floor_name) }
+								           sx={ accordionStyles(theme) }
+								           disableGutters
+								>
+									<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
+										<Typography variant="h5">{ floor.floor_name }</Typography>
+									</AccordionSummary>
+									<AccordionDetails>
+										<Box>
+											{
+												floor.rooms.map((room: any) => {
+													return (
+														<Box key={ room.room_id } >
+															<RoomSelectionItem
+																handleRoomClick={ handleRoomClick }
+																buildingName={ floor.building_name }
+																floorName={ floor.floor_name }
+																roomName={ room.room_number }
+																roomId={ room.room_id }
+																floorNumber={ floor.floor_number }
+															/>
+														</Box>
+													);
+												})
+											}
+										</Box>
+									</AccordionDetails>
+								</Accordion>
+							))
 					) : (
 						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
 							<CircularProgress thickness={ 3 } size="5rem" />
@@ -199,7 +215,20 @@ function FloorSelection() {
 					) }
 				</Box>
 			</Box>
-
+			<Button variant="contained"
+			        onClick={ handleGoToMap }
+			        sx={ {
+				        position: "fixed",
+				        bottom: 0,
+				        width: "100%",
+				        maxWidth: "1440px",
+				        height: "5em"
+			        } }>
+				<Typography variant="h5" sx={ {
+					display: "flex",
+					alignItems: "center"
+				} }>Go to map</Typography>
+			</Button>
 		</Main>
 	);
 }

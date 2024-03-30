@@ -721,7 +721,6 @@ const MapComponent = ({
 	const handleCloseRoomDialog = () => {
 		setIsRoomDialogOpen(false);
 		setDoesRoomExist(true)
-		console.log("Close room dialog");
 	};
 	const handleClose = () => {
 		setIsDialogOpen(false);

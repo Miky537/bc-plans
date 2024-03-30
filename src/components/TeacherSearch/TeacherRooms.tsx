@@ -36,7 +36,6 @@ function TeacherRooms() {
 		setSelectedFaculty,
 		setSelectedBuilding,
 		setSelectedFloor,
-		setSelectedRoomDetail,
 		setRoomData
 	} = useFacultyContext();
 	const { setDoesRoomExist } = useMapContext();
@@ -50,12 +49,11 @@ function TeacherRooms() {
 			enabled: false, // Initially, do not automatically run the query
 		}
 	);
-	const { refetch } = useQuery({
+	const { refetch, isRefetching, isLoading: isRefetchingLoading, isFetching } = useQuery({
 			queryKey: ['searchTeacher', teacherName],
 			queryFn: () => searchTeacher(teacherName),
 			enabled: false, // Turn off automatic execution
 			onSuccess: ({ data }) => {
-				console.log("ucitel", data);
 				setTeachers(data.vysledky)
 			},
 		},
@@ -114,7 +112,7 @@ function TeacherRooms() {
 					className="text"
 					label="Enter a teacher's name..."
 					variant="filled"
-					placeholder="Search..."
+					// placeholder="Search..."
 					size="medium"
 					fullWidth
 					onChange={ handleInputChange }
@@ -126,6 +124,10 @@ function TeacherRooms() {
 						startAdornment: (
 							<InputAdornment position="start">
 								<SearchIcon color={ isLoading? "disabled" : "primary" } />
+								{ (isRefetchingLoading || isRefetching || isFetching) &&
+									<CircularProgress sx={ { position: "fixed", right: 15 } }
+													  size={ 30 }
+													  thickness={ 5 } /> }
 							</InputAdornment>
 						),
 					} }
@@ -168,37 +170,43 @@ function TeacherRooms() {
 										{ label }
 									</Typography>
 								</Box>
-								<Box display="flex"
-								     alignItems="center"
-								     justifyContent="space-evenly"
-								     gap={ 1.5 }
-								     width="90%"
-								     margin="auto"
-								>
-									<Box width="25%" display="flex" justifyContent="center">
-										<Typography variant="body2" sx={ { textAlign: 'center' } }>
-											{ mistnost }
-										</Typography>
+								<Box display="flex" justifyContent="flex-start" width="100%" flexDirection="column">
+									<Box display="flex"
+									     alignItems="center"
+									     justifyContent="center"
+									     gap={ 1.5 }
+									     width="100%"
+									     margin="auto"
+									>
+										<Box width="100%" display="flex" justifyContent="center">
+											<Typography variant="h6" sx={ { textAlign: 'center' } }>
+												{ mistnost }
+											</Typography>
+										</Box>
+
+
 									</Box>
-									<Divider flexItem orientation="vertical" sx={ DividerStyles } />
-									<Box width="50%" display="flex" justifyContent="center">
-										<Typography variant="body2"
-										            sx={ {
-											            textAlign: 'center',
-											            whiteSpace: 'nowrap',
-											            overflow: 'hidden',
-											            textOverflow: 'ellipsis'
-										            } }>
-											{ email }
-										</Typography>
-									</Box>
-									<Divider flexItem orientation="vertical" sx={ DividerStyles } />
-									<Box width="25%" display="flex" justifyContent="center">
-										<Typography variant="body2" sx={ { textAlign: 'center' } }>
-											{ fakulta_zkratka }
-										</Typography>
+									<Box display="flex"
+									     alignItems="center"
+									     justifyContent="space-evenly"
+									     gap={ 1.5 }
+									     width="90%"
+									     margin="auto">
+										<Box width="50%" display="flex" justifyContent="center">
+											<Typography variant="body2">
+												{ email }
+											</Typography>
+										</Box>
+										<Divider flexItem orientation="vertical" sx={ DividerStyles } />
+										<Box width="50%" display="flex" justifyContent="center">
+											<Typography variant="body2"
+											            sx={ { textAlign: 'center', textOverflow: "ellipsis" } }>
+												{ fakulta_zkratka }
+											</Typography>
+										</Box>
 									</Box>
 								</Box>
+
 							</Box>
 							<Box display={ index === teachers?.length - 1? "none" : "block" }
 							     height={ 2 }

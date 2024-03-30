@@ -10,15 +10,18 @@ import {
 	useTheme
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import SearchIcon from "@mui/icons-material/Search";
-import { Teachers, AuthType } from "./types";
+import { Teachers } from "./types";
 import { useNavigate } from "react-router-dom";
 import { useFacultyContext } from "../FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
-import { searchTeacher, login } from "./apiCalls";
+import { searchTeacher } from "./apiCalls";
 import { TextFieldStyles, DividerStyles } from "./styles";
+import { useAuthContext } from "../AuthContext";
+import { isFacultyType } from "../Topbar/Topbar";
+import { useMapContext } from "../MapComponents/MapContext";
 
 function TeacherRooms() {
 
@@ -33,11 +36,16 @@ function TeacherRooms() {
 		setSelectedFaculty,
 		setSelectedBuilding,
 		setSelectedFloor,
+		setSelectedRoomDetail,
+		setRoomData
 	} = useFacultyContext();
+	const { setDoesRoomExist } = useMapContext();
+
+	const { isLoading, loginSuccess, loginError, updateLastUsed } = useAuthContext()
 
 	const { refetch: refetchRoomInfo } = useQuery(
 		['fetchRoomInfo', roomId],
-		() => fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/room/${ roomId }`).then(res => res.json()), // Ensure you return the result of res.json()
+		() => fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/room/${ roomId }`).then(res => res.json()),
 		{
 			enabled: false, // Initially, do not automatically run the query
 		}
@@ -47,25 +55,12 @@ function TeacherRooms() {
 			queryFn: () => searchTeacher(teacherName),
 			enabled: false, // Turn off automatic execution
 			onSuccess: ({ data }) => {
+				console.log("ucitel", data);
 				setTeachers(data.vysledky)
 			},
 		},
 	);
 
-	const {
-		mutate: loginMutate,
-		error: loginError,
-		isSuccess: loginSuccess,
-		isLoading
-	} = useMutation(login, {
-		onSuccess: (data: AuthType) => {
-			const sessionToken = data.http_session_token;
-			sessionStorage.setItem('sessionToken', sessionToken);
-		},
-		onError: (error) => {
-			console.error('Login Error', error);
-		},
-	});
 // eslint-disable-next-line
 	const debouncedSearch = useCallback(
 		debounce((searchValue: any) => {
@@ -82,11 +77,6 @@ function TeacherRooms() {
 	const handleInputChange = (event: any) => {
 		setTeacherName(event.target.value);
 	};
-
-	useEffect(() => {
-		loginMutate();
-	}, [loginMutate]);
-
 	const handleTeacherTabClick = async(roomId: number | null) => {
 		if (roomId === null) {
 			return;
@@ -94,18 +84,26 @@ function TeacherRooms() {
 		await setRoomId(roomId);
 		refetchRoomInfo().then(({ data }) => {
 			setSelectedRoomId(roomId);
-			setSelectedFaculty(data.building_info.zkratka_prezentacni.split(' ')[0]);
-			const normalizedBuildingName = replaceCzechChars(data.building_info.nazev_prezentacni)!.replace(/\s/g, "_")
-			setSelectedBuilding(data.building_info.nazev_prezentacni);
-			const normalizedFloorName = replaceCzechChars(data.floor_info.nazev)!.replace(/\s/g, "_");
-			setSelectedFloor(normalizedFloorName);
-			setSelectedFloorNumber(data.floor_info.cislo);
-			navigate(`/map/${ data.building_info.zkratka_prezentacni.split(' ')[0] }/${ normalizedBuildingName }/${ normalizedFloorName }/${ data.room_info.cislo }`);
+			if (isFacultyType(data.building_info.zkratka_prezentacni.split(' ')[0])) {
+				const normalizedBuildingName = replaceCzechChars(data.building_info.nazev_prezentacni)!.replace(/\s/g, "_")
+				setSelectedBuilding(data.building_info.nazev_prezentacni);
+				setSelectedFaculty(data.building_info.zkratka_prezentacni.split(' ')[0]);
+				const normalizedFloorName = replaceCzechChars(data.floor_info.nazev)!.replace(/\s/g, "_");
+				setSelectedFloor(normalizedFloorName);
+				setSelectedFloorNumber(data.floor_info.cislo);
+				setDoesRoomExist(true);
+				navigate(`/map/${ data.building_info.zkratka_prezentacni.split(' ')[0] }/${ normalizedBuildingName }/${ normalizedFloorName }/${ data.room_info.cislo }`)
+			} else {
+				setRoomData(data);
+				setDoesRoomExist(false);
+				setSelectedFaculty(undefined);
+				navigate("/map")
+			}
 		});
 	}
 
 	if (loginError) {
-		return <div>Failed to login: { loginError.toString() }</div>;
+		return <Typography>Failed to login. Try refreshing the page!</Typography>;
 	}
 
 	return (

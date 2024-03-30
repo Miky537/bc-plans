@@ -22,9 +22,9 @@ export const fetchRoomInfo = async(roomId: number) => {
 	}
 };
 
-export const fetchFacultyRooms = async(faculty: FacultyType) => {
+export const fetchFacultyRooms = async() => {
 	try {
-		const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/faculty/${ faculty }`);
+		const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/rooms`);
 		if (!response.ok) {
 			throw new Error('Network response was not ok');
 		}

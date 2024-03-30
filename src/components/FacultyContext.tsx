@@ -34,6 +34,10 @@ interface FacultyTypeContext {
 
 	facultyChangeSource: "url" | "search";
 	setFacultyChangeSource: (source: "url" | "search") => void;
+
+
+
+
 }
 
 const FacultyContext = createContext<FacultyTypeContext | undefined>(undefined);
@@ -87,6 +91,8 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedBuildingOriginal, setSelectedBuildingOriginal] = useState<string | undefined>(undefined);
 	const [selectedFloorOriginal, setSelectedFloorOriginal] = useState<string | undefined>(undefined);
 	const [selectedRoomOriginal, setSelectedRoomOriginal] = useState<string | undefined>(undefined);
+
+
 	const navigate = useNavigate();
 
 	function transformString(s: string): string {

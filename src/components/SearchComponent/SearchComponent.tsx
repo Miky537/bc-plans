@@ -12,48 +12,12 @@ import PlaceIcon from '@mui/icons-material/Place';
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
 import StarIcon from '@mui/icons-material/Star';
-
-const searchBoxStyle = {
-	display: "flex",
-	override: "hidden",
-	alignItems: "center",
-	padding: "10px",
-	color: "white",
-	gap: 1,
-	flexDirection: "row",
-}
-const InputBaseStyle = {
-	color: "white",
-	width: "100%",
-	'.MuiInputBase-input': {
-		padding: "10px 0",
-		pl: "1em",
-	},
-}
-
-const SearchBoxContainer = (isExpanded: boolean) => ({
-		width: isExpanded? "95%" : "3em",
-		height: "3em",
-		bgcolor: "black",
-		borderRadius: isExpanded? "10px" : "50%",
-		borderBottomLeftRadius: isExpanded? "0" : "50%",
-		borderBottomRightRadius: isExpanded? "0" : "50%",
-		transition: "all 0.3s ease",
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center",
-		position: "absolute",
-		top: "4em",
-		left: "0.5em",
-		zIndex: 3,
-	}
-
-)
+import { InputBaseStyle, searchBoxStyle, SearchBoxContainer } from "./styles";
 
 
 interface RoomNames {
-	nazev: string;
 	room_id: number;
+	room_name: string;
 	floor_number: number;
 	faculty: FacultyType;
 }
@@ -66,13 +30,12 @@ interface SearchComponentProps {
 
 export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawerOpen }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [rooms, setRooms] = useState<RoomNames[]>([]);
+	const [searchRooms, setSearchRooms] = useState<RoomNames[]>([]);
 	const [favouriteRooms, setFavouriteRooms] = useState<FavouritePlacesLocalStorage[]>([]);
 	const [query, setQuery] = useState("");
 	const [filteredRooms, setFilteredRooms] = useState<RoomNames[]>([]);
 	const {
 		handleRoomSelection,
-		selectedFaculty,
 		setSelectedFaculty,
 		setFacultyChangeSource,
 	} = useFacultyContext();
@@ -81,27 +44,32 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 
 	useEffect(() => {
 		const fetchRooms = async() => {
-			const fetchedRooms = await fetchFacultyRooms(selectedFaculty);
+			const fetchedRooms = await fetchFacultyRooms();
 			if (Array.isArray(fetchedRooms)) {
-
-				setRooms(fetchedRooms);
-				// console.log(fetchedRooms);
+				sessionStorage.setItem("allRooms", JSON.stringify(fetchedRooms));
+				setSearchRooms(fetchedRooms);
 			} else {
-				setRooms([]);
+				setSearchRooms([]);
 			}
 		};
-		fetchRooms();
-	}, [selectedFaculty]);
+		console.log(sessionStorage.getItem("allRooms"));
+		if (sessionStorage.getItem("allRooms") === null)
+			fetchRooms();
+		else setSearchRooms(JSON.parse(sessionStorage.getItem("allRooms") as string));
+	}, []);
 
 	useEffect(() => {
 		const options = {
 			includeScore: true,
-			keys: ["nazev"], // Assuming the rooms have a 'name' property to search against
+			keys: ["room_name"], // Assuming the rooms have a 'name' property to search against
 		};
-		const fuse = new Fuse(rooms, options);
-		const result = query? fuse.search(query).map(result => result.item) : [];
+		const fuse = new Fuse(searchRooms, options);
+		const result = query? fuse.search(query).map(result => {
+
+			return result.item
+		}) : [];
 		setFilteredRooms(result.slice(0, 5)); // Take the top 5 results
-	}, [query, rooms]);
+	}, [query, searchRooms]);
 
 	const handleExpand = () => {
 		setIsExpanded(true);
@@ -222,7 +190,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 									<Box sx={ searchBoxStyle }
 									     onClick={ (event) => handleRoomSearchClick(room, event) }>
 										<PlaceIcon color="info" />
-										<Typography>{ room.nazev } - Podlaží: { room.floor_number } -
+										<Typography>{ room.room_name } - Podlaží: { room.floor_number } -
 											Fakulta: { room.faculty }</Typography>
 									</Box>
 									<Divider flexItem
@@ -252,7 +220,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 									     onClick={ (event) => handleRoomSearchClick(room, event) }>
 										<HistoryIcon color="info" />
 										<Typography overflow="hidden" whiteSpace="nowrap">
-											{ room.nazev } - Podlaží: { room.floor_number } - Fakulta: { room.faculty }
+											{ room.room_name } - Podlaží: { room.floor_number } - Fakulta: { room.faculty }
 										</Typography>
 									</Box>
 									<Divider flexItem
@@ -264,7 +232,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 									         } } />
 								</React.Fragment>
 							)) }
-							<Box maxHeight="60dvh" overflow="scroll">{ favouriteRooms.map((roomObject, index) => (
+							<Box maxHeight="60dvh" overflow="auto">{ favouriteRooms.map((roomObject, index) => (
 									<React.Fragment key={ index }>
 										<Divider flexItem
 										         variant="middle"

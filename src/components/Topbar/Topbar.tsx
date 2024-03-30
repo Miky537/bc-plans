@@ -24,11 +24,21 @@ import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
 import { TopbarProps, FacultyIcons, Faculties } from "./types";
 
 
+export function isFacultyType(value: any): value is FacultyType {
+	return ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP", "FA", "CESA", undefined].includes(value);
+}
+
 export function Topbar({ goBack, disabled }: TopbarProps) {
 	const [displayTitle, setDisplayTitle] = useState<FacultyType | string>("");
 	const location = useLocation();
 	const { setCenterCoordinates, setZoom, setActivateAnimation, setArePinsVisible } = useMapContext();
-	const { selectedFaculty, setSelectedFaculty, facultyChangeSource, setFacultyChangeSource } = useFacultyContext();
+	const {
+		selectedFaculty,
+		setSelectedFaculty,
+		facultyChangeSource,
+		setFacultyChangeSource,
+		setSelectedRoomId
+	} = useFacultyContext();
 	const navigate = useNavigate();
 	const pathParts = location.pathname.split('/').filter(Boolean);
 	const facultyName = pathParts[1];
@@ -39,10 +49,6 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 	const isOnFacultyPage = location.pathname === '/faculty';
 	const isOnFavPlacesPage = location.pathname === '/fvPlaces';
 	const isOnTeacherPage = location.pathname === '/teacher';
-
-	function isFacultyType(value: any): value is FacultyType {
-		return ["FIT", "FAST", "FSI", "FEKT", "FAVU", "FCH", "USI", "FP",  "FA", "CESA",  undefined].includes(value);
-	}
 
 
 	useEffect(() => {
@@ -64,13 +70,15 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 
 	useEffect(() => {
 		const pathParts = location.pathname.split('/').filter(Boolean);
-		const urlFaculty = pathParts.length > 1 ? pathParts[1] : null;
-		if (urlFaculty === null) { return }
+		const urlFaculty = pathParts.length > 1? pathParts[1] : null;
+		if (urlFaculty === null) {
+			return
+		}
 		// Convert URL segment to faculty type
 		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
 		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {
 			if (facultyChangeSource === "url") {
-
+				setSelectedRoomId(undefined);
 				setSelectedFaculty(facultyFromUrl);
 				setCenterCoordinates(getFacultyCoordinates(facultyFromUrl));
 			}
@@ -141,7 +149,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 					<FormControl sx={ FormControlLabelStyles }>
 						<InputLabel>Select faculty</InputLabel>
 						<Select
-							value={ selectedFaculty? selectedFaculty : ""}
+							value={ selectedFaculty? selectedFaculty : "" }
 							className="faculty-select-topbar"
 							onChange={ handleChange }
 							sx={ SelectStyles }

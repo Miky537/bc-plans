@@ -20,6 +20,7 @@ function BuildingSelection() {
 		selectedFaculty,
 		setSelectedBuildingId,
 		setSelectedBuilding,
+		setSelectedFloor,
 	} = useFacultyContext();
 
 	useEffect(() => {
@@ -44,6 +45,7 @@ function BuildingSelection() {
 	const handleBuildingClick = (buildingId: number, buildingName: string) => {
 		setSelectedBuilding(buildingName);
 		setSelectedBuildingId(buildingId);
+		setSelectedFloor(undefined)
 		navigate(`/${ selectedFaculty }/${ buildingName.replace(/\s/g, "_") }`)
 	}
 

@@ -4,6 +4,7 @@ import { Topbar } from "../Topbar/Topbar";
 import Content from "../Content/Context";
 import { useNavigate } from "react-router-dom";
 import { useMapContext } from "../MapComponents/MapContext";
+import useAuthToken from "../../useAuthToken";
 
 
 interface MainProps {
@@ -15,6 +16,15 @@ interface MainProps {
 export default function Main({children, topBarTitle, topBarSelectedDisabled}: MainProps) {
 	const navigation = useNavigate();
 	const { mapViewRef, setZoom } = useMapContext();
+	const { updateLastUsed } = useAuthToken();
+
+	const makeApiCall = async () => {
+		// Call this before making an API call
+		updateLastUsed();
+
+		// Your API call logic here
+	};
+
 	const handleGoBack = () => {
 		mapViewRef.current = null;
 		setZoom(18)

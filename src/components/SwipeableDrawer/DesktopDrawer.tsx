@@ -10,6 +10,8 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import DrawerListItem from "./DrawerListItem";
+import useAuthToken from "../../useAuthToken";
+import { useAuthContext } from "../AuthContext";
 
 
 interface DrawerComponentProps {
@@ -70,29 +72,23 @@ export function DesktopDrawer({
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
+	const { loginSuccess } = useAuthContext();
 
 	useEffect(() => {
-		setIsError(false);
-		setIsLoading(true);
-		setPhoto("");
-		if (!selectedRoomId) {
-			return;
-		}
-		getRoomPhoto(selectedRoomId)
-			.then((url: any) => {
-				if (url === "") {
+		if (loginSuccess && selectedRoomId) {
+			setIsLoading(true);
+			getRoomPhoto(selectedRoomId)
+				.then((url) => {
+					setPhoto(url);
+					setIsError(false);
+				})
+				.catch((error) => {
+					console.error('Failed to load image:', error);
 					setIsError(true);
-					setIsLoading(false);
-				}
-				setPhoto(url);
-				setIsLoading(false);
-			})
-			.catch((error: any) => {
-				console.error('Failed to load image:', error)
-				setIsError(true);
-				setIsLoading(false);
-			});
-	}, [selectedRoomId]);
+				})
+				.finally(() => setIsLoading(false));
+		}
+	}, [selectedRoomId, loginSuccess]);
 
 	const toggleFavoriteRoom = (roomToToggle: FavouritePlacesLocalStorage) => {
 		const storageKey = 'favoriteRooms';

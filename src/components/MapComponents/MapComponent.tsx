@@ -28,15 +28,22 @@ import polylabel from "polylabel";
 import Point from "@arcgis/core/geometry/Point";
 import { Dialog, DialogContent, DialogActions, Button, Typography, Divider } from "@mui/material";
 import { DividerStyles } from "../TeacherSearch/styles";
-import LocationIcon from "./LocationIcon.svg";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
+
+const dialogStyles = {
+	"& .MuiPaper-root.MuiDialog-paper": {
+		width: "90%",
+		maxWidth: "600px",
+	},
+}
 
 interface MapComponentProps {
 	selectedFloor: number;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
 	setAreFeaturesLoading: (areFeaturesLoading: boolean) => void;
+	areFeaturesLoading: boolean;
 	allFeatures: any;
 	setAllFeatures: (allFeatures: any) => void;
 	setAreFeaturesEmpty: (areFeaturesEmpty: boolean) => void;
@@ -69,6 +76,7 @@ const MapComponent = ({
 	                      allFeatures,
 	                      setAllFeatures,
 	                      setAreFeaturesEmpty,
+	                      areFeaturesLoading,
                       }: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
@@ -80,6 +88,8 @@ const MapComponent = ({
 		setSelectedFaculty,
 		selectedFloorNumber,
 		selectedRoomId,
+		roomData,
+		selectedRoomDetail
 	} = useFacultyContext()
 	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
@@ -92,6 +102,9 @@ const MapComponent = ({
 	const selectedFloorNumberRef = useRef(selectedFloorNumber);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogData, setDialogData] = useState<any>(null);
+	const [isRoomDialogOpen, setIsRoomDialogOpen] = useState(false);
+	const [featuresUpdated, setFeaturesUpdated] = useState(false);
+
 
 	const location = useLocation()
 	const navigate = useNavigate();
@@ -107,6 +120,7 @@ const MapComponent = ({
 		setCenterCoordinates,
 		setArePinsVisible,
 		setZoom,
+		doesRoomExist, setDoesRoomExist
 	} = useMapContext();
 
 	useEffect(() => {
@@ -246,6 +260,7 @@ const MapComponent = ({
 			if (mapView) {
 				setIsMapLoaded(false);
 				mapView.destroy();
+				// setIsRoomDialogOpen(false);
 				mapViewRef.current = null;
 				if (abortControllerRef.current) {
 					if ("abort" in abortControllerRef.current) {
@@ -326,6 +341,7 @@ const MapComponent = ({
 
 
 	useEffect(() => {
+		setFeaturesUpdated(false);
 		setAreFeaturesLoading(true);
 		const abortController = new AbortController();
 		if (featureLayersRef.current) {
@@ -347,6 +363,7 @@ const MapComponent = ({
 						setAreFeaturesEmpty(true);
 						setAreFeaturesLoading(false);
 					} else {
+						setFeaturesUpdated(true)
 						setAreFeaturesEmpty(false);
 						setAreFeaturesLoading(false);
 					}
@@ -379,7 +396,6 @@ const MapComponent = ({
 
 
 			// Use polylabel to find the pole of inaccessibility (optimal label position)
-			// const poleOfInaccessibility = polylabel(polygon, 1.0); // The precision parameter is optional
 			const [x, y] = polylabel(polygon, 1.0);
 
 			const labelSymbol = new TextSymbol({
@@ -573,7 +589,8 @@ const MapComponent = ({
 	}, [selectedFloorNumber]);
 
 	useEffect(() => {
-		if (selectedRoomId === undefined || allFeatures.length === 0) return;
+		// console.log(`Effect run: selectedRoomId=${selectedRoomId}, allFeatures.length=${allFeatures.length}, areFeaturesLoading=${areFeaturesLoading}`);
+		if (selectedRoomId === undefined || allFeatures.length === 0 || areFeaturesLoading || !featuresUpdated) return;
 		RoomHighlightGraphicsLayerRef.current!.graphics.removeAll();
 
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoomId);
@@ -596,11 +613,12 @@ const MapComponent = ({
 
 			abortControllerRef.current = new AbortController();
 			if (roomFeature.geometry.extent) {
+
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
 					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
-					console.log("Animation")
+					// console.log("Animation")
 					if (!mapViewRef.current) return;
 				}).catch(function(error) {
 					if (error.name !== "AbortError") {
@@ -608,7 +626,8 @@ const MapComponent = ({
 					}
 				});
 			} else {
-				mapViewRef.current!.goTo(
+
+				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry, zoom: 19 },
 					{ duration: 1250, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
@@ -628,7 +647,7 @@ const MapComponent = ({
 			abortControllerRef.current!.abort();
 			setSelectedRoomId(undefined);
 		};
-	}, [selectedRoomId, allFeatures, isDrawerOpen]);
+	}, [selectedRoomId, allFeatures, isDrawerOpen, areFeaturesLoading, featuresUpdated]);
 
 	useEffect(() => {
 		if (activateAnimation) {
@@ -691,10 +710,28 @@ const MapComponent = ({
 		}
 	}, [location.pathname, mapViewRef.current, PinsGraphicsLayerRef.current]);
 
+	useEffect(() => {
+		if (mapViewRef.current) {
+			if (!doesRoomExist) {
+				// setIsRoomDialogOpen(true);
+			}
+		}
+	}, [doesRoomExist]);
+
+	const handleCloseRoomDialog = () => {
+		setIsRoomDialogOpen(false);
+		setDoesRoomExist(true)
+		console.log("Close room dialog");
+	};
+	const handleClose = () => {
+		setIsDialogOpen(false);
+	};
+
+
 	return (
 		<>
 			<div ref={ mapDiv } id="mapDiv" />
-			<Dialog open={ isDialogOpen } onClose={ () => setIsDialogOpen(false) }>
+			<Dialog open={ isDialogOpen } onClose={ handleClose }>
 				<Typography variant="h5" align="center" pt={ 2 }>Navigate to faculty</Typography>
 				<DialogContent sx={ { pl: 2 } }>
 					<Typography color="GrayText" variant="body2">Faculty</Typography>
@@ -711,6 +748,19 @@ const MapComponent = ({
 					} }>Navigate</Button>
 				</DialogActions>
 			</Dialog>
+			<Dialog open={ isRoomDialogOpen }
+			        onClose={ handleCloseRoomDialog } sx={ dialogStyles }>
+				<Typography variant="h5" align="center" pt={ 2 }>Room is not added yet!</Typography>
+				<DialogContent>
+					<Typography>Room name:{ roomData.room_info.nazev }</Typography>
+					<Typography>Room number:{ roomData.room_info.cislo }</Typography>
+					<Typography>Floor:{ roomData.floor_info.nazev }</Typography>
+					<Typography>Building:{ roomData.building_info.nazev_prezentacni }</Typography>
+					<Typography>Faculty:{ roomData.building_info.zkratka_prezentacni }</Typography>
+					<Typography>Areal:{ roomData.areal_info.nazev }</Typography>
+				</DialogContent>
+			</Dialog>
+
 		</>
 	);
 };

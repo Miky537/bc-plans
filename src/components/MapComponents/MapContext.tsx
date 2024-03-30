@@ -21,6 +21,9 @@ interface MapContextType {
 	activateAnimation: boolean;
 	setArePinsVisible: (visible: boolean) => void;
 	arePinsVisible: boolean;
+
+	setDoesRoomExist: (exists: boolean) => void;
+	doesRoomExist: boolean;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -47,6 +50,7 @@ export const MapProvider = ({children}: any) => {
 	const mapViewRef = useRef<MapView | null>(null);
 	const [activateAnimation, setActivateAnimation] = useState<boolean>(false);
 	const [arePinsVisible, setArePinsVisible] = useState<boolean>(false);
+	const [doesRoomExist, setDoesRoomExist] = useState<boolean>(false);
 
 	return (
 		<MapContext.Provider value={ {
@@ -67,6 +71,8 @@ export const MapProvider = ({children}: any) => {
 			setActivateAnimation,
 			arePinsVisible,
 			setArePinsVisible,
+			doesRoomExist,
+			setDoesRoomExist
 		} }>
 			{ children }
 		</MapContext.Provider>

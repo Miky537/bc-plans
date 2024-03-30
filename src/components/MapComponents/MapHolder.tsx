@@ -61,6 +61,7 @@ const MapHolder = () => {
 			              selectedFloor={ selectedFloorNumber }
 			              setIsDrawerOpen={ setIsDrawerOpen }
 			              setAreFeaturesLoading={ setAreFeaturesLoading }
+			              areFeaturesLoading={ areFeaturesLoading }
 			              allFeatures={ allFeatures }
 			              setAllFeatures={ setAllFeatures }
 			              setAreFeaturesEmpty={ setAreFeaturesEmpty }

@@ -10,9 +10,16 @@ export const login = async() => {
 		console.log("errrorr", response);
 		throw new Error('Authentication failed');
 	}
-
+	startTokenRefreshTimer();
 	const data = await response.json();
 	return data;
+};
+
+const startTokenRefreshTimer = () => {
+	// Set timer for 19 minutes before token expiration (1140 seconds)
+	setTimeout(() => {
+		login(); // Refresh the token by logging in again
+	}, 1140 * 1000);
 };
 
 export const searchTeacher = async(name: any) => {
@@ -35,9 +42,11 @@ export const searchTeacher = async(name: any) => {
 export const getRoomPhoto = async(roomId: number) => {
 	const token = sessionStorage.getItem('sessionToken');
 	const headers: HeadersInit = {};
-
 	if (token) {
 		headers['Authorization'] = token;
+	} else {
+		console.log("no token")
+		return "";
 	}
 	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
 		method: 'GET',

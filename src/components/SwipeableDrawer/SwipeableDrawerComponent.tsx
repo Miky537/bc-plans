@@ -156,14 +156,14 @@ export function SwipeableDrawerComponent({
 					buildingName,
 					faculty
 				}) } sx={ { position: "absolute", top: 0, right: 0 } }>
-					<StarIcon color="primary"
+					<StarBorderIcon color="primary"
 					          style={ {
 						          fontSize: "3rem",
 						          opacity: isFav? 0 : 1,
 						          transition: 'opacity 0.2s',
 						          zIndex: 4
 					          } } />
-					<StarBorderIcon color="primary"
+					<StarIcon color="primary"
 					                style={ {
 						                fontSize: "3rem",
 						                opacity: isFav? 1 : 0,

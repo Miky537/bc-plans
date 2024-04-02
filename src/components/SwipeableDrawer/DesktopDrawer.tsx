@@ -11,6 +11,7 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
 import { RoomDetails } from "../MapComponents/types";
+import { mergeStylesWithTheme } from "./styles";
 
 
 interface DrawerComponentProps {
@@ -19,17 +20,6 @@ interface DrawerComponentProps {
 	onOpen: () => void;
 	roomData: RoomDetails;
 }
-
-const mergeStylesWithTheme = (theme: Theme): SxProps => {
-	return {
-		"& .MuiDrawer-paper.MuiDrawer-paperAnchorLeft": {
-			width: { sm: '25em', md: '30em', lg: '32em' },
-			borderRadius: "0px 4% 40px 0px",
-			padding: "2em 1em 1em 1em",
-			backgroundColor: theme.palette.background.default,
-		},
-	};
-};
 
 export function DesktopDrawer({
 	                              isDrawerOpen,
@@ -53,11 +43,12 @@ export function DesktopDrawer({
 	const [photoUrl, setPhoto] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const theme = useTheme();
-	const { loginSuccess } = useAuthContext();
+	const { loginSuccess, updateLastUsed } = useAuthContext();
 
 	useEffect(() => {
 		if (loginSuccess && selectedRoomId) {
 			setIsLoading(true);
+			updateLastUsed();
 			getRoomPhoto(selectedRoomId)
 				.then((url) => {
 					setPhoto(url);

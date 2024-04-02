@@ -6,6 +6,7 @@ export const searchBoxStyle = {
 	color: "white",
 	gap: 1,
 	flexDirection: "row",
+	cursor: "pointer",
 }
 export const InputBaseStyle = {
 	color: "white",

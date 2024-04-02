@@ -10,6 +10,7 @@ import { FacultyType } from "../FacultySelection/FacultySelection";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { RoomDetails } from "../MapComponents/types";
+import { useAuthContext } from "../../Contexts/AuthContext";
 
 
 interface SwipeableDrawerComponentProps {
@@ -40,6 +41,7 @@ export function SwipeableDrawerComponent({
 	const { room_info, floor_info, areal_info, building_info } = roomData;
 	const [isImageZoomed, setIsImageZoomed] = useState(false);
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
+	const { updateLastUsed } = useAuthContext()
 	const faculty = selectedFaculty as FacultyType;
 	const [isFav, setIsFav] = useState<boolean>(false);
 	const { cislo: roomName, mistnost_id: roomId, mistnost_typ_id: roomType, label: roomLabel } = room_info
@@ -54,6 +56,7 @@ export function SwipeableDrawerComponent({
 	useEffect(() => {
 		setIsError(false);
 		setIsLoading(true);
+		updateLastUsed();
 		setPhoto("");
 		if (!selectedRoomId) {
 			return;
@@ -157,20 +160,20 @@ export function SwipeableDrawerComponent({
 					faculty
 				}) } sx={ { position: "absolute", top: 0, right: 0 } }>
 					<StarBorderIcon color="primary"
-					          style={ {
-						          fontSize: "3rem",
-						          opacity: isFav? 0 : 1,
-						          transition: 'opacity 0.2s',
-						          zIndex: 4
-					          } } />
-					<StarIcon color="primary"
 					                style={ {
 						                fontSize: "3rem",
-						                opacity: isFav? 1 : 0,
+						                opacity: isFav? 0 : 1,
 						                transition: 'opacity 0.2s',
-						                position: 'absolute',
 						                zIndex: 4
 					                } } />
+					<StarIcon color="primary"
+					          style={ {
+						          fontSize: "3rem",
+						          opacity: isFav? 1 : 0,
+						          transition: 'opacity 0.2s',
+						          position: 'absolute',
+						          zIndex: 4
+					          } } />
 				</IconButton>
 				<Box sx={ {
 					opacity: isImageZoomed? 0 : 1,

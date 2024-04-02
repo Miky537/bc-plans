@@ -141,7 +141,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		handleRoomSelection(room.room_id);
 		setIsExpanded(false);
 		setIsDrawerOpen(true);
-		setSelectedFaculty(room.faculty);
 	}
 
 	const handleFavouriteRoomClick = (room: FavouritePlacesLocalStorage, event: any) => {
@@ -153,7 +152,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		handleRoomSelection(room.roomId);
 		setIsExpanded(false);
 		setIsDrawerOpen(true);
-		setSelectedFaculty(room.faculty);
 	}
 
 
@@ -219,7 +217,8 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 									     onClick={ (event) => handleRoomSearchClick(room, event) }>
 										<HistoryIcon color="info" />
 										<Typography overflow="hidden" whiteSpace="nowrap">
-											{ room.room_name } - Podlaží: { room.floor_number } - Fakulta: { room.faculty }
+											{ room.room_name } - Podlaží: { room.floor_number } -
+											Fakulta: { room.faculty }
 										</Typography>
 									</Box>
 									<Divider flexItem

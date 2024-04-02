@@ -52,7 +52,7 @@ export const getRoomPhoto = async(roomId: number) => {
 	});
 
 	if (!response.ok) {
-		throw new Error('Failed to fetch photo');
+		return "";
 	}
 	if (response.status === 204) {
 		return "";

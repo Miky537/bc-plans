@@ -682,9 +682,7 @@ const MapComponent = ({
 			setCenterCoordinates({ lat: 16.58718904843347, lng: 49.217963479239316 });
 			setZoom(13);
 			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
-			console.log("No specific path, use default map view.", PinsGraphicsLayerRef.current?.graphics);
 		} else {
-			console.log("No specific path, use default map view.");
 			return;
 		}
 	}, [faculty, building, floor, roomName]);

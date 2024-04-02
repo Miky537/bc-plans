@@ -6,6 +6,7 @@ import { replaceCzechChars } from "../components/FloorSelection";
 import { useNavigate } from "react-router-dom";
 import { RoomDetails } from "../components/MapComponents/types";
 import { SelectedRoomDetail, RoomDetail, FloorDetail, BuildingDetail } from "./types";
+import { isFacultyType } from "../components/Topbar/Topbar";
 
 interface FacultyTypeContext {
 	selectedBuildingId: number | null;
@@ -87,13 +88,20 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			setRoomData(defaultState);
 			return;
 		} else {
+			const facultyExtraction = roomInfo.building_info.zkratka_prezentacni!.split(" ")[0] as FacultyType
 			await setRoomData(roomInfo);
-			await setSelectedFaculty(roomInfo.building_info.zkratka_prezentacni!.split(" ")[0] as FacultyType)
+			if (!isFacultyType(facultyExtraction)) {
+				setSelectedFaculty(undefined);
+				navigate(`/map`);
+				return;
+			}
+			await setSelectedFaculty(facultyExtraction);
 			const random = replaceCzechChars(roomInfo.floor_info.nazev)
 			setSelectedFloor(random.replace(" ", "_"))
 			setSelectedFloorNumber(roomInfo.floor_info.cislo)
 			updateSelectedRoomDetail(roomInfo);
 			const faculty = roomInfo.building_info.zkratka_prezentacni!.split(" ")[0];
+
 			const building = replaceCzechChars(roomInfo.building_info.nazev_prezentacni!.replace(" ", "_"))
 			const correctBuilding = transformString(building)
 			const floor = replaceCzechChars(roomInfo.floor_info.nazev.replace(" ", "_")).toLowerCase()

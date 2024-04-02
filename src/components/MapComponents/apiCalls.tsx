@@ -1,12 +1,4 @@
-import { Building, Floor, Room, Areal } from "../parser/types";
-import { FacultyType } from "../FacultySelection/FacultySelection";
-
-export interface RoomDetails {
-	room_info: Room;
-	floor_info: Floor;
-	building_info: Building;
-	areal_info: Areal;
-}
+import { RoomDetails } from "./types";
 
 export const fetchRoomInfo = async(roomId: number) => {
 	try {

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useTheme, SxProps, Theme, Typography, Drawer } from "@mui/material";
+import { useTheme, SxProps, Theme, Typography, Drawer, CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
-import { RoomDetails } from "../MapComponents/tempFile";
 import { getRoomPhoto } from "../TeacherSearch/apiCalls";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import IconButton from "@mui/material/IconButton";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import DrawerListItem from "./DrawerListItem";
-import useAuthToken from "../../useAuthToken";
-import { useAuthContext } from "../AuthContext";
+import { useAuthContext } from "../../Contexts/AuthContext";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
+import { RoomDetails } from "../MapComponents/types";
 
 
 interface DrawerComponentProps {
@@ -26,8 +23,7 @@ interface DrawerComponentProps {
 const mergeStylesWithTheme = (theme: Theme): SxProps => {
 	return {
 		"& .MuiDrawer-paper.MuiDrawer-paperAnchorLeft": {
-			maxWidth: "25em",
-			width: "25em",
+			width: { sm: '25em', md: '30em', lg: '32em' },
 			borderRadius: "0px 4% 40px 0px",
 			padding: "2em 1em 1em 1em",
 			backgroundColor: theme.palette.background.default,
@@ -35,25 +31,9 @@ const mergeStylesWithTheme = (theme: Theme): SxProps => {
 	};
 };
 
-const boxStyles = {
-	borderRadius: '20px',
-	cursor: 'pointer',
-	transition: 'max-width 0.3s ease-in-out, max-height 0.3s ease-in-out',
-	width: '100%', // Ensures the width matches between placeholders and images
-	maxHeight: '40vh', // Consistent maximum height
-	height: 'auto', // Allows natural height but within the maxHeight constraint
-	objectFit: 'contain', // For images, to ensure they fit within the box without stretching/distorting
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-	overflow: 'hidden', // Prevents content from spilling outside the box
-};
-
-
 export function DesktopDrawer({
 	                              isDrawerOpen,
 	                              onClose,
-	                              onOpen,
 	                              roomData
                               }: DrawerComponentProps) {
 	const { room_info, floor_info, areal_info, building_info } = roomData;
@@ -63,16 +43,15 @@ export function DesktopDrawer({
 	const {
 		cislo: roomName,
 		mistnost_id: roomId,
-		mistnost_typ_id: roomType,
-		label: roomLabel,
-		popis: description
+		popis: description,
+		pocet_mist: roomCapacity,
+		nazev: roomNameLong,
 	} = room_info
-	const { podlazi_id: floorId, cislo: floorNumber, nazev: floorName } = floor_info
+	const { cislo: floorNumber, nazev: floorName } = floor_info
 	const { zkratka_prezentacni: buildingName, adresa: address } = building_info
 	const { nazev_puvodni: arealName } = areal_info
 	const [photoUrl, setPhoto] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
 	const { loginSuccess } = useAuthContext();
 
@@ -82,11 +61,9 @@ export function DesktopDrawer({
 			getRoomPhoto(selectedRoomId)
 				.then((url) => {
 					setPhoto(url);
-					setIsError(false);
 				})
 				.catch((error) => {
 					console.error('Failed to load image:', error);
-					setIsError(true);
 				})
 				.finally(() => setIsLoading(false));
 		}
@@ -129,48 +106,34 @@ export function DesktopDrawer({
 			sx={ mergeStylesWithTheme(theme) }
 		>
 			<Box display="flex" gap={ 1 } flexDirection="column">
-				{ isLoading || isError? <Box sx={ {
-						...boxStyles,
-						bgcolor: 'grey.700', // Placeholder specific styles
-					} }>{ isError?
-						<Box display="flex"
-						     justifyContent="center"
-						     alignItems="center"
-						     height="36vh"
-						     width="25em"
-						     borderRadius="20px">
-							<Typography variant="h4">No photo yet</Typography>
-						</Box>
-						:
-						<Box display="flex"
-						     justifyContent="center"
-						     alignItems="center"
-						     height="36vh"
-						     width="25em"
-						     borderRadius="20px">
-							<Typography variant="h4">Loading...</Typography>
-						</Box>
-					}</Box>
+				{ isLoading || photoUrl === "" ?
+					<Box sx={ {
+						display: 'flex',
+						color: 'black',
+						alignItems: 'center',
+						justifyContent: 'center',
+						borderRadius: '10px',
+						bgcolor: 'grey.300',
+						width: '100%', // Subtracts some space for padding
+						height: '25em',
+						maxHeight: 'calc(45em - 2em)',
+					} }>{  photoUrl === ""  ? "No photo yet" : <CircularProgress size={90} /> }
+					</Box>
 					:
 					<Box
-						maxHeight="36vh"
-						overflow="auto" // Enables scrolling within this box
-						width="100%"
-					>
-						<Box height="36vh" width="25em">
-							<Box
-								component="img"
-								src={ photoUrl }
-								alt="Detailed View"
-								height="99%"
-								width="100%"
-								borderRadius="20px"
-							/>
-						</Box>
-					</Box>
-				}
+						component="img"
+						src={ photoUrl }
+						alt="Detailed View"
+						sx={ {
+							borderRadius: '10px',
+							width: '100%', // Ensures the image width matches the drawer width minus padding
+							height: '25em', // Maintains aspect ratio
+							maxHeight: 'calc(45em - 2em)',
+							transition: 'max-width 0.3s ease-in-out, max-height 0.3s ease-in-out',
+						} }
+					/> }
 				<Box display="flex" alignItems="center" mt={ 2 }>
-					<Typography variant="h3" sx={ { flexGrow: 1 } }>{ roomName }</Typography>
+					<Typography variant="h3" fontWeight="bolder" sx={ { flexGrow: 1 } }>{ roomName }</Typography>
 					<IconButton sx={ { p: 0 } } onClick={ () => toggleFavoriteRoom({
 						roomName,
 						roomId,
@@ -179,32 +142,32 @@ export function DesktopDrawer({
 						buildingName,
 						faculty
 					}) }>
-						<StarBorderIcon color="error"
-						                    style={ {
-							                    fontSize: "3rem",
-							                    opacity: isFav? 0 : 1,
-							                    transition: 'opacity 0.2s',
-							                    zIndex: 4
-						                    } } />
-						<StarIcon color="error"
-						              style={ {
-							              fontSize: "3rem",
-							              opacity: isFav? 1 : 0,
-							              transition: 'opacity 0.2s',
-							              position: 'absolute',
-							              zIndex: 4
-						              } } />
+						<StarBorderIcon color="primary"
+						                style={ {
+							                fontSize: "3rem",
+							                opacity: isFav? 0 : 1,
+							                transition: 'opacity 0.2s',
+							                zIndex: 4
+						                } } />
+						<StarIcon color="primary"
+						          style={ {
+							          fontSize: "3rem",
+							          opacity: isFav? 1 : 0,
+							          transition: 'opacity 0.2s',
+							          position: 'absolute',
+							          zIndex: 4
+						          } } />
 					</IconButton>
 				</Box>
+				<DrawerListItem text={ roomNameLong } />
 				<DrawerListItem text={ faculty as string } />
 				<DrawerListItem text={ buildingName } />
 				<DrawerListItem text={ floorName } />
 				<DrawerListItem text={ arealName } />
 				<DrawerListItem text={ address } />
 				<DrawerListItem text={ description } desc="Popis:" />
+				<DrawerListItem text={ roomCapacity } desc="Number of seats:" />
 			</Box>
-
-
 		</Drawer>
 	)
 }

@@ -13,7 +13,7 @@ import {
 	Theme,
 	Button
 } from "@mui/material";
-import { useFacultyContext } from "./FacultyContext";
+import { useFacultyContext } from "../Contexts/FacultyContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useParams, useNavigate } from "react-router-dom";
 import RoomSelectionItem from "./RoomSelectionItem";
@@ -67,7 +67,6 @@ function FloorSelection() {
 		handleRoomSelection,
 		setSelectedFloorNumber,
 		selectedBuildingId,
-		setSelectedFloorOriginal,
 	} = useFacultyContext();
 
 
@@ -75,7 +74,6 @@ function FloorSelection() {
 		(panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
 			setExpanded(isExpanded? panel : false);
 			setSelectedFloor(isExpanded? panel : undefined);
-			setSelectedFloorOriginal(isExpanded? panel : undefined);
 			const selectedFloorLocal = replaceCzechChars(panel)!.replace(/\s/g, "_");
 			if (panel && isExpanded) {
 				navigate(`/${ selectedFaculty }/${ building }/${ selectedFloorLocal }`, { replace: true });
@@ -217,13 +215,15 @@ function FloorSelection() {
 			</Box>
 			<Button variant="contained"
 			        onClick={ handleGoToMap }
-			        sx={ {
+			        sx={{
 				        position: "fixed",
 				        bottom: 0,
+				        left: "50%",
+				        transform: 'translateX(-50%)',
 				        width: "100%",
 				        maxWidth: "1440px",
 				        height: "5em"
-			        } }>
+			        }}>
 				<Typography variant="h5" sx={ {
 					display: "flex",
 					alignItems: "center"

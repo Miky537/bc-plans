@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useMutation } from 'react-query';
-import { login } from "./components/TeacherSearch/apiCalls";
-import { AuthType } from "./components/TeacherSearch/types";
-import { useAuthContext } from "./components/AuthContext";
+import { login } from "../components/TeacherSearch/apiCalls";
+import { AuthType } from "../components/TeacherSearch/types";
+import { useAuthContext } from "../Contexts/AuthContext";
 
 const useAuthToken = () => {
 

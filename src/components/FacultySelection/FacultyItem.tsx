@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { FacultyType } from "./FacultySelection";
 import { useNavigate } from "react-router-dom";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 
 interface FacultyItemProps {
 	name: FacultyType;
@@ -29,8 +29,8 @@ function FacultyItem({ name, Image }: FacultyItemProps) {
 			<Box
 
 				sx={ {
-					width: ['25vw', '17vw', '15vw'], // Responsive width across breakpoints
-					height: ['25vw', '17vw', '15vw'], // Responsive height across breakpoints
+					width: ['25vw', '17vw', '15vw'],
+					height: ['25vw', '17vw', '15vw'],
 					maxWidth: "10em",
 					maxHeight: "10em",
 				} }

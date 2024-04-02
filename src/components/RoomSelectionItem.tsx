@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import { FacultyType } from "./FacultySelection/FacultySelection";
-import { useFacultyContext } from "./FacultyContext";
+import { useFacultyContext } from "../Contexts/FacultyContext";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
 
@@ -66,7 +66,6 @@ const RoomSelectionItem = ({
 		<Box display="flex"
 		     alignItems="center"
 		     justifyContent="space-between"
-		     // borderTop="1px solid white"
 		     borderBottom="1px solid white"
 		     py={ 1 }>
 			<Typography variant="h6"

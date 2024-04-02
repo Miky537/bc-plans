@@ -15,13 +15,13 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import SearchIcon from "@mui/icons-material/Search";
 import { Teachers } from "./types";
 import { useNavigate } from "react-router-dom";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { replaceCzechChars } from "../FloorSelection";
 import { searchTeacher } from "./apiCalls";
 import { TextFieldStyles, DividerStyles } from "./styles";
-import { useAuthContext } from "../AuthContext";
+import { useAuthContext } from "../../Contexts/AuthContext";
 import { isFacultyType } from "../Topbar/Topbar";
-import { useMapContext } from "../MapComponents/MapContext";
+import { useMapContext } from "../../Contexts/MapContext";
 
 function TeacherRooms() {
 
@@ -42,10 +42,9 @@ function TeacherRooms() {
 
 	const { isLoading, loginSuccess, loginError, updateLastUsed } = useAuthContext()
 
-	const { refetch: refetchRoomInfo } = useQuery(
-		['fetchRoomInfo', roomId],
-		() => fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/room/${ roomId }`).then(res => res.json()),
-		{
+	const { refetch: refetchRoomInfo } = useQuery({
+			queryKey: ['fetchRoomInfo', roomId],
+			queryFn: () => fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/room/${ roomId }`).then(res => res.json()),
 			enabled: false, // Initially, do not automatically run the query
 		}
 	);
@@ -55,6 +54,7 @@ function TeacherRooms() {
 			enabled: false, // Turn off automatic execution
 			onSuccess: ({ data }) => {
 				setTeachers(data.vysledky)
+				updateLastUsed();
 			},
 		},
 	);

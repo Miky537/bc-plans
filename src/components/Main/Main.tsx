@@ -3,9 +3,7 @@ import Box from "@mui/material/Box";
 import { Topbar } from "../Topbar/Topbar";
 import Content from "../Content/Context";
 import { useNavigate } from "react-router-dom";
-import { useMapContext } from "../MapComponents/MapContext";
-import useAuthToken from "../../useAuthToken";
-
+import { useMapContext } from "../../Contexts/MapContext";
 
 interface MainProps {
 	children: React.ReactNode;
@@ -13,17 +11,9 @@ interface MainProps {
 	topBarSelectedDisabled?: boolean;
 }
 
-export default function Main({children, topBarTitle, topBarSelectedDisabled}: MainProps) {
+export default function Main({ children, topBarTitle, topBarSelectedDisabled }: MainProps) {
 	const navigation = useNavigate();
 	const { mapViewRef, setZoom } = useMapContext();
-	const { updateLastUsed } = useAuthToken();
-
-	const makeApiCall = async () => {
-		// Call this before making an API call
-		updateLastUsed();
-
-		// Your API call logic here
-	};
 
 	const handleGoBack = () => {
 		mapViewRef.current = null;
@@ -33,7 +23,7 @@ export default function Main({children, topBarTitle, topBarSelectedDisabled}: Ma
 
 	return (
 		<Box display="flex" flexDirection="column" height="100dvh" bgcolor="background.paper" position="relative">
-			<Topbar title={topBarTitle} goBack={handleGoBack} disabled={topBarSelectedDisabled} />
+			<Topbar title={ topBarTitle } goBack={ handleGoBack } disabled={ topBarSelectedDisabled } />
 			<Content>{ children }</Content>
 		</Box>
 	);

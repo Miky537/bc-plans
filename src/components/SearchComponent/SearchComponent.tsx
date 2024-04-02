@@ -3,9 +3,9 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
-import { fetchFacultyRooms } from "../MapComponents/tempFile";
+import { fetchFacultyRooms } from "../MapComponents/apiCalls";
 import Fuse from "fuse.js";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { Typography, Divider } from "@mui/material";
 import HistoryIcon from '@mui/icons-material/History';
 import PlaceIcon from '@mui/icons-material/Place';
@@ -109,7 +109,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	const handleRoomSearchClick = (room: RoomNames, event: any) => {
 		event.stopPropagation();
 		setFacultyChangeSource('search');
-		// Step 1: Retrieve existing data from local storage
+		// Retrieve existing data from local storage
 		const previouslySearched = localStorage.getItem('previouslySearched');
 		const previouslySearchedRooms = previouslySearched? JSON.parse(previouslySearched) : [];
 
@@ -176,9 +176,9 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 							position: "absolute",
 							top: "100%",
 							color: "white",
-							transition: "max-height 1s ease-out", // Transition for the roll-down effect
+							transition: "max-height 1s ease-out",
 							overflow: "hidden",
-							maxHeight: isExpanded? "300px" : "0", // Adjust max-height accordingly
+							maxHeight: isExpanded? "300px" : "0",
 							width: "100%",
 							borderBottomLeftRadius: 10,
 							borderBottomRightRadius: 10,

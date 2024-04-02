@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import FacultyItem from "./FacultyItem";
 import Box from "@mui/material/Box";
-import { useMapContext } from "../MapComponents/MapContext";
+import { useMapContext } from "../../Contexts/MapContext";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as CesaLogo } from "../../FacultyLogos/cesa-logo.svg";
 import { ReactComponent as FaLogo } from "../../FacultyLogos/fa-logo.svg";
@@ -14,7 +14,7 @@ import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
 import { Button, Typography } from "@mui/material";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 
 export type FacultyType = "FIT" | "FAST" | "FSI" | "FEKT" | "FAVU" | "FCH" | "USI" | "FP" | "FA" | "CESA" | undefined;
 
@@ -51,13 +51,12 @@ function FacultySelection() {
 		     maxWidth="1440px"
 		     margin="auto">
 			<Box display="grid"
-			     gridTemplateColumns="repeat(2, minmax(150px, 0.3fr))" // Creates a two-column layout with equal column widths
+			     gridTemplateColumns="repeat(2, minmax(150px, 0.3fr))"
 			     rowGap={ 4 }
-			     columnGap={ { xs: '0px', sm: '15px', md: '20px' } } // Adjusts column gap based on breakpoints
+			     columnGap={ { xs: '0px', sm: '15px', md: '20px' } }
 			     justifyContent="center"
 			     minHeight="fit-content"
 			     height="100%"
-			     // pt={ 4 }
 			     mb={ 4 }
 			     color="white"
 			>
@@ -74,17 +73,20 @@ function FacultySelection() {
 			</Box>
 			<Button variant="contained"
 			        onClick={ handleGoToMap }
-			        sx={ {
+			        sx={{
 				        position: "fixed",
 				        bottom: 0,
-				        width: "100%",
+				        left: "50%",
+				        transform: 'translateX(-50%)',
+				        width: "50%",
 				        maxWidth: "1440px",
-				        height:"5em"
-			        } }>
+				        height: "5em"
+			        }}>
 				<Typography variant="h5" sx={ {
 					display: "flex",
 					alignItems: "center"
-				} }>Go to map</Typography>
+				} }
+				>Go to map</Typography>
 			</Button>
 		</Box>
 

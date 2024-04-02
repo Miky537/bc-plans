@@ -1,15 +1,13 @@
 import React from 'react';
 import { ThemeProvider } from "@mui/material";
 import { theme } from './Theme/CustomTheme';
-import { FacultyProvider } from "./components/FacultyContext";
 import { QueryClient, QueryClientProvider } from "react-query";
 import AppTree from "./AppTree";
-import { AuthProvider } from "./components/AuthContext";
+import { AuthProvider } from "./Contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 function App() {
-
 
 	return (
 		<ThemeProvider theme={ theme }>

@@ -10,7 +10,6 @@ interface AuthTypeContext {
 	setLoginError: (error: Error | null) => void;
 	setLoginSuccess: (success: boolean) => void;
 	setIsLoading: (loading: boolean) => void;
-	// loginMutate: () => void;
 }
 
 const AuthContext = createContext<AuthTypeContext | undefined>(undefined);

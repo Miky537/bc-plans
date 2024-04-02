@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
-import { Coordinates } from "./MapComponent";
+import { Coordinates } from "../components/MapComponents/MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 
 

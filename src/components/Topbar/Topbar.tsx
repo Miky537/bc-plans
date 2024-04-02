@@ -3,7 +3,7 @@ import './Topbar.tsx.css';
 import Box from "@mui/material/Box";
 import WestIcon from '@mui/icons-material/West';
 import IconButton from "@mui/material/IconButton";
-import { useMapContext } from "../MapComponents/MapContext";
+import { useMapContext } from "../../Contexts/MapContext";
 import { Select, MenuItem, SelectChangeEvent, FormControl, InputLabel, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FacultyType } from "../FacultySelection/FacultySelection";
@@ -19,7 +19,7 @@ import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
 import MapIcon from '@mui/icons-material/Map';
 import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponents/MapFunctions";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
 import { TopbarProps, FacultyIcons, Faculties } from "./types";
 
@@ -74,7 +74,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 		if (urlFaculty === null) {
 			return
 		}
-		// Convert URL segment to faculty type
+		// Convert URL to faculty type
 		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
 		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {
 			if (facultyChangeSource === "url") {

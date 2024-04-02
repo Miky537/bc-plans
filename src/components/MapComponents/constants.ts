@@ -1,5 +1,4 @@
-import { Room, Floor } from "../parser/types";
-import { RoomDetails } from "./tempFile";
+import { Room, Floor, RoomDetails } from "./types";
 
 const defaultRoomData: Room = {
 	mistnost_id: 0,
@@ -152,9 +151,9 @@ const defaultArealData = {
 }
 
 export const defaultState: RoomDetails = {
-	room_info: defaultRoomData,  // your existing defaultRoomData
-	floor_info: defaultFloorData,  // similarly defined
-	building_info: defaultBuildingData,  // similarly defined
+	room_info: defaultRoomData,
+	floor_info: defaultFloorData,
+	building_info: defaultBuildingData,
 	areal_info: defaultArealData,
 };
 

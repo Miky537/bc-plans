@@ -144,3 +144,10 @@ export interface Areal {
 	externi: number;
 	nazev_puvodni: string | null;
 }
+
+export interface RoomDetails {
+	room_info: Room;
+	floor_info: Floor;
+	building_info: Building;
+	areal_info: Areal;
+}

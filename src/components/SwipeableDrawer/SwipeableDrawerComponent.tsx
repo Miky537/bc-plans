@@ -2,14 +2,14 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import React, { useState, useEffect } from "react";
 import { useTheme, SxProps, Theme, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import { RoomDetails } from "../MapComponents/tempFile";
 import { getRoomPhoto } from "../TeacherSearch/apiCalls";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import IconButton from "@mui/material/IconButton";
 import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { RoomDetails } from "../MapComponents/types";
 
 
 interface SwipeableDrawerComponentProps {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import Main from "./Main/Main";
 import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper, Button } from "@mui/material";
-import { useFacultyContext } from "./FacultyContext";
+import { useFacultyContext } from "../Contexts/FacultyContext";
 import { useNavigate } from "react-router-dom";
 
 export interface BuildingSelectionInt {
@@ -109,13 +109,15 @@ function BuildingSelection() {
 			</Paper>
 			<Button variant="contained"
 			        onClick={ handleGoToMap }
-			        sx={ {
+			        sx={{
 				        position: "fixed",
 				        bottom: 0,
+				        left: "50%",
+				        transform: 'translateX(-50%)',
 				        width: "100%",
 				        maxWidth: "1440px",
 				        height: "5em"
-			        } }>
+			        }}>
 				<Typography variant="h5" sx={ {
 					display: "flex",
 					alignItems: "center"

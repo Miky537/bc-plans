@@ -50,7 +50,7 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 					isBoundingBox: true
 				},
 				symbol: new SimpleFillSymbol({
-					color: [255, 0, 0, 0.5], // RGBA color, here red with 50% opacity
+					color: [255, 0, 0, 0.5], // red with 50% opacity
 					outline: {
 						color: "black",
 						width: 5
@@ -90,10 +90,10 @@ export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, lo
 	mapView.add(pinGraphic);
 	// SVG symbol placed above the pin
 	const svgSymbol = new PictureMarkerSymbol({
-		url: data.logo, // Replace with the path to your SVG image
+		url: data.logo,
 		width: `${ desiredWidth }px`,
 		height: `${ desiredHeight }px`,
-		yoffset: "37px" // Half of the pin's height to position the SVG above the pin
+		yoffset: "37px"
 	});
 
 	const svgGraphic = new Graphic({
@@ -115,7 +115,7 @@ export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, lo
 			url: usiSvgUrl,
 			width: `${ desiredWidth }px`,
 			height: `${ desiredHeight }px`,
-			yoffset: "70px" // Adjust this value based on the visual stacking requirement
+			yoffset: "70px"
 		});
 
 		const usiSvgGraphic = new Graphic({
@@ -130,8 +130,8 @@ export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, lo
 };
 
 export const adjustMapHeight = () => {
-	const topBarElement = document.getElementById('topbar'); // Adjust 'topbar' to your topbar's ID
-	const mapContainerElement = document.getElementById('mapDiv'); // Adjust 'mapDiv' to your map container's ID
+	const topBarElement = document.getElementById('topbar');
+	const mapContainerElement = document.getElementById('mapDiv');
 
 	if (topBarElement && mapContainerElement) {
 		const topBarHeight = topBarElement.clientHeight;
@@ -207,7 +207,7 @@ export const convertPathToFacultyType = (path: string): FacultyType | null => {
 		case "FA":
 			return "FA";
 		default:
-			return null; // or return a default value if you have one
+			return null;
 	}
 };
 

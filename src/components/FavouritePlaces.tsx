@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
 import { Typography, Divider, Paper } from "@mui/material";
-import { useFacultyContext } from "./FacultyContext";
+import { useFacultyContext } from "../Contexts/FacultyContext";
 import { useNavigate } from "react-router-dom";
 import { replaceCzechChars } from "./FloorSelection";
 import { FavouritePlacesLocalStorage } from "./RoomSelectionItem";

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { Button, Divider, Typography } from "@mui/material";
-import { useMapContext } from "./MapContext";
-import { useFacultyContext } from "../FacultyContext";
+import { useMapContext } from "../../Contexts/MapContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 
 const FloorButtonStyles = {
 	"&.FloorButton .MuiTouchRipple-root": {
@@ -60,7 +60,7 @@ const FloorHolder = () => {
 						        alignItems: "center",
 						        padding: "0.5em",
 						        width: "1em",
-						        minWidth: "2.5em", // Control the minimum width of the button
+						        minWidth: "2.5em",
 						        maxWidth: "2.5em",
 						        fontWeight: selectedFloorNumber === floor? "bolder" : "normal",
 						        bgcolor: selectedFloorNumber === floor? "#ABABAB !important" : "#DBDBDB",

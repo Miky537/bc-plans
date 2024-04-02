@@ -53,16 +53,3 @@ export const facultyInfo = {
 		address: "5, Poříčí 273, 639 00 Brno-střed",
 	},
 };
-
-export const FacultyIconsWithNames = {
-	"FIT": fitLogo,
-	"FAST": fastLogo,
-	"FSI": fsiLogo,
-	"FEKT": fektLogo,
-	"FAVU": favuLogo,
-	"FCH": fchLogo,
-	"USI": usiLogo,
-	"FP": fpLogo,
-	"FA": faLogo,
-	"CESA": cesaLogo
-};

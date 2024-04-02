@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState } from 'react';
-import { RoomDetails, fetchRoomInfo } from "./MapComponents/tempFile";
-import { defaultState } from "./MapComponents/constants";
-import { FacultyType } from "./FacultySelection/FacultySelection";
-import { replaceCzechChars } from "./FloorSelection";
+import { fetchRoomInfo } from "../components/MapComponents/apiCalls";
+import { defaultState } from "../components/MapComponents/constants";
+import { FacultyType } from "../components/FacultySelection/FacultySelection";
+import { replaceCzechChars } from "../components/FloorSelection";
 import { useNavigate } from "react-router-dom";
+import { RoomDetails } from "../components/MapComponents/types";
+import { SelectedRoomDetail, RoomDetail, FloorDetail, BuildingDetail } from "./types";
 
 interface FacultyTypeContext {
 	selectedBuildingId: number | null;
@@ -22,51 +24,17 @@ interface FacultyTypeContext {
 	selectedFloorNumber: number;
 	setSelectedFloorNumber: (floorNumber: number) => void;
 
-	selectedBuildingOriginal: string | undefined;
-	setSelectedBuildingOriginal: (building: string | undefined) => void;
-	selectedFloorOriginal: string | undefined;
-	setSelectedFloorOriginal: (floor: string | undefined) => void;
-	selectedRoomOriginal: string | undefined;
-	setSelectedRoomOriginal: (room: string | undefined) => void;
-
 	selectedRoomDetail: SelectedRoomDetail | undefined;
 	setSelectedRoomDetail: (selectedRoomDetail: SelectedRoomDetail | undefined) => void;
 
 	facultyChangeSource: "url" | "search";
 	setFacultyChangeSource: (source: "url" | "search") => void;
 
-
-
-
 }
 
 const FacultyContext = createContext<FacultyTypeContext | undefined>(undefined);
 
-interface RoomDetail {
-	roomName: string | undefined;
-	roomId: number | undefined;
-	urlRoomName: string | undefined;
-}
 
-interface FloorDetail {
-	floorName: string | undefined;
-	floorId: number | undefined;
-	floorNumber: number | undefined;
-	urlFloorName: string | undefined;
-}
-
-interface BuildingDetail {
-	buildingName: string | undefined;
-	buildingId: number | undefined;
-	urlBuildingName: string | undefined;
-}
-
-interface SelectedRoomDetail {
-	RoomDetail: RoomDetail;
-	FloorDetail: FloorDetail;
-	BuildingDetail: BuildingDetail;
-	Faculty: FacultyType;
-}
 
 export const useFacultyContext = () => {
 	const context = useContext(FacultyContext);
@@ -87,10 +55,6 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedFloorNumber, setSelectedFloorNumber] = useState<number>(1);
 	const [selectedRoomDetail, setSelectedRoomDetail] = useState<SelectedRoomDetail | undefined>(undefined)
 	const [facultyChangeSource, setFacultyChangeSource] = useState<"url" | "search">('url');
-
-	const [selectedBuildingOriginal, setSelectedBuildingOriginal] = useState<string | undefined>(undefined);
-	const [selectedFloorOriginal, setSelectedFloorOriginal] = useState<string | undefined>(undefined);
-	const [selectedRoomOriginal, setSelectedRoomOriginal] = useState<string | undefined>(undefined);
 
 
 	const navigate = useNavigate();
@@ -113,7 +77,6 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 
 
 	const handleRoomSelection = async(roomId?: number) => {
-
 		if (roomId === undefined) {
 			return;
 		}
@@ -191,12 +154,6 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			setSelectedFloor,
 			selectedFloorNumber,
 			setSelectedFloorNumber,
-			selectedBuildingOriginal,
-			setSelectedBuildingOriginal,
-			selectedFloorOriginal,
-			setSelectedFloorOriginal,
-			selectedRoomOriginal,
-			setSelectedRoomOriginal,
 
 			selectedRoomDetail,
 			setSelectedRoomDetail,

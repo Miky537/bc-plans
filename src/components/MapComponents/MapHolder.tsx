@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
-import { Room, Floor, Building } from "../parser/types";
+import { Room, Floor, Building } from "./types";
 import FloorHolder from "./FloorHolder";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
-import { useFacultyContext } from "../FacultyContext";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { SwipeableDrawerComponent } from "../SwipeableDrawer/SwipeableDrawerComponent";
 import { CircularProgress, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import { useMapContext } from "./MapContext";
+import { useMapContext } from "../../Contexts/MapContext";
 import MediaQuery from "react-responsive";
 import { DesktopDrawer } from "../SwipeableDrawer/DesktopDrawer";
 

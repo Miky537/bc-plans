@@ -1,16 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MapProvider } from "./components/MapComponents/MapContext";
+import { MapProvider } from "./Contexts/MapContext";
 import MapHolder from "./components/MapComponents/MapHolder";
 import TeacherSearch from "./components/TeacherSearch/TeacherSearch";
 import BuildingSelection from "./components/BuildingSelection";
 import FloorSelection from "./components/FloorSelection";
 import FavouritePlaces from "./components/FavouritePlaces";
-import FacultySelection from "./components/FacultySelection/FacultySelection";
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import React, { useEffect } from "react";
 import Main from "./components/Main/Main";
-import useAuthToken from "./useAuthToken";
-import { FacultyProvider } from "./components/FacultyContext";
+import useAuthToken from "./hooks/useAuthToken";
+import { FacultyProvider } from "./Contexts/FacultyContext";
 
 export default function AppTree() {
 
@@ -19,7 +18,6 @@ export default function AppTree() {
 	useEffect(() => {
 		loginMutate(); // Fetch the token
 	}, [loginMutate]);
-
 
 
 	return (

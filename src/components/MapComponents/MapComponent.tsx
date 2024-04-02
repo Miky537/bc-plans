@@ -7,7 +7,7 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
-import { useMapContext } from "./MapContext";
+import { useMapContext } from "../../Contexts/MapContext";
 import {
 	adjustMapHeight,
 	getRoomCenter,
@@ -15,8 +15,8 @@ import {
 	displayPinsWhenZoomChange,
 	getFacultyCoordinates
 } from "./MapFunctions";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useFacultyContext } from "../FacultyContext";
+import { useParams, useLocation } from "react-router-dom";
+import { useFacultyContext } from "../../Contexts/FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
@@ -89,7 +89,6 @@ const MapComponent = ({
 		selectedFloorNumber,
 		selectedRoomId,
 		roomData,
-		selectedRoomDetail
 	} = useFacultyContext()
 	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
@@ -105,9 +104,7 @@ const MapComponent = ({
 	const [isRoomDialogOpen, setIsRoomDialogOpen] = useState(false);
 	const [featuresUpdated, setFeaturesUpdated] = useState(false);
 
-
 	const location = useLocation()
-	const navigate = useNavigate();
 
 	const {
 		centerCoordinates,

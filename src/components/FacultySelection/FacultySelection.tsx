@@ -78,7 +78,7 @@ function FacultySelection() {
 				        bottom: 0,
 				        left: "50%",
 				        transform: 'translateX(-50%)',
-				        width: "50%",
+				        width: "100%",
 				        maxWidth: "1440px",
 				        height: "5em"
 			        }}>

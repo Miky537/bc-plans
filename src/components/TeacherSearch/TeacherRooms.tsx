@@ -61,7 +61,7 @@ function TeacherRooms() {
 
 // eslint-disable-next-line
 	const debouncedSearch = useCallback(
-		debounce((searchValue: any) => {
+		debounce((searchValue: string) => {
 			if (searchValue && loginSuccess) {
 				refetch(); // Assuming refetch uses searchTerm or teacherName state that's updated here
 			}
@@ -72,7 +72,7 @@ function TeacherRooms() {
 		debouncedSearch(teacherName);
 	}, [teacherName, debouncedSearch]);
 
-	const handleInputChange = (event: any) => {
+	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setTeacherName(event.target.value);
 	};
 	const handleTeacherTabClick = async(roomId: number | null) => {

@@ -14,9 +14,9 @@ export interface FloorDetail {
 }
 
 export interface BuildingDetail {
-	buildingName: string | undefined;
-	buildingId: number | undefined;
-	urlBuildingName: string | undefined;
+	buildingName: string | null;
+	buildingId: number | null;
+	urlBuildingName: string | null;
 }
 
 export interface SelectedRoomDetail {

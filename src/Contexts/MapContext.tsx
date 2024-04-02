@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useRef } from 'react';
-import { Coordinates } from "../components/MapComponents/MapComponent";
+import React, { createContext, useContext, useState, useRef, ReactNode } from 'react';
+
 import MapView from "@arcgis/core/views/MapView";
+import { Coordinates } from "../components/MapComponents/types";
 
 
 interface MapContextType {
@@ -36,7 +37,7 @@ export const useMapContext = () => {
 	return context;
 };
 
-export const MapProvider = ({children}: any) => {
+export const MapProvider = ({children} : { children: React.ReactNode }) => {
 	const [centerCoordinates, setCenterCoordinates] = useState<Coordinates>({
 		lat: 16.603375432788052,
 		lng: 49.20174147400288,

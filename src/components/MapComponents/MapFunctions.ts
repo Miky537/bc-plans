@@ -4,13 +4,13 @@ import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
 import { FacultyType } from "../FacultySelection/FacultySelection";
-import { Coordinates } from "./MapComponent";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import { facultyInfo } from "../../FacultyLogos/constants";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import { Coordinates } from "./types";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -60,7 +60,7 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 
 			mapViewRef.current?.graphics.add(boundingBoxGraphic);
 		}
-	}).catch((err): any => {
+	}).catch((err: Error) => {
 		console.error("Failed to query features:", err);
 	});
 };
@@ -244,7 +244,6 @@ export function getRoomCenter(allFeatures: any, RoomID: number) {
 export const displayPinsWhenZoomChange = (mapView: GraphicsLayer | null, RoomHighlightGraphicsLayerRef: any,
                                           FeaturesGraphicsLayerRef: any, setArePinsVisible: any) => {
 	if (!mapView) return;
-	// RoomHighlightGraphicsLayerRef.current?.removeAll();
 	setArePinsVisible(true);
 	FeaturesGraphicsLayerRef.current?.graphics.removeAll()
 	Object.entries(facultyInfo).forEach(([faculty, data]) => {

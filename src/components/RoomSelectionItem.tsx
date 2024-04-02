@@ -6,21 +6,21 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
 
 export interface FavouritePlacesLocalStorage {
-	roomName: string;
+	roomName: string | null;
 	roomId: number;
 	floorName: string;
 	floorNumber: number;
-	buildingName: string;
+	buildingName: string | null;
 	faculty: FacultyType;
 }
 
 interface RoomSelectionItemProps {
-	roomName: string;
+	roomName: string | null;
 	roomId: number;
 	floorName: string;
 	floorNumber: number;
 	buildingName: string;
-	handleRoomClick: (roomName: string, roomId: number) => void;
+	handleRoomClick: (roomName: string | null, roomId: number) => Promise<void>;
 }
 
 const RoomSelectionItem = ({

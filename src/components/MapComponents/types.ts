@@ -1,9 +1,9 @@
 export interface Building {
 	budova_id: number;
 	areal_id: number,
-	dokument_id: any,
+	dokument_id: number | null,
 	nazev: string,
-	nazev_en: any,
+	nazev_en: string | null
 	kod: string,
 	popis: string | null,
 	popis_en: string | null,
@@ -16,7 +16,7 @@ export interface Building {
 	ins_uid: number,
 	status: number,
 	platnost_od: string,
-	platnost_do: any,
+	platnost_do: string | null,
 	aktualni: number,
 	adr_obec: string,
 	adr_obec_cast: string,
@@ -34,10 +34,10 @@ export interface Building {
 	adresa: string,
 	souradnice_n: number,
 	souradnice_e: number,
-	zkratka_prezentacni: any,
-	zkratka_prezentacni_en: any,
-	nazev_prezentacni: any,
-	nazev_prezentacni_en: any
+	zkratka_prezentacni: string | null
+	zkratka_prezentacni_en: string | null,
+	nazev_prezentacni: string | null,
+	nazev_prezentacni_en: string | null,
 }
 export interface Floor {
 	podlazi_id: number;
@@ -150,4 +150,15 @@ export interface RoomDetails {
 	floor_info: Floor;
 	building_info: Building;
 	areal_info: Areal;
+}
+
+export type Coordinates = {
+	lat: number;
+	lng: number;
+};
+
+export interface RoomIdWithType {
+	RoomID: number;
+	roomType: number;
+	roomName: string;
 }

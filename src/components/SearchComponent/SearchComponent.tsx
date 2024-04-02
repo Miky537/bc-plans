@@ -106,7 +106,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 		fetchPreviouslySearched();
 	}, []);
 
-	const handleRoomSearchClick = (room: RoomNames, event: any) => {
+	const handleRoomSearchClick = (room: RoomNames, event: React.MouseEvent) => {
 		event.stopPropagation();
 		setFacultyChangeSource('search');
 		// Retrieve existing data from local storage

@@ -19,13 +19,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import RoomSelectionItem from "./RoomSelectionItem";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
+interface FetchedFloorRoomType {
+	name: string | null;
+	room_id: number;
+	room_number: string | null;
+}
+
 export interface FetchedFloor {
 	building_id?: number;
 	building_name: string;
 	floor_id: number;
 	floor_name: string;
 	floor_number: number;
-	rooms?: any;
+	rooms?: FetchedFloorRoomType[];
 	roomId?: number;
 }
 
@@ -39,7 +45,7 @@ export const czechCharMap: { [key: string]: string | undefined } = { // Map of C
 	'Ů': 'U', 'Ý': 'Y', 'Ž': 'Z'
 };
 
-export const replaceCzechChars = (str: string | undefined): string => {
+export const replaceCzechChars = (str: string | null): string => {
 	if (!str) return "";
 	return str.split('').map((char: string) => czechCharMap[char] || char).join('');
 };
@@ -116,10 +122,10 @@ function FloorSelection() {
 	}
 
 
-	const handleRoomClick = async(roomName: string, roomId: number) => {
+	const handleRoomClick = async(roomName: string | null, roomId: number) => {
 		await setSelectedRoomId(roomId);
 		const selectedFloorNumberLocal = extractNumberFromString(floor);
-		if (selectedFloorNumberLocal === null) return;
+		if (selectedFloorNumberLocal === null || !roomName) return;
 		await setSelectedFloorNumber(selectedFloorNumberLocal);
 		await handleRoomSelection(roomId);
 		navigate(`/map/${ selectedFaculty }/${ selectedBuilding!.replace(/\s/g, "_") }/${ floor }/${ roomName }`);
@@ -187,7 +193,8 @@ function FloorSelection() {
 									<AccordionDetails>
 										<Box>
 											{
-												floor.rooms.map((room: any) => {
+												floor.rooms?.map((room: FetchedFloorRoomType) => {
+													console.log("sss", room)
 													return (
 														<Box key={ room.room_id } >
 															<RoomSelectionItem

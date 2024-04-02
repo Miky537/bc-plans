@@ -88,13 +88,13 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 			return;
 		} else {
 			await setRoomData(roomInfo);
-			await setSelectedFaculty(roomInfo.building_info.zkratka_prezentacni.split(" ")[0] as FacultyType)
+			await setSelectedFaculty(roomInfo.building_info.zkratka_prezentacni!.split(" ")[0] as FacultyType)
 			const random = replaceCzechChars(roomInfo.floor_info.nazev)
 			setSelectedFloor(random.replace(" ", "_"))
 			setSelectedFloorNumber(roomInfo.floor_info.cislo)
 			updateSelectedRoomDetail(roomInfo);
-			const faculty = roomInfo.building_info.zkratka_prezentacni.split(" ")[0];
-			const building = replaceCzechChars(roomInfo.building_info.nazev_prezentacni.replace(" ", "_"))
+			const faculty = roomInfo.building_info.zkratka_prezentacni!.split(" ")[0];
+			const building = replaceCzechChars(roomInfo.building_info.nazev_prezentacni!.replace(" ", "_"))
 			const correctBuilding = transformString(building)
 			const floor = replaceCzechChars(roomInfo.floor_info.nazev.replace(" ", "_")).toLowerCase()
 			navigate(`/map/${ faculty }/${ correctBuilding }/${ floor }/${ roomInfo.room_info.cislo }`);
@@ -118,18 +118,18 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 				urlFloorName: urlFloorName,
 			};
 
-			const urlBuildingName = replaceCzechChars(fetchedData.building_info.nazev_prezentacni.replace(" ", "_"))
-			const adjustedBuildingDetail: BuildingDetail = {
+			const urlBuildingName = replaceCzechChars(fetchedData.building_info.nazev_prezentacni!.replace(" ", "_"))
+			const adjustedBuildingDetail: { buildingName: string | null; urlBuildingName: string; buildingId: number } = {
 				buildingName: fetchedData.building_info.nazev_prezentacni,
 				buildingId: fetchedData.building_info.budova_id,
 				urlBuildingName: urlBuildingName,
 			};
-			const faculty = fetchedData.building_info.zkratka_prezentacni.split(" ")[0];
+			const faculty = fetchedData.building_info.zkratka_prezentacni!.split(" ")[0];
 			const newDetails: SelectedRoomDetail = {
 				RoomDetail: adjustedRoomDetail,
 				FloorDetail: adjustedFloorDetail,
 				BuildingDetail: adjustedBuildingDetail,
-				Faculty: faculty,
+				Faculty: faculty as FacultyType,
 			};
 
 			return newDetails;

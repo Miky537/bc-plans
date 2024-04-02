@@ -39,8 +39,8 @@ const useAuthToken = () => {
 			if (lastUpdated) {
 				const now = new Date();
 				const timeSinceLastUsed = now.getTime() - lastUpdated.getTime();
-				// 20 minutes
-				const refreshThreshold = 20 * 60 * 1000;
+				// 10 minutes
+				const refreshThreshold = 10 * 60 * 1000;
 
 				if (timeSinceLastUsed >= refreshThreshold) {
 					loginMutate();

@@ -59,7 +59,7 @@ export function SwipeableDrawerComponent({
 			return;
 		}
 		getRoomPhoto(selectedRoomId)
-			.then((url: any) => {
+			.then((url: string) => {
 				if (url === "") {
 					setIsError(true);
 					setIsLoading(false);
@@ -67,7 +67,7 @@ export function SwipeableDrawerComponent({
 				setPhoto(url);
 				setIsLoading(false);
 			})
-			.catch((error: any) => {
+			.catch((error: Error) => {
 				console.error('Failed to load image:', error)
 				setIsError(true);
 				setIsLoading(false);

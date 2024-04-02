@@ -21,7 +21,12 @@ code {
 .esri-ui-bottom-right.esri-ui-corner .esri-component.esri-track.esri-widget {
     width: 3.5em;
     height: 3.5em;
-    border-radius: 7px;
+    border-radius: 50%;
+}
+
+.esri-widget--button.esri-widget.esri-interactive {
+    width: 2.5em;
+    height: 2.5em;
 }
 
 .esri-track {
@@ -29,6 +34,7 @@ code {
     background-size: 50%;
     background-repeat: no-repeat;
     background-position: center;
+    background-color: #1B2228 !important;
 }
 
 .esri-component.esri-track.esri-widget calcite-icon {

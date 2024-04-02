@@ -21,7 +21,7 @@ const startTokenRefreshTimer = () => {
 	}, 1140 * 1000);
 };
 
-export const searchTeacher = async(name: any) => {
+export const searchTeacher = async(name: string) => {
 	const token = sessionStorage.getItem('sessionToken');
 	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/search/teacher/${ name }`, {
 		method: 'GET',

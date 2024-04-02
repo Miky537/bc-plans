@@ -28,16 +28,13 @@ import polylabel from "polylabel";
 import Point from "@arcgis/core/geometry/Point";
 import { Dialog, DialogContent, DialogActions, Button, Typography, Divider } from "@mui/material";
 import { DividerStyles } from "../TeacherSearch/styles";
+import { RoomIdWithType } from "./types";
+import { dialogStyles } from "./styles";
 
 
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
-const dialogStyles = {
-	"& .MuiPaper-root.MuiDialog-paper": {
-		width: "90%",
-		maxWidth: "600px",
-	},
-}
+
 
 interface MapComponentProps {
 	selectedFloor: number;
@@ -51,22 +48,12 @@ interface MapComponentProps {
 }
 
 const layerConfigs = [
-	{ url: featureLayerUrl, name: "VUT_Rektorat", facultyId: "facultyRectorate" },
 	{ url: fastLayerUrl, name: "FAST", facultyId: "facultyFAST" },
 	{ url: FITLayerUrl, name: "FIT", facultyId: "facultyFIT" },
 	// Add more configurations as needed
 ];
 
-export type Coordinates = {
-	lat: number;
-	lng: number;
-};
 
-interface RoomIdWithType {
-	RoomID: number;
-	roomType: number;
-	roomName: string;
-}
 
 const MapComponent = ({
 	                      isDrawerOpen,
@@ -117,7 +104,8 @@ const MapComponent = ({
 		setCenterCoordinates,
 		setArePinsVisible,
 		setZoom,
-		doesRoomExist, setDoesRoomExist
+		doesRoomExist,
+		setDoesRoomExist
 	} = useMapContext();
 
 	useEffect(() => {
@@ -251,7 +239,7 @@ const MapComponent = ({
 				}
 			});
 
-		}).catch((err: any) => console.error("MapView failed to load", err));
+		}).catch((err: Error) => console.error("MapView failed to load", err));
 
 		return () => {
 			if (mapView) {
@@ -398,9 +386,11 @@ const MapComponent = ({
 			const labelSymbol = new TextSymbol({
 				text: feature.attributes.name,
 				color: "black",
+				haloColor: "white",
+				haloSize: "2px",
 				font: {
 					size: 12,
-					weight: "bold"
+					weight: "bold",
 				}
 			});
 

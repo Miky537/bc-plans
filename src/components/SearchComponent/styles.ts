@@ -20,7 +20,7 @@ export const SearchBoxContainer = (isExpanded: boolean) => ({
 		width: isExpanded? "95%" : "3em",
 		maxWidth: "40em",
 		height: "3em",
-		bgcolor: "black",
+		bgcolor: "background.paper",
 		borderRadius: isExpanded? "10px" : "50%",
 		borderBottomLeftRadius: isExpanded? "0" : "50%",
 		borderBottomRightRadius: isExpanded? "0" : "50%",

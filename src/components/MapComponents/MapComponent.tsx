@@ -740,7 +740,7 @@ const MapComponent = ({
 					<Typography color="GrayText" variant="body2">Faculty</Typography>
 					<Typography variant="body1">{ dialogData?.faculty }</Typography>
 					<Divider sx={ { mb: 1, pt: 1, ...DividerStyles } } />
-					<Typography color="GrayText" variant="body2">Title</Typography>
+					<Typography color="GrayText" variant="body2">Address</Typography>
 					<Typography variant="body1">{ dialogData?.address }</Typography>
 				</DialogContent>
 				<DialogActions>

@@ -6,7 +6,7 @@ import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
-import { featureLayerUrl, fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
+import { fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
 import { useMapContext } from "../../Contexts/MapContext";
 import {
 	adjustMapHeight,
@@ -35,7 +35,6 @@ import { dialogStyles } from "./styles";
 esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
 
 
-
 interface MapComponentProps {
 	selectedFloor: number;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
@@ -52,7 +51,6 @@ const layerConfigs = [
 	{ url: FITLayerUrl, name: "FIT", facultyId: "facultyFIT" },
 	// Add more configurations as needed
 ];
-
 
 
 const MapComponent = ({
@@ -673,6 +671,7 @@ const MapComponent = ({
 				setSelectedRoomId(undefined);
 			}
 		};
+		console.log("Jsem tu")
 		if (faculty && building && floor && roomName) {
 			fetchRoomId();
 		} else if (faculty) {
@@ -694,14 +693,6 @@ const MapComponent = ({
 			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
 		}
 	}, [location.pathname, mapViewRef.current, PinsGraphicsLayerRef.current]);
-
-	useEffect(() => {
-		if (mapViewRef.current) {
-			if (!doesRoomExist) {
-				// setIsRoomDialogOpen(true);
-			}
-		}
-	}, [doesRoomExist]);
 
 	const handleCloseRoomDialog = () => {
 		setIsRoomDialogOpen(false);

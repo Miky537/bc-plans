@@ -15,9 +15,9 @@ import StarIcon from '@mui/icons-material/Star';
 import { InputBaseStyle, searchBoxStyle, SearchBoxContainer } from "./styles";
 
 
-interface RoomNames {
+export interface RoomNames {
 	room_id: number;
-	room_name: string;
+	room_name: string | null;
 	floor_number: number;
 	faculty: FacultyType;
 }
@@ -36,7 +36,6 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	const [filteredRooms, setFilteredRooms] = useState<RoomNames[]>([]);
 	const {
 		handleRoomSelection,
-		setSelectedFaculty,
 		setFacultyChangeSource,
 	} = useFacultyContext();
 	const [previouslySearchedRooms, setPreviouslySearchedRooms] = useState<RoomNames[]>([]);

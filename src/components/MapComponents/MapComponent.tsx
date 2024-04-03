@@ -243,7 +243,7 @@ const MapComponent = ({
 			if (mapView) {
 				setIsMapLoaded(false);
 				mapView.destroy();
-				// setIsRoomDialogOpen(false);
+				setIsRoomDialogOpen(false);
 				mapViewRef.current = null;
 				if (abortControllerRef.current) {
 					if ("abort" in abortControllerRef.current) {
@@ -324,6 +324,8 @@ const MapComponent = ({
 
 
 	useEffect(() => {
+		console.log("Started fetching features")
+		setAllFeatures([]);
 		setFeaturesUpdated(false);
 		setAreFeaturesLoading(true);
 		const abortController = new AbortController();
@@ -331,7 +333,9 @@ const MapComponent = ({
 			const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 			if (!selectedLayer) {
 				setAreFeaturesEmpty(true);
+				console.log("here")
 				setAreFeaturesLoading(false);
+				setFeaturesUpdated(true);
 				return;
 			}
 			const query = new Query();
@@ -341,19 +345,26 @@ const MapComponent = ({
 
 			selectedLayer.queryFeatures(query, { signal: abortController.signal })
 				.then((results) => {
+					// console.log("res", results.features)
 					setAllFeatures(results.features);
 					if (results.features.length === 0) {
 						setAreFeaturesEmpty(true);
+						console.log("Here 2")
 						setAreFeaturesLoading(false);
+						setFeaturesUpdated(true)
 					} else {
+						console.log("Ended fetching features")
 						setFeaturesUpdated(true)
 						setAreFeaturesEmpty(false);
+						console.log("Here 3")
 						setAreFeaturesLoading(false);
 					}
 				})
 				.catch((error) => {
-
-					setAreFeaturesLoading(false);
+					setFeaturesUpdated(true)
+					setAreFeaturesEmpty(true);
+					console.log("Here 4")
+					// setAreFeaturesLoading(false);
 					if (error.name === "AbortError") {
 						// console.log("Found abortError!")
 					} else {
@@ -574,12 +585,30 @@ const MapComponent = ({
 	}, [selectedFloorNumber]);
 
 	useEffect(() => {
-		// console.log(`Effect run: selectedRoomId=${selectedRoomId}, allFeatures.length=${allFeatures.length}, areFeaturesLoading=${areFeaturesLoading}`);
-		if (selectedRoomId === undefined || allFeatures.length === 0 || areFeaturesLoading || !featuresUpdated) return;
+		// console.log("alll", selectedRoomId, areFeaturesLoading, featuresUpdated)
+		if (selectedRoomId === undefined || areFeaturesLoading || !featuresUpdated) {
+			return;
+		}
 		RoomHighlightGraphicsLayerRef.current!.graphics.removeAll();
-
 		const roomFeature = allFeatures.find((feature: any) => feature.attributes.RoomID === selectedRoomId);
+		if (!roomFeature && selectedFaculty) {
+			const centerArr = getFacultyCoordinates(selectedFaculty);
+			const arr = [centerArr.lat, centerArr.lng]
+			mapViewRef.current?.goTo(
+				{ target: arr },
+				{ duration: 1000, easing: "ease-out", animate: true }
+			).then(() => {
+				if (!mapViewRef.current) return;
+			}).catch(function(error) {
+				if (error.name !== "AbortError") {
+					console.error(error);
+				}
+			});
+		}
 		if (!roomFeature) {
+			if (isDrawerOpen) {
+				setIsRoomDialogOpen(true);
+			}
 			return;
 		}
 
@@ -671,7 +700,6 @@ const MapComponent = ({
 				setSelectedRoomId(undefined);
 			}
 		};
-		console.log("Jsem tu")
 		if (faculty && building && floor && roomName) {
 			fetchRoomId();
 		} else if (faculty) {
@@ -720,22 +748,16 @@ const MapComponent = ({
 					<Button variant="contained" onClick={ () => {
 						window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(dialogData?.address) }`, '_blank');
 						setIsDialogOpen(false);
-					} }>Navigate</Button>
+					} }><Typography>Navigate</Typography></Button>
 				</DialogActions>
 			</Dialog>
-			<Dialog open={ isRoomDialogOpen }
+
+			<Dialog open={ isRoomDialogOpen } className="room-dialog"
 			        onClose={ handleCloseRoomDialog } sx={ dialogStyles }>
-				<Typography variant="h5" align="center" pt={ 2 }>Room is not added yet!</Typography>
-				<DialogContent>
-					<Typography>Room name:{ roomData.room_info.nazev }</Typography>
-					<Typography>Room number:{ roomData.room_info.cislo }</Typography>
-					<Typography>Floor:{ roomData.floor_info.nazev }</Typography>
-					<Typography>Building:{ roomData.building_info.nazev_prezentacni }</Typography>
-					<Typography>Faculty:{ roomData.building_info.zkratka_prezentacni }</Typography>
-					<Typography>Areal:{ roomData.areal_info.nazev }</Typography>
+				<DialogContent sx={ { margin: 0, display: "flex", alignItems: "center" } }>
+					<Typography variant="h5" align="center" pt={ 2 }>Room is yet to be added!</Typography>
 				</DialogContent>
 			</Dialog>
-
 		</>
 	);
 };

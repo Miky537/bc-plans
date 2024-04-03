@@ -37,7 +37,8 @@ function TeacherRooms() {
 		setSelectedFaculty,
 		setSelectedBuilding,
 		setSelectedFloor,
-		setRoomData
+		setRoomData,
+		setAreFeaturesLoading,
 	} = useFacultyContext();
 	const { setDoesRoomExist } = useMapContext();
 
@@ -141,7 +142,7 @@ function TeacherRooms() {
 				teacherFaculty: teacherFaculty
 			};
 			checkTeacher(template);
-
+			setAreFeaturesLoading(true);
 			if (isFacultyType(teacherFaculty) || teacherFaculty === "CVIS") {
 				const selFaculty = teacherFaculty === "CVIS"? "FP" : data.building_info.zkratka_prezentacni.split(' ')[0];
 				const normalizedBuildingName = replaceCzechChars(data.building_info.nazev_prezentacni)!.replace(/\s/g, "_")

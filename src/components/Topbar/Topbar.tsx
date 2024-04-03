@@ -74,6 +74,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 		if (urlFaculty === null) {
 			return
 		}
+
 		// Convert URL to faculty type
 		const facultyFromUrl = convertPathToFacultyType(urlFaculty);
 		if (facultyFromUrl && facultyFromUrl !== selectedFaculty) {

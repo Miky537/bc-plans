@@ -19,10 +19,9 @@ export interface InfoState {
 
 const MapHolder = () => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
 	const [allFeatures, setAllFeatures] = useState<any>([]);
 	const [areFeaturesEmpty, setAreFeaturesEmpty] = useState(false);
-	const { selectedFaculty } = useFacultyContext();
+	const { selectedFaculty, setAreFeaturesLoading, areFeaturesLoading } = useFacultyContext();
 	const { arePinsVisible } = useMapContext();
 
 	const {
@@ -50,7 +49,9 @@ const MapHolder = () => {
 		<Box className="Map-Holder">
 			<SearchComponent setSelectedRoom={ setSelectedRoomId }
 			                 setSelectedFloor={ setSelectedFloorNumber }
-			                 setIsDrawerOpen={ setIsDrawerOpen } />
+			                 setIsDrawerOpen={ setIsDrawerOpen }
+			                 setAreFeaturesLoading={ setAreFeaturesLoading }
+			/>
 
 			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>
 				<FloorHolder />

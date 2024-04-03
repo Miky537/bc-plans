@@ -31,6 +31,9 @@ interface FacultyTypeContext {
 	facultyChangeSource: "url" | "search";
 	setFacultyChangeSource: (source: "url" | "search") => void;
 
+	areFeaturesLoading: boolean;
+	setAreFeaturesLoading: (loading: boolean) => void;
+
 }
 
 const FacultyContext = createContext<FacultyTypeContext | undefined>(undefined);
@@ -57,6 +60,7 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 	const [selectedRoomDetail, setSelectedRoomDetail] = useState<SelectedRoomDetail | undefined>(undefined)
 	const [facultyChangeSource, setFacultyChangeSource] = useState<"url" | "search">('url');
 
+	const [areFeaturesLoading, setAreFeaturesLoading] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -168,6 +172,9 @@ export const FacultyProvider = ({ children }: { children: React.ReactNode }) => 
 
 			facultyChangeSource,
 			setFacultyChangeSource,
+
+			areFeaturesLoading,
+			setAreFeaturesLoading
 		} }>
 			{ children }
 		</FacultyContext.Provider>

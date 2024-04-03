@@ -28,8 +28,6 @@ function TeacherCard({
 	                     email
                      }: TeacherCardProps) {
 
-	console.log("TeacherCard rendered", faculty);
-
 
 	return (
 		<Box width="90%"

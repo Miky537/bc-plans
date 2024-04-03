@@ -26,9 +26,15 @@ interface SearchComponentProps {
 	setSelectedRoom: (roomId: number) => void;
 	setSelectedFloor: (floor: number) => void;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
+	setAreFeaturesLoading   : (areFeaturesLoading: boolean) => void;
 }
 
-export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawerOpen }: SearchComponentProps) {
+export function SearchComponent({
+	                                setSelectedRoom,
+	                                setSelectedFloor,
+	                                setIsDrawerOpen,
+	                                setAreFeaturesLoading
+                                }: SearchComponentProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [searchRooms, setSearchRooms] = useState<RoomNames[]>([]);
 	const [favouriteRooms, setFavouriteRooms] = useState<FavouritePlacesLocalStorage[]>([]);
@@ -37,6 +43,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	const {
 		handleRoomSelection,
 		setFacultyChangeSource,
+		selectedFaculty
 	} = useFacultyContext();
 	const [previouslySearchedRooms, setPreviouslySearchedRooms] = useState<RoomNames[]>([]);
 	const [isWriting, setIsWriting] = useState(false);
@@ -107,6 +114,10 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 
 	const handleRoomSearchClick = (room: RoomNames, event: React.MouseEvent) => {
 		event.stopPropagation();
+		if (room.faculty !== selectedFaculty) {
+			setAreFeaturesLoading(true);
+			console.log("Faculty changed");
+		}
 		setFacultyChangeSource('search');
 		// Retrieve existing data from local storage
 		const previouslySearched = localStorage.getItem('previouslySearched');
@@ -143,6 +154,9 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 	}
 
 	const handleFavouriteRoomClick = (room: FavouritePlacesLocalStorage, event: any) => {
+		if (room.faculty !== selectedFaculty) {
+			setAreFeaturesLoading(true);
+		}
 		event.stopPropagation();
 		setFacultyChangeSource('search');
 		setIsWriting(false);
@@ -163,7 +177,7 @@ export function SearchComponent({ setSelectedRoom, setSelectedFloor, setIsDrawer
 				<>
 					<InputBase
 						autoFocus
-						placeholder="Type to find room.."
+						placeholder="Type name of the room.."
 						inputProps={ { "aria-label": "search" } }
 						onBlur={ handleCollapse }
 						onChange={ handleSearch }

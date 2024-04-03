@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme, SxProps, Theme, Typography, Drawer, CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
-import { getRoomPhoto } from "../TeacherSearch/apiCalls";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import IconButton from "@mui/material/IconButton";
 import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
@@ -12,6 +11,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
 import { RoomDetails } from "../MapComponents/types";
 import { mergeStylesWithTheme } from "./styles";
+import useAuthToken from "../../hooks/useAuthToken";
 
 
 interface DrawerComponentProps {
@@ -28,6 +28,7 @@ export function DesktopDrawer({
                               }: DrawerComponentProps) {
 	const { room_info, floor_info, areal_info, building_info } = roomData;
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
+	const { loginMutate } = useAuthToken()
 	const faculty = selectedFaculty as FacultyType;
 	const [isFav, setIsFav] = useState<boolean>(false);
 	const {
@@ -46,14 +47,47 @@ export function DesktopDrawer({
 	const { loginSuccess, updateLastUsed } = useAuthContext();
 
 	useEffect(() => {
+		const getRoomPhoto = async(roomId: number) => {
+			let token = sessionStorage.getItem('sessionToken');
+			const headers: HeadersInit = {};
+			if (token) {
+				headers['Authorization'] = token;
+			} else {
+				loginMutate();
+				token = sessionStorage.getItem('sessionToken');
+				if (token) {
+					headers['Authorization'] = token;
+				} else {
+					return "";
+				}
+			}
+			const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
+				method: 'GET',
+				headers: headers,
+			});
+
+			if (!response.ok) {
+				return "";
+			}
+			if (response.status === 204) {
+				return "";
+			}
+			// Convert the response to a blob if you're working with binary data
+			const imageBlob = await response.blob();
+
+			// Create a local URL for the blob to be used in an <img> element
+			const imageObjectURL = URL.createObjectURL(imageBlob);
+			// console.log("imageObjectURL", imageObjectURL)
+			return imageObjectURL;
+		};
 		if (loginSuccess && selectedRoomId) {
 			setIsLoading(true);
 			updateLastUsed();
 			getRoomPhoto(selectedRoomId)
-				.then((url) => {
+				.then((url: string) => {
 					setPhoto(url);
 				})
-				.catch((error) => {
+				.catch((error: Error) => {
 					console.error('Failed to load image:', error);
 				})
 				.finally(() => setIsLoading(false));

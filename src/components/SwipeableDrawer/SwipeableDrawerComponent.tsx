@@ -2,7 +2,6 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import React, { useState, useEffect } from "react";
 import { useTheme, SxProps, Theme, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import { getRoomPhoto } from "../TeacherSearch/apiCalls";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import IconButton from "@mui/material/IconButton";
 import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
@@ -11,6 +10,7 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { RoomDetails } from "../MapComponents/types";
 import { useAuthContext } from "../../Contexts/AuthContext";
+import useAuthToken from "../../hooks/useAuthToken";
 
 
 interface SwipeableDrawerComponentProps {
@@ -42,6 +42,7 @@ export function SwipeableDrawerComponent({
 	const [isImageZoomed, setIsImageZoomed] = useState(false);
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
 	const { updateLastUsed } = useAuthContext()
+	const { loginMutate } = useAuthToken()
 	const faculty = selectedFaculty as FacultyType;
 	const [isFav, setIsFav] = useState<boolean>(false);
 	const { cislo: roomName, mistnost_id: roomId, mistnost_typ_id: roomType, label: roomLabel } = room_info
@@ -54,6 +55,40 @@ export function SwipeableDrawerComponent({
 	const theme = useTheme();
 
 	useEffect(() => {
+		const getRoomPhoto = async(roomId: number) => {
+			let token = sessionStorage.getItem('sessionToken');
+			const headers: HeadersInit = {};
+			if (token) {
+				headers['Authorization'] = token;
+			} else {
+				loginMutate();
+				token = sessionStorage.getItem('sessionToken');
+				if (token) {
+					headers['Authorization'] = token;
+				} else {
+					return "";
+				}
+
+			}
+			const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
+				method: 'GET',
+				headers: headers,
+			});
+
+			if (!response.ok) {
+				return "";
+			}
+			if (response.status === 204) {
+				return "";
+			}
+			// Convert the response to a blob if you're working with binary data
+			const imageBlob = await response.blob();
+
+			// Create a local URL for the blob to be used in an <img> element
+			const imageObjectURL = URL.createObjectURL(imageBlob);
+			// console.log("imageObjectURL", imageObjectURL)
+			return imageObjectURL;
+		};
 		setIsError(false);
 		setIsLoading(true);
 		updateLastUsed();

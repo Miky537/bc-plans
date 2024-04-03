@@ -16,7 +16,7 @@ import { RoomNames } from "../SearchComponent/SearchComponent";
 import { FacultyType } from "../FacultySelection/FacultySelection";
 import TeacherCard from "./TeacherCard";
 
-interface TeacherRooms extends RoomNames {
+interface TeacherRoomsInter extends RoomNames {
 	email: string | null;
 	fullTeacherName: string | null;
 	teacherFaculty: string | null | FacultyType;
@@ -28,7 +28,7 @@ function TeacherRooms() {
 	const [teachers, setTeachers] = useState<Teachers[] | null>(null);
 	const [roomId, setRoomId] = useState<number | null>(null);
 	const [isWriting, setIsWriting] = useState(false);
-	const [previouslySearchedTeachers, setPreviouslySearchedTeachers] = useState<TeacherRooms[]>([]);
+	const [previouslySearchedTeachers, setPreviouslySearchedTeachers] = useState<TeacherRoomsInter[]>([]);
 	const theme = useTheme();
 	const navigate = useNavigate();
 	const {
@@ -63,12 +63,12 @@ function TeacherRooms() {
 	);
 
 
-	const checkTeacher = (room: TeacherRooms) => {
+	const checkTeacher = (room: TeacherRoomsInter) => {
 		const previouslySearched = localStorage.getItem('TeacherSearch');
 		const previouslySearchedRooms = previouslySearched? JSON.parse(previouslySearched) : [];
 
 		// Check if the room is already in the array to avoid duplicates
-		const existingIndex = previouslySearchedRooms.findIndex((existingRoom: TeacherRooms) => existingRoom.room_id === room.room_id);
+		const existingIndex = previouslySearchedRooms.findIndex((existingRoom: TeacherRoomsInter) => existingRoom.room_id === room.room_id);
 
 		let updatedRooms = [];
 
@@ -132,7 +132,7 @@ function TeacherRooms() {
 		refetchRoomInfo().then(({ data }) => {
 			setSelectedRoomId(roomId);
 
-			const template: TeacherRooms = {
+			const template: TeacherRoomsInter = {
 				room_id: roomId,
 				room_name: teacherRoomName,
 				floor_number: data.floor_info.cislo,

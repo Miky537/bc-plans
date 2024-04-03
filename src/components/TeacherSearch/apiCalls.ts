@@ -38,30 +38,3 @@ export const searchTeacher = async(name: string) => {
 	return await response.json();
 };
 
-export const getRoomPhoto = async(roomId: number) => {
-	const token = sessionStorage.getItem('sessionToken');
-	const headers: HeadersInit = {};
-	if (token) {
-		headers['Authorization'] = token;
-	} else {
-		return "";
-	}
-	const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
-		method: 'GET',
-		headers: headers,
-	});
-
-	if (!response.ok) {
-		return "";
-	}
-	if (response.status === 204) {
-		return "";
-	}
-	// Convert the response to a blob if you're working with binary data
-	const imageBlob = await response.blob();
-
-	// Create a local URL for the blob to be used in an <img> element
-	const imageObjectURL = URL.createObjectURL(imageBlob);
-	// console.log("imageObjectURL", imageObjectURL)
-	return imageObjectURL;
-};

@@ -1,6 +1,6 @@
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
-import React, { useState, useEffect } from "react";
-import { useTheme, SxProps, Theme, Typography } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { useTheme, Theme, Typography, Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import IconButton from "@mui/material/IconButton";
@@ -11,7 +11,10 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { RoomDetails } from "../MapComponents/types";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import useAuthToken from "../../hooks/useAuthToken";
-
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import DrawerListItem from "./DrawerListItem";
+import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
 
 interface SwipeableDrawerComponentProps {
 	isDrawerOpen: boolean;
@@ -19,18 +22,6 @@ interface SwipeableDrawerComponentProps {
 	onOpen: () => void;
 	roomData: RoomDetails;
 }
-
-const mergeStylesWithTheme = (theme: Theme): SxProps => {
-	return {
-		"& .MuiDrawer-paper.MuiDrawer-paperAnchorBottom": {
-			height: "30%",
-			borderRadius: "40px 40px 0px 0px",
-			padding: "2em 1em 1em 1em",
-			backgroundColor: theme.palette.background.default,
-		},
-	};
-};
-
 
 export function SwipeableDrawerComponent({
 	                                         isDrawerOpen,
@@ -42,6 +33,8 @@ export function SwipeableDrawerComponent({
 	const [isImageZoomed, setIsImageZoomed] = useState(false);
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
 	const { updateLastUsed } = useAuthContext()
+	const contentRef = useRef<HTMLDivElement | null>(null);
+
 	const { loginMutate } = useAuthToken()
 	const faculty = selectedFaculty as FacultyType;
 	const [isFav, setIsFav] = useState<boolean>(false);
@@ -53,6 +46,17 @@ export function SwipeableDrawerComponent({
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
+	const [drawerHeight, setDrawerHeight] = useState('27vh');
+
+	const calculateContentHeight = () => {
+		if (contentRef.current) {
+			const height = contentRef.current?.offsetHeight;
+			// Add some extra height for padding/margins/borders
+			return `${ Math.min(height + 470, window.innerHeight * 0.8) }px`;
+		}
+		return '27vh'; // Fallback height
+	};
+
 
 	useEffect(() => {
 		const getRoomPhoto = async(roomId: number) => {
@@ -76,6 +80,7 @@ export function SwipeableDrawerComponent({
 			});
 
 			if (!response.ok) {
+				loginMutate();
 				return "";
 			}
 			if (response.status === 204) {
@@ -112,6 +117,25 @@ export function SwipeableDrawerComponent({
 			});
 	}, [selectedRoomId]);
 
+	const toggleDrawerHeight = () => {
+		if (drawerHeight === '27vh') {
+			const newHeight = calculateContentHeight();
+			setDrawerHeight(newHeight);
+		} else {
+			setDrawerHeight('27vh');
+		}
+	};
+	useEffect(() => {
+		if (!isDrawerOpen) {
+			setDrawerHeight('27vh');
+		}
+	}, [isDrawerOpen]);
+
+	const handleCloseDrawer = () => {
+		setDrawerHeight('27vh');
+		onClose();
+	};
+
 	const handleImageClick = () => {
 		setIsImageZoomed(!isImageZoomed);
 	};
@@ -134,6 +158,8 @@ export function SwipeableDrawerComponent({
 		}
 		localStorage.setItem(storageKey, JSON.stringify(favoriteRooms));
 	};
+
+
 	useEffect(() => {
 		setIsFav(false);
 		const storageKey = 'favoriteRooms';
@@ -143,49 +169,46 @@ export function SwipeableDrawerComponent({
 		setIsFav(isFavorite);
 	}, [roomId, isDrawerOpen]);
 
+	const drawerStyles = {
+		'& .MuiDrawer-paperAnchorBottom.MuiPaper-root.MuiDrawer-paper': {
+			height: drawerHeight,
+			minHeight: 'fit-content',
+			overflow: 'visible',
+			display: 'flex',
+			flexDirection: 'column',
+			alignItems: 'center',
+			borderRadius: '20px 20px 0 0',
+			padding: '2em 1em',
+			pb: { xs: "3em", sm: "6.5em" },
+			backgroundColor: theme.palette.background.default,
+			transition: ({ transitions }: Theme) =>
+				`${ transitions.create(['height', 'transform'], {
+					duration: transitions.duration.leavingScreen,
+					easing: transitions.easing.sharp,
+				}) } !important`,
+		},
+	};
+
 	return (
 		<SwipeableDrawer
 			anchor="bottom"
 			open={ isDrawerOpen }
-			onClose={ onClose }
+			onClose={ handleCloseDrawer }
 			onOpen={ onOpen }
 			transitionDuration={ { enter: 500, exit: 200 } }
-			sx={ mergeStylesWithTheme(theme) }
+			sx={ drawerStyles }
 		>
-			<Box position="absolute"
-			     top="1em"
-			     left="25%"
-			     borderTop="5px solid #ABABAB"
-			     height="1px"
-			     width="50%"
-			     display="flex"></Box>
-			<Box display="flex" gap={ 2 }>
-				{ isLoading || isError? <Box sx={ {
-						display: 'flex',
-						color: 'black',
-						alignItems: 'center',
-						justifyContent: 'center',
-						borderRadius: '10px',
-						bgcolor: 'grey.300',
-						width: '55%',
-						maxWidth: '55%',
-						height: '100%',
-						maxHeight: '45dvh',
-						cursor: 'pointer',
-					} }>{ isError? "No photo yet" : "Loading.." }</Box> :
-					<Box
-						component="img"
-						src={ photoUrl }
-						alt="Detailed View"
-						sx={ {
-							borderRadius: '10px',
-							maxWidth: isImageZoomed? '100%' : '55%',
-							maxHeight: isImageZoomed? '90dvh' : '45dvh',
-							cursor: 'pointer',
-							transition: 'max-width 0.3s ease-in-out, max-height 0.3s ease-in-out',
-						} }
-						onClick={ handleImageClick }
-					/> }
+			<Box display="flex"
+			     ref={ contentRef }
+			     position="absolute"
+			     sx={ { top: { xs: "1.5em", sm: "2em" } } }
+			     left={ 0 }
+			     width="100%"
+			     gap={ 8 }
+			     height="fit-content"
+			     alignItems="center"
+			     justifyContent="space-around"
+			>
 				<IconButton onClick={ () => toggleFavoriteRoom({
 					roomName,
 					roomId,
@@ -193,53 +216,114 @@ export function SwipeableDrawerComponent({
 					floorNumber,
 					buildingName,
 					faculty
-				}) } sx={ { position: "absolute", top: 0, right: 0 } }>
+				}) } sx={ {
+					bgcolor: "#181f25", p: { sx: 0, sm: "0.1em" },
+					borderRadius: "10px"
+				} }>
 					<StarBorderIcon color="primary"
-					                style={ {
-						                fontSize: "3rem",
+					                sx={ {
+						                fontSize: { xs: "2.5rem", sm: "3rem" },
 						                opacity: isFav? 0 : 1,
 						                transition: 'opacity 0.2s',
 						                zIndex: 4
 					                } } />
 					<StarIcon color="primary"
-					          style={ {
-						          fontSize: "3rem",
+					          sx={ {
+						          fontSize: { xs: "2.5rem", sm: "3rem" },
 						          opacity: isFav? 1 : 0,
 						          transition: 'opacity 0.2s',
 						          position: 'absolute',
 						          zIndex: 4
 					          } } />
 				</IconButton>
-				<Box sx={ {
-					opacity: isImageZoomed? 0 : 1,
-					display: isImageZoomed? 'none' : 'block',
-					cursor: 'pointer',
-					transition: 'opacity 0.05s ease-in-out, display 0.05s ease-in-out',
-				} }>
-
-					<Typography variant="h6">Room: { room_info.cislo }</Typography>
-					<Typography variant="h6">Floor: { floor_info.cislo }</Typography>
-					<Typography variant="h6">Building: { building_info.zkratka_prezentacni }</Typography>
+				<Box height="fit-content">
+					<Typography variant="h4" fontWeight="bolder">{ room_info.cislo }</Typography>
 				</Box>
+				<IconButton onClick={ toggleDrawerHeight }
+				            sx={ {
+					            p: "0.1em",
+					            bgcolor: "#181f25 !important",
+					            borderRadius: "10px",
+					            zIndex: 4,
+				            } }
+				>
+					{ drawerHeight === '27vh'?
+						<ExpandLessIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } /> :
+						<ExpandMoreIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } />
+					}
+				</IconButton>
 			</Box>
 
+			<Box position="absolute"
+			     top="1em"
+			     left="25%"
+			     borderTop="5px solid #ABABAB"
+			     height="1px"
+			     width="50%"
+			     display="flex"
+			/>
+			<Box display="flex"
+			     minHeight='fit-content'
+			     gap="0.3em"
+			     flexDirection="column"
+			     minWidth="fit-content"
+			     height="fit-content"
+			     position="relative"
+			     overflow="hidden"
+			     sx={ { mt: { xs: "3em", sm: "4em" } } }>
+				<DrawerListItem text={ room_info.cislo } desc="Number of seats:" />
+				<DrawerListItem text={ faculty as string } desc="Faculty:" />
+				<DrawerListItem text={ buildingName } desc="Building:" />
+				<DrawerListItem text={ floorNumber } desc="Floor:" />
+				<DrawerListItem text={ arealName } variant="body1" desc="Areal:" />
+				<DrawerListItem text={ room_info.popis } desc="Popis:" />
+				{ isLoading || isError? <Box sx={ {
+						display: "flex",
+						color: 'black',
+						alignItems: 'center',
+						justifyContent: 'center',
+						borderRadius: '10px',
+						bgcolor: 'grey.700',
+						maxWidth: '100%',
+						height: '45dvh',
+						maxHeight: '45dvh',
+						cursor: 'pointer',
+						overflow: 'hidden',
+						opacity: drawerHeight === "27vh" ? 0 : 1,
+						transition: 'opacity 0.3s',
+					} }>{ isError?
+						<Box display="flex"
+						     sx={ { opacity: drawerHeight === "27vh"? 0 : 1, } }
+						     flexDirection="column"
+						     alignItems="center">
+							<NoPhotographyOutlinedIcon />
+							<Typography>No photo yet!</Typography>
+						</Box> : "Loading.." }</Box> :
+					<Box
+						display="flex"
+						component="img"
+						src={ photoUrl }
+						alt="Detailed View"
+						sx={ {
+							opacity: drawerHeight === "27vh"? 0 : 1,
+							transition: 'opacity 0.3s',
+							borderRadius: '10px',
+							maxWidth: '100%',
+							maxHeight: '45dvh',
+							cursor: 'pointer',
+						} }
+						onClick={ handleImageClick }
+					/>
+				}
+			</Box>
 
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">name:</Typography><Typography variant="h6">{ roomName }</Typography></Box>
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">popis:</Typography><Typography variant="h6">{ room_info.popis }</Typography></Box>
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">podlazi_id:</Typography><Typography variant="h6">{ floorId }</Typography></Box>
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">label:</Typography><Typography variant="h6">{ roomLabel }</Typography></Box>
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">Areal
-				name:</Typography><Typography variant="h6">{ arealName }</Typography></Box>
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">Room
-				Id:</Typography><Typography variant="h6">{ roomId }</Typography></Box>
-			<Box display="flex"><Typography flexGrow="1"
-			                                variant="h6">roomType</Typography><Typography variant="h6">{ roomType }</Typography></Box>
+			<Button sx={ { position: "absolute", bottom: 0, width: "90%", height: { xs: 40, sm: 50, lg: 100 } } }
+			        variant="contained"
+			        onClick={ () => {
+				        window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(building_info.adresa) }`, '_blank');
+			        } }>
+				<Typography>Navigate</Typography>
+			</Button>
 		</SwipeableDrawer>
 	)
 }

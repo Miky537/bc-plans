@@ -4,7 +4,7 @@ export const theme = createTheme({
 	palette: {
 		text: {
 			primary: '#b3bbce',
-			secondary: '#ADB3BF',
+			secondary: '#a0a0b2',
 			disabled: "#646464",
 		},
 		background: {

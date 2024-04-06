@@ -65,7 +65,6 @@ function TeacherRooms() {
 			queryFn: () => searchTeacher(teacherName),
 			enabled: false, // Turn off automatic execution
 			onSuccess: ({ data }) => {
-				console.log(data);
 				setTeachers(data.vysledky)
 				updateLastUsed();
 			},

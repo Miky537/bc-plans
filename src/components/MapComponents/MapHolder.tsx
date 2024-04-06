@@ -10,7 +10,6 @@ import Box from "@mui/material/Box";
 import { useMapContext } from "../../Contexts/MapContext";
 import MediaQuery from "react-responsive";
 import { DesktopDrawer } from "../SwipeableDrawer/DesktopDrawer";
-import NoPhotographyOutlinedIcon from '@mui/icons-material/NoPhotographyOutlined';
 
 export interface InfoState {
 	room: Room | undefined;

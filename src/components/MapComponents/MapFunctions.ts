@@ -235,7 +235,6 @@ export function getRoomCenter(allFeatures: any, RoomID: number) {
 	} else if (feature) {
 		return feature.geometry;
 	} else {
-		console.log(feature)
 		console.error('No feature found with the given RoomID:', RoomID);
 		return null;
 	}

@@ -283,11 +283,29 @@ export const iconProps = {
 	height: "20px"
 };
 
-export const geoJsonUrl = "https://gist.githubusercontent.com/Miky537/cb568efc11c1833a5cd54ba87e583db5/raw/5a32a29cc63a8a017de7e134150ee74b2f7779ac/rektorat-mistnosti.geojson";
-export const smallGeoJsonUrl = "https://gist.githubusercontent.com/Miky537/60edaac3927c035cd92d064ea90f84ac/raw/8399f0c67ad662285c55080cc4b6a752f0a5db06/small-rektorat.geojson";
-export const bigFile = "https://gist.githubusercontent.com/Miky537/a9e6492c6657ef53f212b700826c8df7/raw/48a9cebdd82474b56ba1957374ecb3e789c4a7e9/bigFile.geojson";
-export const ultraShortFile = "https://gist.githubusercontent.com/Miky537/d2cbf6618da88eeb201d352c103cc829/raw/aca56cbb096cf7853a18aa1a21e643213cf4b89b/UltraShort.geojson";
-export const featureLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/re_mistnosti2/FeatureServer";
-
-export const fastLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/TempLayer/FeatureServer";
+export const FASTLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/TempLayer/FeatureServer";
 export const FITLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/repairedFIT2Floor/FeatureServer";
+export const CESALayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/CESA/FeatureServer";
+export const FALayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FA/FeatureServer";
+export const FPLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FP/FeatureServer";
+export const USILayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/USI/FeatureServer";
+export const FCHLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FCH/FeatureServer";
+export const FAVULayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FAVU/FeatureServer";
+export const FEKTLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FEKT/FeatureServer";
+export const FSILayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/FSI/FeatureServer";
+
+
+
+export const layerConfigs = [
+	{ url: FASTLayerUrl, name: "FAST", facultyId: "facultyFAST" },
+	{ url: FITLayerUrl, name: "FIT", facultyId: "facultyFIT" },
+	{ url: CESALayerUrl, name: "CESA", facultyId: "facultyCESA" },
+	{ url: FALayerUrl, name: "FA", facultyId: "facultyFA" },
+	{ url: FPLayerUrl, name: "FP", facultyId: "facultyFP" },
+	{ url: USILayerUrl, name: "USI", facultyId: "facultyUSI" },
+	{ url: FCHLayerUrl, name: "FCH", facultyId: "facultyFCH" },
+	{ url: FAVULayerUrl, name: "FAVU", facultyId: "facultyFAVU" },
+	{ url: FEKTLayerUrl, name: "FEKT", facultyId: "facultyFEKT" },
+	{ url: FSILayerUrl, name: "FSI", facultyId: "facultyFSI" },
+	// Add more configurations as needed
+];

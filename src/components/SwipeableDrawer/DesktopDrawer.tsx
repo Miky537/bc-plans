@@ -49,7 +49,6 @@ export function DesktopDrawer({
 	useEffect(() => {
 		const getRoomPhoto = async(roomId: number) => {
 			let token = sessionStorage.getItem('sessionToken');
-			console.log("Token: ", token);
 			const headers: HeadersInit = {};
 			if (token) {
 				headers['Authorization'] = token;

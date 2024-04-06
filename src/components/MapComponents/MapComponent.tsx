@@ -6,7 +6,7 @@ import './MapComponent.css';
 import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
-import { fastLayerUrl, FITLayerUrl, typeToColorMapping, iconProps } from "./constants";
+import { typeToColorMapping, iconProps, layerConfigs } from "./constants";
 import { useMapContext } from "../../Contexts/MapContext";
 import {
 	adjustMapHeight,
@@ -32,7 +32,7 @@ import { RoomIdWithType } from "./types";
 import { dialogStyles } from "./styles";
 
 
-esriConfig.apiKey = 'AAPKc9aec3697f4a4713914b13af91abd4b6SdWI-MVezH6uUVejuWqbmOpM2km6nQVf51tilIpWLfPvuXleLnYZbsvY0o9uMey7';
+esriConfig.apiKey = process.env.REACT_APP_API_KEY as string;
 
 
 interface MapComponentProps {
@@ -45,13 +45,6 @@ interface MapComponentProps {
 	setAreFeaturesEmpty: (areFeaturesEmpty: boolean) => void;
 	isDrawerOpen: boolean;
 }
-
-const layerConfigs = [
-	{ url: fastLayerUrl, name: "FAST", facultyId: "facultyFAST" },
-	{ url: FITLayerUrl, name: "FIT", facultyId: "facultyFIT" },
-	// Add more configurations as needed
-];
-
 
 const MapComponent = ({
 	                      isDrawerOpen,
@@ -73,7 +66,6 @@ const MapComponent = ({
 		setSelectedFaculty,
 		selectedFloorNumber,
 		selectedRoomId,
-		roomData,
 	} = useFacultyContext()
 	const IconsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const FeaturesGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
@@ -102,7 +94,6 @@ const MapComponent = ({
 		setCenterCoordinates,
 		setArePinsVisible,
 		setZoom,
-		doesRoomExist,
 		setDoesRoomExist
 	} = useMapContext();
 
@@ -122,15 +113,19 @@ const MapComponent = ({
 	};
 	useEffect(() => {
 		if (!mapDiv.current) return;
-		featureLayersRef.current = layerConfigs.map(config => {
-			const layer = new FeatureLayer({
-				url: config.url,
-				outFields: ["*"], // * means all fields
-				maxScale: 0,
-				title: config.name, //used to only affect selected faculty
+		if (featureLayersRef.current.length === 0) {
+			featureLayersRef.current = layerConfigs.map(config => {
+				console.log("hha")
+				const layer = new FeatureLayer({
+					url: config.url,
+					outFields: ["*"], // * means all fields
+					maxScale: 0,
+					title: config.name, //used to only affect selected faculty
+				});
+				return layer;
 			});
-			return layer;
-		});
+		}
+
 
 		const map = new Map({
 			basemap: 'dark-gray-vector',
@@ -324,7 +319,6 @@ const MapComponent = ({
 
 
 	useEffect(() => {
-		console.log("Started fetching features")
 		setAllFeatures([]);
 		setFeaturesUpdated(false);
 		setAreFeaturesLoading(true);
@@ -333,7 +327,6 @@ const MapComponent = ({
 			const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 			if (!selectedLayer) {
 				setAreFeaturesEmpty(true);
-				console.log("here")
 				setAreFeaturesLoading(false);
 				setFeaturesUpdated(true);
 				return;
@@ -345,32 +338,27 @@ const MapComponent = ({
 
 			selectedLayer.queryFeatures(query, { signal: abortController.signal })
 				.then((results) => {
-					// console.log("res", results.features)
 					setAllFeatures(results.features);
 					if (results.features.length === 0) {
 						setAreFeaturesEmpty(true);
-						console.log("Here 2")
 						setAreFeaturesLoading(false);
 						setFeaturesUpdated(true)
 					} else {
-						console.log("Ended fetching features")
 						setFeaturesUpdated(true)
 						setAreFeaturesEmpty(false);
-						console.log("Here 3")
 						setAreFeaturesLoading(false);
 					}
 				})
 				.catch((error) => {
 					setFeaturesUpdated(true)
 					setAreFeaturesEmpty(true);
-					console.log("Here 4")
-					// setAreFeaturesLoading(false);
+					setAreFeaturesLoading(false);
 					if (error.name === "AbortError") {
-						// console.log("Found abortError!")
+						console.log("Fetch aborted");
 					} else {
-						console.error("Error fetching feature layer data:", error);
+						// console.error("Error fetching feature layer data:", error);
 						if (error?.message) {
-							console.error("Error message:", error.message);
+							// console.error("Error message:", error.message);
 						}
 					}
 				});
@@ -586,7 +574,6 @@ const MapComponent = ({
 	}, [selectedFloorNumber]);
 
 	useEffect(() => {
-		// console.log("alll", selectedRoomId, areFeaturesLoading, featuresUpdated)
 		if (selectedRoomId === undefined || areFeaturesLoading || !featuresUpdated) {
 			return;
 		}
@@ -633,7 +620,6 @@ const MapComponent = ({
 					{ target: roomFeature.geometry.extent.expand(1.5) },
 					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
 				).then(() => {
-					// console.log("Animation")
 					if (!mapViewRef.current) return;
 				}).catch(function(error) {
 					if (error.name !== "AbortError") {
@@ -684,7 +670,6 @@ const MapComponent = ({
 		const fetchRoomId = async() => {
 			try {
 				if (!faculty || !building || !floor || !roomName) {
-					console.log("Missing parameters for fetching room ID", faculty, building, selectedFloorNumber, roomName);
 					return
 				}
 				const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/roomid/${ faculty }/${ building }/${ floor }/${ roomName }`)

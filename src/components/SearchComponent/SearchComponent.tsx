@@ -116,7 +116,6 @@ export function SearchComponent({
 		event.stopPropagation();
 		if (room.faculty !== selectedFaculty) {
 			setAreFeaturesLoading(true);
-			console.log("Faculty changed");
 		}
 		setFacultyChangeSource('search');
 		// Retrieve existing data from local storage

@@ -194,7 +194,6 @@ function FloorSelection() {
 										<Box>
 											{
 												floor.rooms?.map((room: FetchedFloorRoomType) => {
-													console.log("sss", room)
 													return (
 														<Box key={ room.room_id } >
 															<RoomSelectionItem

@@ -221,7 +221,12 @@ function TeacherRooms() {
 					<>
 
 						<Box display="flex" flexDirection="column" alignItems="center">
-							<Typography alignSelf="flex-start" sx={ { pl: 1, color: "gray" } }>Previously
+							<Typography alignSelf="flex-start"
+							            sx={ {
+								            pl: 1,
+								            color: "gray",
+								            display: previouslySearchedTeachers.length > 0? "block" : "none"
+							            } }>Previously
 								searched:</Typography>
 							{
 								[...previouslySearchedTeachers].reverse().map(({

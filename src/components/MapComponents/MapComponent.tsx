@@ -115,7 +115,6 @@ const MapComponent = ({
 		if (!mapDiv.current) return;
 		if (featureLayersRef.current.length === 0) {
 			featureLayersRef.current = layerConfigs.map(config => {
-				console.log("hha")
 				const layer = new FeatureLayer({
 					url: config.url,
 					outFields: ["*"], // * means all fields

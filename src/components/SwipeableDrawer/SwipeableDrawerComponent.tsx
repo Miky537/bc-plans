@@ -15,6 +15,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DrawerListItem from "./DrawerListItem";
 import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
+import { Simulate } from "react-dom/test-utils";
+import compositionStart = Simulate.compositionStart;
 
 interface SwipeableDrawerComponentProps {
 	isDrawerOpen: boolean;
@@ -34,6 +36,7 @@ export function SwipeableDrawerComponent({
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
 	const { updateLastUsed } = useAuthContext()
 	const contentRef = useRef<HTMLDivElement | null>(null);
+	const imageRef = useRef<HTMLDivElement | null>(null);
 
 	const { loginMutate } = useAuthToken()
 	const faculty = selectedFaculty as FacultyType;
@@ -46,15 +49,18 @@ export function SwipeableDrawerComponent({
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
-	const [drawerHeight, setDrawerHeight] = useState('27vh');
+	const [drawerHeight, setDrawerHeight] = useState('15em');
+	const imageHeight = '16em';
 
-	const calculateContentHeight = () => {
-		if (contentRef.current) {
-			const height = contentRef.current?.offsetHeight;
-			// Add some extra height for padding/margins/borders
-			return `${ Math.min(height + 470, window.innerHeight * 0.8) }px`;
+	const calculateExpandedHeight = () => {
+		const contentHeight = contentRef.current?.offsetHeight || 0;
+		const imageHeightFromRef  = imageRef.current?.offsetHeight || 100;
+		if (imageRef.current && "offsetHeight" in imageRef.current) {
+			const totalHeight: string = `${ contentHeight + imageHeightFromRef + 70}px`;
+			return totalHeight;
+		} else {
+			return "25em"
 		}
-		return '27vh'; // Fallback height
 	};
 
 
@@ -118,21 +124,18 @@ export function SwipeableDrawerComponent({
 	}, [selectedRoomId]);
 
 	const toggleDrawerHeight = () => {
-		if (drawerHeight === '27vh') {
-			const newHeight = calculateContentHeight();
-			setDrawerHeight(newHeight);
-		} else {
-			setDrawerHeight('27vh');
-		}
+		const newHeight = drawerHeight === '15em'? calculateExpandedHeight() : '15em';
+		console.log("Chaning", newHeight)
+		setDrawerHeight(newHeight);
 	};
 	useEffect(() => {
 		if (!isDrawerOpen) {
-			setDrawerHeight('27vh');
+			setDrawerHeight('15em');
 		}
 	}, [isDrawerOpen]);
 
 	const handleCloseDrawer = () => {
-		setDrawerHeight('27vh');
+		setDrawerHeight('15em');
 		onClose();
 	};
 
@@ -199,7 +202,6 @@ export function SwipeableDrawerComponent({
 			sx={ drawerStyles }
 		>
 			<Box display="flex"
-			     ref={ contentRef }
 			     position="absolute"
 			     sx={ { top: { xs: "1.5em", sm: "2em" } } }
 			     left={ 0 }
@@ -244,10 +246,10 @@ export function SwipeableDrawerComponent({
 					            p: "0.1em",
 					            bgcolor: "#181f25 !important",
 					            borderRadius: "10px",
-					            zIndex: 4,
+					            zIndex: 400,
 				            } }
 				>
-					{ drawerHeight === '27vh'?
+					{ drawerHeight === '15em'?
 						<ExpandLessIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } /> :
 						<ExpandMoreIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } />
 					}
@@ -263,11 +265,11 @@ export function SwipeableDrawerComponent({
 			     display="flex"
 			/>
 			<Box display="flex"
-			     minHeight='fit-content'
+			     ref={ contentRef }
+			     minHeight="fit-content"
 			     gap="0.3em"
 			     flexDirection="column"
 			     minWidth="fit-content"
-			     height="fit-content"
 			     position="relative"
 			     overflow="hidden"
 			     sx={ { mt: { xs: "3em", sm: "4em" } } }>
@@ -276,7 +278,12 @@ export function SwipeableDrawerComponent({
 				<DrawerListItem text={ buildingName } desc="Building:" />
 				<DrawerListItem text={ floorNumber } desc="Floor:" />
 				<DrawerListItem text={ arealName } variant="body1" desc="Areal:" />
-				<DrawerListItem text={ room_info.popis } desc="Popis:" />
+			</Box>
+			<Box zIndex="-1"
+			     width="90%"
+			     ref={ imageRef }
+			     position="absolute"
+			     sx={ { bottom: drawerHeight === "15em"? "0em" : "3em", transition: "all 0.15s ease" } }>
 				{ isLoading || isError? <Box sx={ {
 						display: "flex",
 						color: 'black',
@@ -285,34 +292,36 @@ export function SwipeableDrawerComponent({
 						borderRadius: '10px',
 						bgcolor: 'grey.700',
 						maxWidth: '100%',
-						height: '45dvh',
+						height: imageHeight,
 						maxHeight: '45dvh',
 						cursor: 'pointer',
 						overflow: 'hidden',
-						opacity: drawerHeight === "27vh" ? 0 : 1,
+						opacity: drawerHeight === "15em"? 0 : 1,
 						transition: 'opacity 0.3s',
 					} }>{ isError?
 						<Box display="flex"
-						     sx={ { opacity: drawerHeight === "27vh"? 0 : 1, } }
+						     sx={ { opacity: drawerHeight === "15em"? 0 : 1, } }
 						     flexDirection="column"
 						     alignItems="center">
 							<NoPhotographyOutlinedIcon />
 							<Typography>No photo yet!</Typography>
 						</Box> : "Loading.." }</Box> :
 					<Box
-						display="flex"
-						component="img"
-						src={ photoUrl }
-						alt="Detailed View"
-						sx={ {
-							opacity: drawerHeight === "27vh"? 0 : 1,
-							transition: 'opacity 0.3s',
-							borderRadius: '10px',
-							maxWidth: '100%',
-							maxHeight: '45dvh',
-							cursor: 'pointer',
-						} }
-						onClick={ handleImageClick }
+					     display="flex"
+					     component="img"
+					     src={ photoUrl }
+					     alt="Detailed View"
+					     sx={ {
+						     opacity: drawerHeight === "15em"? 0 : 1,
+						     transition: 'opacity 0.3s',
+						     borderRadius: '10px',
+						     width: '100%',
+						     maxWidth: '100%',
+						     height: imageHeight,
+						     maxHeight: '45dvh',
+						     cursor: 'pointer',
+					     } }
+					     onClick={ handleImageClick }
 					/>
 				}
 			</Box>

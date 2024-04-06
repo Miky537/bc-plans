@@ -47,6 +47,7 @@ const MapHolder = () => {
 
 	return (
 		<Box className="Map-Holder">
+
 			<SearchComponent setSelectedRoom={ setSelectedRoomId }
 			                 setSelectedFloor={ setSelectedFloorNumber }
 			                 setIsDrawerOpen={ setIsDrawerOpen }

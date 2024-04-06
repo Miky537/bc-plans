@@ -10,6 +10,7 @@ export const searchBoxStyle = {
 }
 export const InputBaseStyle = {
 	color: "white",
+	zIndex: "1000",
 	width: "100%",
 	'.MuiInputBase-input': {
 		padding: "10px 0",

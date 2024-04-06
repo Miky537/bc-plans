@@ -171,6 +171,7 @@ export function SearchComponent({
 		<Box
 			sx={ SearchBoxContainer(isExpanded) }
 			onClick={ handleExpand }
+			zIndex={ 1100 }
 		>
 			{ isExpanded? (
 				<>

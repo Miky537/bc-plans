@@ -77,20 +77,26 @@ export function DesktopDrawer({
 
 			// Create a local URL for the blob to be used in an <img> element
 			const imageObjectURL = URL.createObjectURL(imageBlob);
-			// console.log("imageObjectURL", imageObjectURL)
 			return imageObjectURL;
 		};
 		if (loginSuccess && selectedRoomId) {
-			setIsLoading(true);
 			updateLastUsed();
+			setPhoto("");
+			if (!selectedRoomId) {
+				return;
+			}
 			getRoomPhoto(selectedRoomId)
 				.then((url: string) => {
+					if (url === "") {
+						setIsLoading(false);
+					}
 					setPhoto(url);
+					setIsLoading(false);
 				})
 				.catch((error: Error) => {
-					console.error('Failed to load image:', error);
-				})
-				.finally(() => setIsLoading(false));
+					console.error('Failed to load image:', error)
+					setIsLoading(false);
+				});
 		}
 	}, [selectedRoomId, loginSuccess]);
 

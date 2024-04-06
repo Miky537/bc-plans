@@ -34,7 +34,7 @@ export function SwipeableDrawerComponent({
 	const { room_info, floor_info, areal_info, building_info } = roomData;
 	const [isImageZoomed, setIsImageZoomed] = useState(false);
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
-	const { updateLastUsed } = useAuthContext()
+	const { updateLastUsed, isLoading: authIsLoading, loginSuccess } = useAuthContext()
 	const contentRef = useRef<HTMLDivElement | null>(null);
 	const imageRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,7 +54,7 @@ export function SwipeableDrawerComponent({
 
 	const calculateExpandedHeight = () => {
 		const contentHeight = contentRef.current?.offsetHeight || 0;
-		const imageHeightFromRef  = imageRef.current?.offsetHeight || 100;
+		const imageHeightFromRef  = imageRef.current?.offsetHeight || 0;
 		if (imageRef.current && "offsetHeight" in imageRef.current) {
 			const totalHeight: string = `${ contentHeight + imageHeightFromRef + 70}px`;
 			return totalHeight;
@@ -66,6 +66,8 @@ export function SwipeableDrawerComponent({
 
 	useEffect(() => {
 		const getRoomPhoto = async(roomId: number) => {
+			setIsError(false);
+			setIsLoading(true);
 			let token = sessionStorage.getItem('sessionToken');
 			const headers: HeadersInit = {};
 			if (token) {
@@ -78,7 +80,6 @@ export function SwipeableDrawerComponent({
 				} else {
 					return "";
 				}
-
 			}
 			const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
 				method: 'GET',
@@ -97,35 +98,35 @@ export function SwipeableDrawerComponent({
 
 			// Create a local URL for the blob to be used in an <img> element
 			const imageObjectURL = URL.createObjectURL(imageBlob);
-			// console.log("imageObjectURL", imageObjectURL)
 			return imageObjectURL;
 		};
-		setIsError(false);
-		setIsLoading(true);
-		updateLastUsed();
-		setPhoto("");
-		if (!selectedRoomId) {
-			return;
-		}
-		getRoomPhoto(selectedRoomId)
-			.then((url: string) => {
-				if (url === "") {
+		if (loginSuccess && selectedRoomId) {
+			updateLastUsed();
+			setPhoto("");
+			if (!selectedRoomId) {
+				return;
+			}
+			getRoomPhoto(selectedRoomId)
+				.then((url: string) => {
+					console.log("SMSMSMSMSMSM", url)
+					if (url === "") {
+						setIsError(true);
+						setIsLoading(false);
+					}
+					setPhoto(url);
+					setIsLoading(false);
+				})
+				.catch((error: Error) => {
+					console.error('Failed to load image:', error)
 					setIsError(true);
 					setIsLoading(false);
-				}
-				setPhoto(url);
-				setIsLoading(false);
-			})
-			.catch((error: Error) => {
-				console.error('Failed to load image:', error)
-				setIsError(true);
-				setIsLoading(false);
-			});
-	}, [selectedRoomId]);
+				});
+		}
+
+	}, [selectedRoomId, loginSuccess]);
 
 	const toggleDrawerHeight = () => {
 		const newHeight = drawerHeight === '15em'? calculateExpandedHeight() : '15em';
-		console.log("Chaning", newHeight)
 		setDrawerHeight(newHeight);
 	};
 	useEffect(() => {
@@ -243,6 +244,8 @@ export function SwipeableDrawerComponent({
 				</Box>
 				<IconButton onClick={ toggleDrawerHeight }
 				            sx={ {
+								display: "flex",
+					            flexDirection: "column",
 					            p: "0.1em",
 					            bgcolor: "#181f25 !important",
 					            borderRadius: "10px",
@@ -253,6 +256,7 @@ export function SwipeableDrawerComponent({
 						<ExpandLessIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } /> :
 						<ExpandMoreIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } />
 					}
+					<Typography>Expand</Typography>
 				</IconButton>
 			</Box>
 

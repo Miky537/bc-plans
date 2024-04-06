@@ -16,6 +16,7 @@ const useAuthToken = () => {
 		isLoading,
 	} = useMutation(login, {
 		onSuccess: (data: AuthType) => {
+			console.log("ddd", data)
 			const sessionToken = data.http_session_token;
 			sessionStorage.setItem('sessionToken', sessionToken);
 			updateLastUsed();

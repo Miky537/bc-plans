@@ -8,7 +8,7 @@ interface DrawerListItemProps {
 	variant?: TypographyProps['variant'];
 }
 
-function DrawerListItem({ text, desc, variant = "h5" }: DrawerListItemProps) {
+function DrawerListItem({ text, desc, variant = "body1" }: DrawerListItemProps) {
 
 	const theme = useTheme();
 
@@ -17,8 +17,8 @@ function DrawerListItem({ text, desc, variant = "h5" }: DrawerListItemProps) {
 			{ desc && <Typography whiteSpace="nowrap"
 			                      flexGrow={ 1 }
 								  sx={ { width: "8em", pr: 1, color: theme.palette.text.secondary } }
-								  variant="h6">{ desc }</Typography> }
-			<Typography whiteSpace="nowrap" textAlign="left" variant={ variant }>{ text }</Typography>
+								  variant="body1">{ desc }</Typography> }
+			<Typography  textAlign="left" variant={ variant }>{ text }</Typography>
 		</Box>
 	);
 }

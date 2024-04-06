@@ -49,7 +49,8 @@ const FloorHolder = () => {
 		     right="1em"
 		     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
 		     bgcolor="#DBDBDB"
-		     maxHeight="18.5em"
+		     // maxHeight="18.5em"
+		     sx={ { maxHeight: { xs: "18.5em", md: "30em" } } }
 		     overflow="auto">
 			{ floors.map((floor: number, index: number) => (
 				<React.Fragment key={ floor }>
@@ -66,7 +67,7 @@ const FloorHolder = () => {
 						        bgcolor: selectedFloorNumber === floor? "#ABABAB !important" : "#DBDBDB",
 						        ...FloorButtonStyles,
 					        } }>
-						<Typography sx={{  fontWeight: selectedFloorNumber === floor? "900" : "normal"}}>{ floor }</Typography>
+						<Typography sx={ { fontWeight: selectedFloorNumber === floor? "900" : "normal" } }>{ floor }</Typography>
 					</Button>
 					{ index !== floors.length - 1 && <Divider flexItem /> }
 				</React.Fragment>

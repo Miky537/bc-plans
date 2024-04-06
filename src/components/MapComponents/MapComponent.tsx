@@ -397,6 +397,7 @@ const MapComponent = ({
 				color: "black",
 				haloColor: "white",
 				haloSize: "2px",
+				yoffset: -2,
 				font: {
 					size: 12,
 					weight: "bold",

@@ -16,7 +16,6 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DrawerListItem from "./DrawerListItem";
 import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
 import { Simulate } from "react-dom/test-utils";
-import compositionStart = Simulate.compositionStart;
 
 interface SwipeableDrawerComponentProps {
 	isDrawerOpen: boolean;
@@ -49,14 +48,14 @@ export function SwipeableDrawerComponent({
 	const [isLoading, setIsLoading] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
-	const [drawerHeight, setDrawerHeight] = useState('15em');
-	const imageHeight = '16em';
+	const [drawerHeight, setDrawerHeight] = useState('14em');
+	const imageHeight = '14em';
 
 	const calculateExpandedHeight = () => {
 		const contentHeight = contentRef.current?.offsetHeight || 0;
-		const imageHeightFromRef  = imageRef.current?.offsetHeight || 0;
+		const imageHeightFromRef = imageRef.current?.offsetHeight || 0;
 		if (imageRef.current && "offsetHeight" in imageRef.current) {
-			const totalHeight: string = `${ contentHeight + imageHeightFromRef + 70}px`;
+			const totalHeight: string = `${ contentHeight + imageHeightFromRef + 70 }px`;
 			return totalHeight;
 		} else {
 			return "25em"
@@ -108,7 +107,6 @@ export function SwipeableDrawerComponent({
 			}
 			getRoomPhoto(selectedRoomId)
 				.then((url: string) => {
-					console.log("SMSMSMSMSMSM", url)
 					if (url === "") {
 						setIsError(true);
 						setIsLoading(false);
@@ -126,17 +124,17 @@ export function SwipeableDrawerComponent({
 	}, [selectedRoomId, loginSuccess]);
 
 	const toggleDrawerHeight = () => {
-		const newHeight = drawerHeight === '15em'? calculateExpandedHeight() : '15em';
+		const newHeight = drawerHeight === '14em'? calculateExpandedHeight() : '14em';
 		setDrawerHeight(newHeight);
 	};
 	useEffect(() => {
 		if (!isDrawerOpen) {
-			setDrawerHeight('15em');
+			setDrawerHeight('14em');
 		}
 	}, [isDrawerOpen]);
 
 	const handleCloseDrawer = () => {
-		setDrawerHeight('15em');
+		setDrawerHeight('14em');
 		onClose();
 	};
 
@@ -204,7 +202,7 @@ export function SwipeableDrawerComponent({
 		>
 			<Box display="flex"
 			     position="absolute"
-			     sx={ { top: { xs: "1.5em", sm: "2em" } } }
+			     sx={ { top: { xs: "1.2em", sm: "2em" } } }
 			     left={ 0 }
 			     width="100%"
 			     gap={ 8 }
@@ -220,7 +218,7 @@ export function SwipeableDrawerComponent({
 					buildingName,
 					faculty
 				}) } sx={ {
-					bgcolor: "#181f25", p: { sx: 0, sm: "0.1em" },
+					bgcolor: "#181f25 !important", p: { sx: 0, sm: "0.1em" },
 					borderRadius: "10px"
 				} }>
 					<StarBorderIcon color="primary"
@@ -244,7 +242,7 @@ export function SwipeableDrawerComponent({
 				</Box>
 				<IconButton onClick={ toggleDrawerHeight }
 				            sx={ {
-								display: "flex",
+					            display: "flex",
 					            flexDirection: "column",
 					            p: "0.1em",
 					            bgcolor: "#181f25 !important",
@@ -252,11 +250,10 @@ export function SwipeableDrawerComponent({
 					            zIndex: 400,
 				            } }
 				>
-					{ drawerHeight === '15em'?
+					{ drawerHeight === '14em'?
 						<ExpandLessIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } /> :
 						<ExpandMoreIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } />
 					}
-					<Typography>Expand</Typography>
 				</IconButton>
 			</Box>
 
@@ -272,12 +269,14 @@ export function SwipeableDrawerComponent({
 			     ref={ contentRef }
 			     minHeight="fit-content"
 			     gap="0.3em"
+			     width="95%"
 			     flexDirection="column"
 			     minWidth="fit-content"
 			     position="relative"
 			     overflow="hidden"
 			     sx={ { mt: { xs: "3em", sm: "4em" } } }>
-				<DrawerListItem text={ room_info.cislo } desc="Number of seats:" />
+				<DrawerListItem text={ room_info.nazev } desc="Room name:" />
+				<DrawerListItem text={ room_info.pocet_mist } desc="Number of seats:" />
 				<DrawerListItem text={ faculty as string } desc="Faculty:" />
 				<DrawerListItem text={ buildingName } desc="Building:" />
 				<DrawerListItem text={ floorNumber } desc="Floor:" />
@@ -287,7 +286,7 @@ export function SwipeableDrawerComponent({
 			     width="90%"
 			     ref={ imageRef }
 			     position="absolute"
-			     sx={ { bottom: drawerHeight === "15em"? "0em" : "3em", transition: "all 0.15s ease" } }>
+			     sx={ { bottom: drawerHeight === "14em"? "0em" : "3em", transition: "all 0.15s ease" } }>
 				{ isLoading || isError? <Box sx={ {
 						display: "flex",
 						color: 'black',
@@ -300,32 +299,32 @@ export function SwipeableDrawerComponent({
 						maxHeight: '45dvh',
 						cursor: 'pointer',
 						overflow: 'hidden',
-						opacity: drawerHeight === "15em"? 0 : 1,
+						opacity: drawerHeight === "14em"? 0 : 1,
 						transition: 'opacity 0.3s',
 					} }>{ isError?
 						<Box display="flex"
-						     sx={ { opacity: drawerHeight === "15em"? 0 : 1, } }
+						     sx={ { opacity: drawerHeight === "14em"? 0 : 1, } }
 						     flexDirection="column"
 						     alignItems="center">
 							<NoPhotographyOutlinedIcon />
 							<Typography>No photo yet!</Typography>
 						</Box> : "Loading.." }</Box> :
 					<Box
-					     display="flex"
-					     component="img"
-					     src={ photoUrl }
-					     alt="Detailed View"
-					     sx={ {
-						     opacity: drawerHeight === "15em"? 0 : 1,
-						     transition: 'opacity 0.3s',
-						     borderRadius: '10px',
-						     width: '100%',
-						     maxWidth: '100%',
-						     height: imageHeight,
-						     maxHeight: '45dvh',
-						     cursor: 'pointer',
-					     } }
-					     onClick={ handleImageClick }
+						display="flex"
+						component="img"
+						src={ photoUrl }
+						alt="Detailed View"
+						sx={ {
+							opacity: drawerHeight === "14em"? 0 : 1,
+							transition: 'opacity 0.3s',
+							borderRadius: '10px',
+							width: '100%',
+							maxWidth: '100%',
+							height: imageHeight,
+							maxHeight: '45dvh',
+							cursor: 'pointer',
+						} }
+						onClick={ handleImageClick }
 					/>
 				}
 			</Box>

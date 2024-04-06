@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Paper, TextField, Typography, InputAdornment, CircularProgress, debounce, useTheme } from "@mui/material";
+import {
+	Paper,
+	TextField,
+	Typography,
+	InputAdornment,
+	CircularProgress,
+	debounce,
+	useTheme,
+	Button
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import { useQuery } from "react-query";
 import SearchIcon from "@mui/icons-material/Search";
@@ -39,6 +48,7 @@ function TeacherRooms() {
 		setSelectedFloor,
 		setRoomData,
 		setAreFeaturesLoading,
+		selectedFaculty,
 	} = useFacultyContext();
 	const { setDoesRoomExist } = useMapContext();
 
@@ -165,6 +175,14 @@ function TeacherRooms() {
 			}
 		});
 	}
+	const handleGoToMap = () => {
+		if (selectedFaculty) {
+			navigate(`/map/${ selectedFaculty }`);
+		} else {
+			navigate(`/map`);
+		}
+	}
+
 
 	if (loginError) {
 		return <Typography>Failed to login. Try refreshing the page!</Typography>;
@@ -172,7 +190,7 @@ function TeacherRooms() {
 
 	return (
 		<Box height="100vh">
-			<Paper sx={ { margin: "auto", maxWidth: "900px" } }>
+			<Box sx={ { margin: "auto", maxWidth: "900px" } }>
 				<TextField
 					id="search-bar"
 					className="text"
@@ -198,73 +216,91 @@ function TeacherRooms() {
 						),
 					} }
 				/>
-			</Paper>
-			{ !isWriting?
-				<Box display="flex" flexDirection="column" alignItems="center">
-					{
-						[...previouslySearchedTeachers].reverse().map(({
-							                                               room_id,
-							                                               room_name,
-							                                               faculty,
-							                                               floor_number,
-							                                               email,
-							                                               fullTeacherName,
-							                                               teacherFaculty
-						                                               }, index) => (
-							<React.Fragment key={ index }>
-								<TeacherCard isSearchedItem
-								             fullTeacherName={ fullTeacherName }
-								             email={ email }
-								             faculty={ teacherFaculty }
-								             room_name={ room_name }
-								             room_id={ room_id }
-								             handleTeacherTabClick={ handleTeacherTabClick }
-								/>
-							</React.Fragment>
-						))
-					}
-				</Box>
-				:
-				null
-			}
 
-			{
-				teacherName === '' || isLoading? null :
-					isLoading && !loginSuccess? (
-						<Box display="flex" width="100%" height="30em" justifyContent="center" alignItems="center">
-							<CircularProgress size={ 100 } thickness={ 5 } />
+				{ !isWriting?
+					<>
+
+						<Box display="flex" flexDirection="column" alignItems="center">
+							<Typography alignSelf="flex-start" sx={ { pl: 1, color: "gray" } }>Previously
+								searched:</Typography>
+							{
+								[...previouslySearchedTeachers].reverse().map(({
+									                                               room_id,
+									                                               room_name,
+									                                               faculty,
+									                                               floor_number,
+									                                               email,
+									                                               fullTeacherName,
+									                                               teacherFaculty
+								                                               }, index) => (
+									<React.Fragment key={ index }>
+										<TeacherCard isSearchedItem
+										             fullTeacherName={ fullTeacherName }
+										             email={ email }
+										             faculty={ teacherFaculty }
+										             room_name={ room_name }
+										             room_id={ room_id }
+										             handleTeacherTabClick={ handleTeacherTabClick }
+										/>
+									</React.Fragment>
+								))
+							}
 						</Box>
-					) : (
-						<Paper sx={ {
-							height: "fit-content",
-							minHeight: "100vh",
-							width: "100%",
-							display: "flex",
-							margin: "auto",
-							alignItems: "center",
-							flexDirection: "column"
-						} } square>
+					</>
+					:
+					null
+				}
 
-							{ teachers?.map(({ label, mistnost, mistnost_id, email, fakulta_zkratka }, index) => (
-								<React.Fragment key={ index }>
-									<TeacherCard isSearchedItem={ false }
-									             fullTeacherName={ label }
-									             email={ email }
-									             faculty={ fakulta_zkratka as FacultyType }
-									             room_name={ mistnost }
-									             room_id={ mistnost_id as number }
-									             handleTeacherTabClick={ handleTeacherTabClick }
-									/>
-									<Box display={ index === teachers?.length - 1? "none" : "block" }
-									     height={ 2 }
-									     bgcolor={ theme.palette.text.primary }
-									     width="70%"
-									     maxWidth="700px" />
-								</React.Fragment>
-							)) }
-						</Paper>
-					)
-			}
+				{
+					teacherName === '' || isLoading? null :
+						isLoading && !loginSuccess? (
+							<Box display="flex" width="100%" height="30em" justifyContent="center" alignItems="center">
+								<CircularProgress size={ 100 } thickness={ 5 } />
+							</Box>
+						) : (
+							<Paper sx={ {
+								height: "fit-content",
+								minHeight: "100vh",
+								width: "100%",
+								display: "flex",
+								margin: "auto",
+								alignItems: "center",
+								flexDirection: "column"
+							} } square>
+
+								{ teachers?.map(({ label, mistnost, mistnost_id, email, fakulta_zkratka }, index) => (
+									<React.Fragment key={ index }>
+										<TeacherCard isSearchedItem={ false }
+										             fullTeacherName={ label }
+										             email={ email }
+										             faculty={ fakulta_zkratka as FacultyType }
+										             room_name={ mistnost }
+										             room_id={ mistnost_id as number }
+										             handleTeacherTabClick={ handleTeacherTabClick }
+										/>
+									</React.Fragment>
+								)) }
+							</Paper>
+						)
+				}
+				<Button variant="contained"
+				        onClick={ handleGoToMap }
+				        sx={ {
+					        position: "fixed",
+					        bottom: 0,
+					        left: "50%",
+					        transform: 'translateX(-50%)',
+					        width: "100%",
+					        maxWidth: "1440px",
+					        height: "5em"
+				        } }>
+					<Typography variant="h5" sx={ {
+						display: "flex",
+						alignItems: "center"
+					} }
+					>Go to map</Typography>
+				</Button>
+			</Box>
 		</Box>
 	);
 }

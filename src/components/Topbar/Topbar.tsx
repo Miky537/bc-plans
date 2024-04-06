@@ -17,7 +17,6 @@ import { ReactComponent as FavuLogo } from "../../FacultyLogos/ffa-logo.svg";
 import { ReactComponent as FitLogo } from "../../FacultyLogos/fit-logo.svg";
 import { ReactComponent as FsiLogo } from "../../FacultyLogos/fme-logo.svg";
 import { ReactComponent as UsiLogo } from "../../FacultyLogos/ife-logo.svg";
-import MapIcon from '@mui/icons-material/Map';
 import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponents/MapFunctions";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
@@ -141,10 +140,16 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 
 	return (
 		<div className="Topbar" id="topbar">
-			<IconButton sx={ { position: "absolute", left: 0, display: !isOnFacultyPage? "inline" : "none" } }
+			<IconButton sx={ {
+				flexDirection: "column",
+				position: "absolute",
+				left: 0,
+				display: !isOnFacultyPage && !isOnTeacherPage? "flex" : "none"
+			} }
 			            onClick={ goBack }>
 				<WestIcon sx={ { color: "white" } } />
 			</IconButton>
+
 			<Box>
 				{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage?
 					<FormControl sx={ FormControlLabelStyles }>
@@ -177,16 +182,6 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 					<Typography variant="h5">{ displayTitle }</Typography>
 				}
 			</Box>
-			<IconButton onClick={ handleMapIconClick } sx={ {
-				position: "absolute",
-				right: 5,
-				padding: "0.2em",
-				display: isOnFacultyPage? "flex" : "none",
-				borderRadius: "50%",
-				border: "1px solid white",
-			} }>
-				<MapIcon fontSize="medium" sx={ { color: "white" } } />
-			</IconButton>
 		</div>
 	);
 }

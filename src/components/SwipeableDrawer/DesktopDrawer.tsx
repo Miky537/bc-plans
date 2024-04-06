@@ -49,6 +49,7 @@ export function DesktopDrawer({
 	useEffect(() => {
 		const getRoomPhoto = async(roomId: number) => {
 			let token = sessionStorage.getItem('sessionToken');
+			console.log("Token: ", token);
 			const headers: HeadersInit = {};
 			if (token) {
 				headers['Authorization'] = token;
@@ -82,9 +83,6 @@ export function DesktopDrawer({
 		if (loginSuccess && selectedRoomId) {
 			updateLastUsed();
 			setPhoto("");
-			if (!selectedRoomId) {
-				return;
-			}
 			getRoomPhoto(selectedRoomId)
 				.then((url: string) => {
 					if (url === "") {

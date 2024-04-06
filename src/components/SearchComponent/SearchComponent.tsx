@@ -243,7 +243,8 @@ export function SearchComponent({
 									         } } />
 								</React.Fragment>
 							)) }
-							<Box maxHeight="60dvh" overflow="auto">{ favouriteRooms.map((roomObject, index) => (
+							<Box maxHeight="60dvh" overflow="auto">{
+								favouriteRooms.map((roomObject, index) => (
 									<React.Fragment key={ index }>
 										<Divider flexItem
 										         variant="middle"
@@ -256,7 +257,7 @@ export function SearchComponent({
 										     onClick={ (event) => handleFavouriteRoomClick(roomObject, event) }>
 											<StarIcon color="info" />
 											<Typography overflow="hidden" whiteSpace="nowrap">
-												{ roomObject.roomName } - Podlaží: { roomObject.floorName } -
+												{ roomObject.roomName } - Podlaží: { roomObject.floorNumber } -
 												Fakulta: { roomObject.faculty }
 											</Typography>
 										</Box>

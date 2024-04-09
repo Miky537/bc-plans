@@ -135,7 +135,7 @@ export function DesktopDrawer({
 			transitionDuration={ { enter: 750, exit: 200 } }
 			sx={ mergeStylesWithTheme(theme) }
 		>
-			<Box display="flex" gap="1%" flexDirection="column" height="100%" position="relative" overflow="auto">
+			<Box display="flex" gap="1%" flexDirection="column" height="100%" minHeight="47em" position="relative" overflow="auto">
 				{ isLoading || photoUrl === ""?
 					<Box sx={ {
 						display: 'flex',

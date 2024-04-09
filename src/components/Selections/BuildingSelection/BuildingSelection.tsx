@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
-import Main from "./Main/Main";
+import Main from "../../Main/Main";
 import { Typography, Breadcrumbs, Link, useTheme, CircularProgress, Paper, Button } from "@mui/material";
-import { useFacultyContext } from "../Contexts/FacultyContext";
+import { useFacultyContext } from "../../../Contexts/FacultyContext";
 import { useNavigate } from "react-router-dom";
+import BuildingSelItem from "./BuldingSelItem";
+import MapButton from "../../MapButton";
 
 export interface BuildingSelectionInt {
 	name: string;
@@ -48,13 +50,10 @@ function BuildingSelection() {
 		setSelectedFloor(undefined)
 		navigate(`/${ selectedFaculty }/${ buildingName.replace(/\s/g, "_") }`)
 	}
-	const handleGoToMap = () => {
-		navigate(`/map/${ selectedFaculty }`)
-	}
 
 	return (
 		<Main topBarSelectedDisabled>
-			<Paper sx={{
+			<Paper sx={ {
 				height: "100%",
 				minHeight: "fit-content",
 				width: "100%",
@@ -63,12 +62,12 @@ function BuildingSelection() {
 				mb: "calc(5em - 12px)",
 				position: 'relative', // Ensures the Paper can correctly handle sticky children
 				overflow: 'auto' // Ensures Paper can scroll if content overflows
-			}}>
-				<Box sx={{ position: 'sticky', top: 0, zIndex: 1, borderBottom: "2px solid white" }}>
-					<Breadcrumbs separator="›" sx={{ bgcolor: 'background.default', py: 1, pl: 2 }}>
+			} }>
+				<Box sx={ { position: 'sticky', top: 0, zIndex: 1, borderBottom: "2px solid white" } }>
+					<Breadcrumbs separator="›" sx={ { bgcolor: 'background.default', py: 1, pl: 2 } }>
 						<Link underline="hover">
 							<Typography variant="h5">
-								{selectedFaculty}
+								{ selectedFaculty }
 							</Typography>
 						</Link>
 					</Breadcrumbs>
@@ -84,14 +83,11 @@ function BuildingSelection() {
 							.filter((building: BuildingSelectionInt) => building.building_id !== 39)
 							.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
 							.map((building: BuildingSelectionInt) => (
-								<Box key={ building.building_id }
-								     width="100%"
-								     pt="0.7em"
-								     pb="0.7em"
-								     bgcolor={ "background.paper" }
-								     borderBottom="1px solid white"
-								     onClick={ () => handleBuildingClick(building.building_id, building.name) }>
-									<Typography variant="h5" ml="0.7em">{ building.name }</Typography>
+								<Box key={ building.building_id }>
+									<BuildingSelItem buildingId={ building.building_id }
+									                 buildingName={ building.name }
+									                 handleBuildingClick={ handleBuildingClick }
+									/>
 								</Box>
 							))
 					) : (
@@ -107,23 +103,7 @@ function BuildingSelection() {
 					}
 				</Box>
 			</Paper>
-			<Button variant="contained"
-			        onClick={ handleGoToMap }
-			        sx={{
-				        position: "fixed",
-				        bottom: 0,
-				        left: "50%",
-				        transform: 'translateX(-50%)',
-				        width: "100%",
-				        maxWidth: "1440px",
-				        height: "5em"
-			        }}>
-				<Typography variant="h5" sx={ {
-					display: "flex",
-					alignItems: "center"
-				} }>Go to map</Typography>
-			</Button>
-
+			<MapButton />
 		</Main>
 	);
 }

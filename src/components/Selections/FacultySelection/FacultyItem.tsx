@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { FacultyType } from "./FacultySelection";
 import { useNavigate } from "react-router-dom";
-import { useFacultyContext } from "../../Contexts/FacultyContext";
+import { useFacultyContext } from "../../../Contexts/FacultyContext";
 
 interface FacultyItemProps {
 	name: FacultyType;

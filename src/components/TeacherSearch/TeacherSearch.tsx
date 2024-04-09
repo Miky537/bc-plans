@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Main from "../Main/Main";
 import Box from "@mui/material/Box";
 import { Tab, Tabs, Paper } from "@mui/material";
-import FacultySelection from "../FacultySelection/FacultySelection";
+import FacultySelection from "../Selections/FacultySelection/FacultySelection";
 import TeacherRooms from "./TeacherRooms";
 import TabPanel from "./TabPanel";
 import { TabStyles } from "./styles";

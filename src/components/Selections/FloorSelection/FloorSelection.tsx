@@ -1,25 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from "@mui/material/Box";
-import Main from "./Main/Main";
-import {
-	Typography,
-	AccordionSummary,
-	Accordion,
-	AccordionDetails,
-	Breadcrumbs,
-	Link,
-	useTheme,
-	CircularProgress,
-	Theme,
-	Button
-} from "@mui/material";
-import { useFacultyContext } from "../Contexts/FacultyContext";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Main from "../../Main/Main";
+import { Typography, Breadcrumbs, Link, useTheme, CircularProgress } from "@mui/material";
+import { useFacultyContext } from "../../../Contexts/FacultyContext";
 import { useParams, useNavigate } from "react-router-dom";
-import RoomSelectionItem from "./RoomSelectionItem";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import FloorSelItem from "./FloorSelItem";
+import MapButton from "../../MapButton";
 
-interface FetchedFloorRoomType {
+export interface FetchedFloorRoomType {
 	name: string | null;
 	room_id: number;
 	room_number: string | null;
@@ -50,12 +39,6 @@ export const replaceCzechChars = (str: string | null): string => {
 	return str.split('').map((char: string) => czechCharMap[char] || char).join('');
 };
 
-const accordionStyles = (theme: Theme) => ({
-	'& .MuiAccordionSummary-expandIconWrapper': {
-		color: theme.palette.text.primary,
-	}
-});
-
 
 function FloorSelection() {
 	const theme = useTheme();
@@ -63,33 +46,17 @@ function FloorSelection() {
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
-	const { building, floor } = useParams();
+	const { floor } = useParams();
 	const {
 		selectedFaculty,
 		selectedBuilding,
 		selectedFloor,
-		setSelectedFloor,
 		setSelectedRoomId,
 		handleRoomSelection,
 		setSelectedFloorNumber,
 		selectedBuildingId,
+		setFacultyChangeSource,
 	} = useFacultyContext();
-
-
-	const handleChange = useCallback(
-		(panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-			setExpanded(isExpanded? panel : false);
-			setSelectedFloor(isExpanded? panel : undefined);
-			const selectedFloorLocal = replaceCzechChars(panel)!.replace(/\s/g, "_");
-			if (panel && isExpanded) {
-				navigate(`/${ selectedFaculty }/${ building }/${ selectedFloorLocal }`, { replace: true });
-			} else {
-				navigate(`/${ selectedFaculty }/${ building }`, { replace: true });
-			}
-		},
-		[navigate, selectedFaculty, building]
-	);
-
 
 	useEffect(() => {
 		if (selectedBuildingId === null) return
@@ -123,6 +90,7 @@ function FloorSelection() {
 
 
 	const handleRoomClick = async(roomName: string | null, roomId: number) => {
+		setFacultyChangeSource('search');
 		await setSelectedRoomId(roomId);
 		const selectedFloorNumberLocal = extractNumberFromString(floor);
 		if (selectedFloorNumberLocal === null || !roomName) return;
@@ -135,9 +103,6 @@ function FloorSelection() {
 	}
 	const handleGoFloorSelection = () => {
 		setExpanded(false);
-	}
-	const handleGoToMap = () => {
-		navigate(`/map/${selectedFaculty}`)
 	}
 
 	return (
@@ -181,36 +146,12 @@ function FloorSelection() {
 						floors
 							.sort((a: FetchedFloor, b: FetchedFloor) => a.floor_number - b.floor_number)
 							.map((floor: FetchedFloor) => (
-								<Accordion key={ floor.floor_id }
-								           expanded={ expanded === floor.floor_name }
-								           onChange={ handleChange(floor.floor_name) }
-								           sx={ accordionStyles(theme) }
-								           disableGutters
-								>
-									<AccordionSummary expandIcon={ <ExpandMoreIcon /> }>
-										<Typography variant="h5">{ floor.floor_name }</Typography>
-									</AccordionSummary>
-									<AccordionDetails>
-										<Box>
-											{
-												floor.rooms?.map((room: FetchedFloorRoomType) => {
-													return (
-														<Box key={ room.room_id } >
-															<RoomSelectionItem
-																handleRoomClick={ handleRoomClick }
-																buildingName={ floor.building_name }
-																floorName={ floor.floor_name }
-																roomName={ room.room_number }
-																roomId={ room.room_id }
-																floorNumber={ floor.floor_number }
-															/>
-														</Box>
-													);
-												})
-											}
-										</Box>
-									</AccordionDetails>
-								</Accordion>
+								<Box key={ floor.floor_id }>
+									<FloorSelItem floor={ floor }
+									              setExpanded={ setExpanded }
+									              expanded={ expanded }
+									              handleRoomClick={ handleRoomClick } />
+								</Box>
 							))
 					) : (
 						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
@@ -219,22 +160,7 @@ function FloorSelection() {
 					) }
 				</Box>
 			</Box>
-			<Button variant="contained"
-			        onClick={ handleGoToMap }
-			        sx={{
-				        position: "fixed",
-				        bottom: 0,
-				        left: "50%",
-				        transform: 'translateX(-50%)',
-				        width: "100%",
-				        maxWidth: "1440px",
-				        height: "5em"
-			        }}>
-				<Typography variant="h5" sx={ {
-					display: "flex",
-					alignItems: "center"
-				} }>Go to map</Typography>
-			</Button>
+			<MapButton />
 		</Main>
 	);
 }

@@ -15,14 +15,14 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Teachers } from "./types";
 import { useNavigate } from "react-router-dom";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
-import { replaceCzechChars } from "../FloorSelection";
+import { replaceCzechChars } from "../Selections/FloorSelection/FloorSelection";
 import { searchTeacher } from "./apiCalls";
 import { TextFieldStyles } from "./styles";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { isFacultyType } from "../Topbar/Topbar";
 import { useMapContext } from "../../Contexts/MapContext";
 import { RoomNames } from "../SearchComponent/SearchComponent";
-import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import TeacherCard from "./TeacherCard";
 
 interface TeacherRoomsInter extends RoomNames {

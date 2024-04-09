@@ -2,7 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import HistoryIcon from "@mui/icons-material/History";
 
 interface TeacherCardProps {

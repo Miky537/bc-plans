@@ -23,7 +23,7 @@ import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import Query from "@arcgis/core/rest/support/Query";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import polylabel from "polylabel";
 import Point from "@arcgis/core/geometry/Point";
 import { Dialog, DialogContent, DialogActions, Button, Typography, Divider } from "@mui/material";
@@ -161,7 +161,7 @@ const MapComponent = ({
 
 
 		let isFirstTrackingActivation = true; // flag for not moving the view when tracking starts
-		const trackWidget = new Track({
+		const LocationWidget = new Track({
 			view: mapView,
 			icon: "", //adding custom icon in index.css
 			rotationEnabled: false, // Disable the rotation of the view
@@ -180,8 +180,8 @@ const MapComponent = ({
 			}
 		});
 
-		mapView.ui.add(trackWidget, `bottom-right`);
-		trackWidget.watch("tracking", function(isTracking) {
+		mapView.ui.add(LocationWidget, `bottom-right`);
+		LocationWidget.watch("tracking", function(isTracking) {
 			if (!isTracking) {
 				isFirstTrackingActivation = true; // reset the flag when tracking stops
 			}
@@ -335,7 +335,7 @@ const MapComponent = ({
 			query.returnGeometry = true;
 			query.outFields = ['RoomID', 'name', 'roomType', 'Shape__Area'];
 
-			selectedLayer.queryFeatures(query, { signal: abortController.signal })
+			selectedLayer.queryFeatures(query)
 				.then((results) => {
 					setAllFeatures(results.features);
 					if (results.features.length === 0) {
@@ -369,12 +369,13 @@ const MapComponent = ({
 
 	function createLabels(features: any, floorRoomIds: number[]) {
 		LabelsGraphicsLayerRef.current?.removeAll();
-		const filteredFeatures = features.filter((feature: Graphic) => floorRoomIds.includes(feature.attributes.RoomID));
+		const excludedRoomId = 1308;
+		const filteredFeatures = features.filter((feature: Graphic) =>
+			floorRoomIds.includes(feature.attributes.RoomID) && feature.attributes.RoomID !== excludedRoomId);
 
 		filteredFeatures.forEach((feature: any) => {
 			// Convert ArcGIS Polygon geometry to a format compatible with polylabel
 			const polygon = feature.geometry.rings.map((ring: number[][]) => ring.map((point) => [point[0], point[1]]));
-
 
 			// Use polylabel to find the pole of inaccessibility (optimal label position)
 			const [x, y] = polylabel(polygon, 1.0);
@@ -394,7 +395,7 @@ const MapComponent = ({
 			const pointGeometry = new Point({
 				x: x,
 				y: y,
-				spatialReference: feature.geometry.spatialReference // Use the feature's spatial reference
+				spatialReference: feature.geometry.spatialReference
 			});
 
 			const labelGraphic = new Graphic({
@@ -440,6 +441,7 @@ const MapComponent = ({
 		if (!iconsGraphicsLayer || !mapViewRef.current || allFeatures.length === 0) return;
 		iconsGraphicsLayer.removeAll();
 		roomsToAddIcons.forEach(room => {
+			if (room.RoomID === 1308) return;
 			const roomCenter = getRoomCenter(allFeatures, room.RoomID);
 			if (roomCenter) {
 				let excludedRoomIconURL;
@@ -460,22 +462,44 @@ const MapComponent = ({
 					case 88:
 						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WCIcon.svg`;
 						break;
+					case 81:
+					case 159:
+					case 177:
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/StairsIcon.svg`;
+						break;
+					case 13:
+					case 140:
+						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/EntranceIcon.svg`;
+						break;
 					default:
 						excludedRoomIconURL = ''; // Default or 'none' indicating no icon should be added
 						break;
 				}
 
 				if (excludedRoomIconURL) {
-					const iconGraphic = new Graphic({
-						geometry: roomCenter,
-						symbol: new PictureMarkerSymbol({
-							...iconProps,
-							url: excludedRoomIconURL,
-						}),
-						attributes: room,
-					});
-
-					iconsGraphicsLayer.add(iconGraphic);
+					if (room.roomType === 140 || room.roomType === 13) {
+						const iconGraphic = new Graphic({
+							geometry: roomCenter,
+							symbol: new PictureMarkerSymbol({
+								...iconProps,
+								width: 30,
+								height: 30,
+								url: excludedRoomIconURL,
+							}),
+							attributes: room,
+						});
+						iconsGraphicsLayer.add(iconGraphic);
+					} else {
+						const iconGraphic = new Graphic({
+							geometry: roomCenter,
+							symbol: new PictureMarkerSymbol({
+								...iconProps,
+								url: excludedRoomIconURL,
+							}),
+							attributes: room,
+						});
+						iconsGraphicsLayer.add(iconGraphic);
+					}
 				}
 			}
 		});
@@ -512,7 +536,7 @@ const MapComponent = ({
 					throw new Error('Failed to fetch rooms');
 				}
 				const rooms = await response.json();
-				const roomsWithoutLabels = [7, 8, 21, 24, 25, 26, 27, 35, 36, 38, 78, 79, 81, 83, 84, 85, 86, 87, 88, 90, 138, 140, 150, 161];
+				const roomsWithoutLabels = [7, 8, 13, 21, 24, 25, 26, 27, 35, 36, 38, 78, 79, 81, 83, 84, 85, 86, 87, 88, 90, 138, 140, 150, 161];
 
 				// const selectedLayer = featureLayersRef.current.find(layer => layer.title === selectedFaculty);
 				FeaturesGraphicsLayerRef.current?.removeAll();

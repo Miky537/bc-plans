@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
-import { FacultyType } from "./FacultySelection/FacultySelection";
-import { useFacultyContext } from "../Contexts/FacultyContext";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import StarIcon from "@mui/icons-material/Star";
+import { Box, Typography } from '@mui/material';
+import { FacultyType } from "../FacultySelection/FacultySelection";
+import { useFacultyContext } from "../../../Contexts/FacultyContext";
+import FavIconButton from "./FavIconButton";
 
 export interface FavouritePlacesLocalStorage {
 	roomName: string | null;
@@ -71,28 +70,15 @@ const RoomSelectionItem = ({
 			<Typography variant="h6"
 			            width="100%"
 			            onClick={ () => handleRoomClick(roomName, roomId) }>{ roomName }</Typography>
-			<IconButton onClick={ () => toggleFavoriteRoom({
-				roomName,
-				roomId,
-				floorName,
-				buildingName,
-				faculty,
-				floorNumber
-			}) }>
-				<StarBorderIcon color="primary"
-				                style={ {
-					                fontSize: "2rem",
-					                opacity: isFav? 0 : 1,
-					                transition: 'opacity 0.5s',
-				                } } />
-				<StarIcon color="primary"
-				          style={ {
-					          fontSize: "2rem",
-					          opacity: isFav? 1 : 0,
-					          transition: 'opacity 0.5s',
-					          position: 'absolute',
-				          } } />
-			</IconButton>
+			<FavIconButton roomName={ roomName }
+			               roomId={ roomId }
+			               floorName={ floorName }
+			               floorNumber={ floorNumber }
+			               buildingName={ buildingName }
+			               faculty={ faculty }
+			               toggleFavoriteRoom={ toggleFavoriteRoom }
+			               isFav={ isFav }
+			/>
 		</Box>
 	);
 };

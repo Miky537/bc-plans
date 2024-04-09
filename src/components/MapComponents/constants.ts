@@ -279,8 +279,8 @@ export const typeToColorMapping: ColorMapping = {
 };
 
 export const iconProps = {
-	width: "20px",
-	height: "20px"
+	width: "25px",
+	height: "25px"
 };
 
 export const FASTLayerUrl = "https://services8.arcgis.com/zBrV7gOCnjSoTkv7/arcgis/rest/services/TempLayer/FeatureServer";

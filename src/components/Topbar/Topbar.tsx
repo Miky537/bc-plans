@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import { useMapContext } from "../../Contexts/MapContext";
 import { Select, MenuItem, SelectChangeEvent, FormControl, InputLabel, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import { ReactComponent as CesaLogo } from "../../FacultyLogos/cesa-logo.svg";
 import { ReactComponent as FaLogo } from "../../FacultyLogos/fa-logo.svg";
 import { ReactComponent as FpLogo } from "../../FacultyLogos/fbm-logo.svg";

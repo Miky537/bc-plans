@@ -1,21 +1,18 @@
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import React, { useState, useEffect, useRef } from "react";
-import { useTheme, Theme, Typography, Button } from "@mui/material";
+import { useTheme, Theme, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
-import IconButton from "@mui/material/IconButton";
-import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
-import { FacultyType } from "../FacultySelection/FacultySelection";
-import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { FavouritePlacesLocalStorage } from "../Selections/FloorSelection/RoomSelectionItem";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import { RoomDetails } from "../MapComponents/types";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import useAuthToken from "../../hooks/useAuthToken";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DrawerListItem from "./DrawerListItem";
 import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
-import { Simulate } from "react-dom/test-utils";
+import { MoveButton } from "./MoveButton";
+import { FavIconButton } from "./FavIconButton";
+import NavigateButton from "./NavigateButton";
 
 interface SwipeableDrawerComponentProps {
 	isDrawerOpen: boolean;
@@ -31,7 +28,6 @@ export function SwipeableDrawerComponent({
 	                                         roomData
                                          }: SwipeableDrawerComponentProps) {
 	const { room_info, floor_info, areal_info, building_info } = roomData;
-	const [isImageZoomed, setIsImageZoomed] = useState(false);
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
 	const { updateLastUsed, isLoading: authIsLoading, loginSuccess } = useAuthContext()
 	const contentRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +45,6 @@ export function SwipeableDrawerComponent({
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
 	const [drawerHeight, setDrawerHeight] = useState('14em');
-	const imageHeight = '14em';
 
 	const calculateExpandedHeight = () => {
 		const contentHeight = contentRef.current?.offsetHeight || 0;
@@ -138,9 +133,6 @@ export function SwipeableDrawerComponent({
 		onClose();
 	};
 
-	const handleImageClick = () => {
-		setIsImageZoomed(!isImageZoomed);
-	};
 	const toggleFavoriteRoom = (roomToToggle: FavouritePlacesLocalStorage) => {
 		const storageKey = 'favoriteRooms';
 
@@ -210,51 +202,18 @@ export function SwipeableDrawerComponent({
 			     alignItems="center"
 			     justifyContent="space-around"
 			>
-				<IconButton onClick={ () => toggleFavoriteRoom({
-					roomName,
-					roomId,
-					floorName,
-					floorNumber,
-					buildingName,
-					faculty
-				}) } sx={ {
-					bgcolor: "#181f25 !important", p: { sx: 0, sm: "0.1em" },
-					borderRadius: "10px"
-				} }>
-					<StarBorderIcon color="primary"
-					                sx={ {
-						                fontSize: { xs: "2.5rem", sm: "3rem" },
-						                opacity: isFav? 0 : 1,
-						                transition: 'opacity 0.2s',
-						                zIndex: 4
-					                } } />
-					<StarIcon color="primary"
-					          sx={ {
-						          fontSize: { xs: "2.5rem", sm: "3rem" },
-						          opacity: isFav? 1 : 0,
-						          transition: 'opacity 0.2s',
-						          position: 'absolute',
-						          zIndex: 4
-					          } } />
-				</IconButton>
+				<FavIconButton toggleFavoriteRoom={ toggleFavoriteRoom }
+				               isFav={ isFav }
+				               roomName={ roomName }
+				               roomId={ roomId }
+				               floorName={ floorName }
+				               floorNumber={ floorNumber }
+				               buildingName={ buildingName }
+				               faculty={ faculty } />
 				<Box height="fit-content">
 					<Typography variant="h4" fontWeight="bolder">{ room_info.cislo }</Typography>
 				</Box>
-				<IconButton onClick={ toggleDrawerHeight }
-				            sx={ {
-					            display: "flex",
-					            flexDirection: "column",
-					            p: "0.1em",
-					            bgcolor: "#181f25 !important",
-					            borderRadius: "10px",
-					            zIndex: 400,
-				            } }
-				>
-					{ drawerHeight === '14em'?
-						<ExpandLessIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } /> :
-						<ExpandMoreIcon color="info" sx={ { fontSize: "3rem", transition: 'opacity 0.2s' } } />
-					}
-				</IconButton>
+				<MoveButton toggleDrawerHeight={ toggleDrawerHeight } drawerHeight={ drawerHeight } />
 			</Box>
 
 			<Box position="absolute"
@@ -295,7 +254,7 @@ export function SwipeableDrawerComponent({
 						borderRadius: '10px',
 						bgcolor: 'grey.700',
 						maxWidth: '100%',
-						height: imageHeight,
+						height: "14em",
 						maxHeight: '45dvh',
 						cursor: 'pointer',
 						overflow: 'hidden',
@@ -308,34 +267,35 @@ export function SwipeableDrawerComponent({
 						     alignItems="center">
 							<NoPhotographyOutlinedIcon />
 							<Typography>No photo yet!</Typography>
-						</Box> : "Loading.." }</Box> :
-					<Box
-						display="flex"
-						component="img"
-						src={ photoUrl }
-						alt="Detailed View"
-						sx={ {
-							opacity: drawerHeight === "14em"? 0 : 1,
-							transition: 'opacity 0.3s',
-							borderRadius: '10px',
-							width: '100%',
-							maxWidth: '100%',
-							height: imageHeight,
-							maxHeight: '45dvh',
-							cursor: 'pointer',
-						} }
-						onClick={ handleImageClick }
-					/>
+						</Box> : "Loading.." }</Box>
+					:
+					<Box height="fit-content"
+					     maxHeight="25em"
+					     width="100%"
+					     overflow={ drawerHeight === "14em"? "hidden" : "auto" }>
+						<Box
+							display="flex"
+							component="img"
+							className="PhotoBox"
+							src={ photoUrl }
+							alt="Detailed View"
+							sx={ {
+								opacity: drawerHeight === "14em"? 0 : 1,
+								transition: 'opacity 0.3s',
+								borderRadius: '10px',
+								width: '100%',
+								maxWidth: '100%',
+								objectFit: 'cover',
+								zIndex: 1,
+								height: "auto",
+								cursor: 'pointer',
+							} }
+						/>
+					</Box>
+
 				}
 			</Box>
-
-			<Button sx={ { position: "absolute", bottom: 0, width: "90%", height: { xs: 40, sm: 50, lg: 100 } } }
-			        variant="contained"
-			        onClick={ () => {
-				        window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(building_info.adresa) }`, '_blank');
-			        } }>
-				<Typography>Navigate</Typography>
-			</Button>
+			<NavigateButton address={ building_info.adresa } />
 		</SwipeableDrawer>
 	)
 }

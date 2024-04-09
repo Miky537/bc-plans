@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState } from 'react';
 import { fetchRoomInfo } from "../components/MapComponents/apiCalls";
 import { defaultState } from "../components/MapComponents/constants";
-import { FacultyType } from "../components/FacultySelection/FacultySelection";
-import { replaceCzechChars } from "../components/FloorSelection";
+import { FacultyType } from "../components/Selections/FacultySelection/FacultySelection";
+import { replaceCzechChars } from "../components/Selections/FloorSelection/FloorSelection";
 import { useNavigate } from "react-router-dom";
 import { RoomDetails } from "../components/MapComponents/types";
 import { SelectedRoomDetail, RoomDetail, FloorDetail, BuildingDetail } from "./types";

@@ -3,7 +3,7 @@ import Extent from "@arcgis/core/geometry/Extent";
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
-import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import MapView from "@arcgis/core/views/MapView";
 import React from "react";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";

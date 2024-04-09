@@ -3,8 +3,8 @@ import { useTheme, Typography, Drawer, CircularProgress, Button } from "@mui/mat
 import Box from "@mui/material/Box";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import IconButton from "@mui/material/IconButton";
-import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
-import { FacultyType } from "../FacultySelection/FacultySelection";
+import { FavouritePlacesLocalStorage } from "../Selections/FloorSelection/RoomSelectionItem";
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import DrawerListItem from "./DrawerListItem";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -149,18 +149,21 @@ export function DesktopDrawer({
 					} }>{ photoUrl === ""? "No photo yet" : <CircularProgress size={ 90 } /> }
 					</Box>
 					:
-					<Box
-						component="img"
-						src={ photoUrl }
-						alt="Detailed View"
-						sx={ {
-							borderRadius: '10px',
-							width: '100%', // Ensures the image width matches the drawer width minus padding
-							height: '25em', // Maintains aspect ratio
-							maxHeight: 'calc(45em - 2em)',
-							transition: 'max-width 0.3s ease-in-out, max-height 0.3s ease-in-out',
-						} }
-					/> }
+					<Box height="fit-content" maxHeight="25em" width="100%" overflow="auto">
+						<Box
+							component="img"
+							src={ photoUrl }
+							alt="Detailed View"
+							sx={ {
+								borderRadius: '10px',
+								width: '100%',
+								height: 'auto',
+								objectFit: 'cover',
+								transition: 'max-width 0.3s ease-in-out, max-height 0.3s ease-in-out',
+							} }
+						/>
+					</Box>
+				}
 				<Box display="flex" alignItems="center" mt={ 2 }>
 					<Typography variant="h3" fontWeight="bolder" sx={ { flexGrow: 1 } }>{ roomName }</Typography>
 					<IconButton sx={ { p: 0 } } onClick={ () => toggleFavoriteRoom({
@@ -198,9 +201,11 @@ export function DesktopDrawer({
 				<DrawerListItem text={ arealName } desc="Areal:" />
 				<DrawerListItem text={ description } desc="Popis:" />
 
-				<Button sx={ { position: "absolute", bottom: 35, width: "100%", height: 50 } } variant="contained" onClick={ () => {
-					window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(address) }`, '_blank');
-				} }>
+				<Button sx={ { position: "absolute", bottom: 35, width: "100%", height: 50 } }
+				        variant="contained"
+				        onClick={ () => {
+					        window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(address) }`, '_blank');
+				        } }>
 					<Typography>Navigate</Typography>
 				</Button>
 			</Box>

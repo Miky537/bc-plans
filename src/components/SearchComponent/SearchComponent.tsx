@@ -7,12 +7,12 @@ import { fetchFacultyRooms } from "../MapComponents/apiCalls";
 import Fuse from "fuse.js";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { Typography, Divider } from "@mui/material";
-import HistoryIcon from '@mui/icons-material/History';
 import PlaceIcon from '@mui/icons-material/Place';
-import { FacultyType } from "../FacultySelection/FacultySelection";
-import { FavouritePlacesLocalStorage } from "../RoomSelectionItem";
-import StarIcon from '@mui/icons-material/Star';
+import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
+import { FavouritePlacesLocalStorage } from "../Selections/FloorSelection/RoomSelectionItem";
 import { InputBaseStyle, searchBoxStyle, SearchBoxContainer } from "./styles";
+import SearchedItem from "./SearchedItem";
+import FavItem from "./FavItem";
 
 
 export interface RoomNames {
@@ -26,7 +26,7 @@ interface SearchComponentProps {
 	setSelectedRoom: (roomId: number) => void;
 	setSelectedFloor: (floor: number) => void;
 	setIsDrawerOpen: (isDrawerOpen: boolean) => void;
-	setAreFeaturesLoading   : (areFeaturesLoading: boolean) => void;
+	setAreFeaturesLoading: (areFeaturesLoading: boolean) => void;
 }
 
 export function SearchComponent({
@@ -226,14 +226,7 @@ export function SearchComponent({
 
 							{ previouslySearchedRooms.slice().reverse().map((room, index) => (
 								<React.Fragment key={ index }>
-									<Box sx={ searchBoxStyle }
-									     onClick={ (event) => handleRoomSearchClick(room, event) }>
-										<HistoryIcon color="info" />
-										<Typography overflow="hidden" whiteSpace="nowrap">
-											{ room.room_name } - Podlaží: { room.floor_number } -
-											Fakulta: { room.faculty }
-										</Typography>
-									</Box>
+									<SearchedItem room={ room } handleRoomSearchClick={ handleRoomSearchClick } />
 									<Divider flexItem
 									         variant="middle"
 									         color="#FFFFF"
@@ -245,32 +238,26 @@ export function SearchComponent({
 							)) }
 							<Box maxHeight="60dvh" overflow="auto">{
 								favouriteRooms.map((roomObject, index) => (
-									<React.Fragment key={ index }>
-										<Divider flexItem
-										         variant="middle"
-										         color="#FFFFF"
-										         sx={ {
-											         backgroundColor: "gray",
-											         display: index === 0? "block" : "none"
-										         } } />
-										<Box sx={ searchBoxStyle }
-										     onClick={ (event) => handleFavouriteRoomClick(roomObject, event) }>
-											<StarIcon color="info" />
-											<Typography overflow="hidden" whiteSpace="nowrap">
-												{ roomObject.roomName } - Podlaží: { roomObject.floorNumber } -
-												Fakulta: { roomObject.faculty }
-											</Typography>
-										</Box>
-										<Divider flexItem
-										         variant="middle"
-										         color="#FFFFF"
-										         sx={ {
-											         backgroundColor: "gray",
-											         display: index === favouriteRooms.length - 1? "none" : "block"
-										         } } />
-									</React.Fragment>
-								)
-							) }</Box>
+										<React.Fragment key={ index }>
+											<Divider flexItem
+											         variant="middle"
+											         color="#FFFFF"
+											         sx={ {
+												         backgroundColor: "gray",
+												         display: index === 0? "block" : "none"
+											         } } />
+											<FavItem room={ roomObject }
+											         handleFavouriteRoomClick={ handleFavouriteRoomClick } />
+											<Divider flexItem
+											         variant="middle"
+											         color="#FFFFF"
+											         sx={ {
+												         backgroundColor: "gray",
+												         display: index === favouriteRooms.length - 1? "none" : "block"
+											         } } />
+										</React.Fragment>
+									)
+								) }</Box>
 						</Box> }
 				</>
 			) : (

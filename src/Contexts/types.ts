@@ -1,4 +1,4 @@
-import { FacultyType } from "../components/FacultySelection/FacultySelection";
+import { FacultyType } from "../components/Selections/FacultySelection/FacultySelection";
 
 export interface RoomDetail {
 	roomName: string | undefined;

@@ -12,6 +12,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { RoomDetails } from "../MapComponents/types";
 import { mergeStylesWithTheme } from "./styles";
 import useAuthToken from "../../hooks/useAuthToken";
+import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
 
 
 interface DrawerComponentProps {
@@ -80,6 +81,7 @@ export function DesktopDrawer({
 			return imageObjectURL;
 		};
 		if (loginSuccess && selectedRoomId) {
+			setIsLoading(true);
 			updateLastUsed();
 			setPhoto("");
 			getRoomPhoto(selectedRoomId)
@@ -141,12 +143,20 @@ export function DesktopDrawer({
 						alignItems: 'center',
 						justifyContent: 'center',
 						borderRadius: '10px',
-						bgcolor: 'grey.300',
+						bgcolor: 'grey.700',
 						width: '100%', // Subtracts some space for padding
 						height: '25em',
 						minHeight: "25em",
 						maxHeight: 'calc(45em - 2em)',
-					} }>{ photoUrl === ""? "No photo yet" : <CircularProgress size={ 90 } /> }
+					} }>
+						{ isLoading? <CircularProgress size={ 90 } /> :
+							<Box display="flex"
+							     flexDirection="column"
+							     alignItems="center">
+								<NoPhotographyOutlinedIcon />
+								<Typography>No photo yet!</Typography>
+							</Box>
+						}
 					</Box>
 					:
 					<Box height="fit-content" maxHeight="25em" width="100%" overflow="auto">

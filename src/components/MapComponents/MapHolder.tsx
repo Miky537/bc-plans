@@ -4,12 +4,12 @@ import { Room, Floor, Building } from "./types";
 import FloorHolder from "./FloorHolder";
 import { SearchComponent } from "../SearchComponent/SearchComponent";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
-import { SwipeableDrawerComponent } from "../SwipeableDrawer/SwipeableDrawerComponent";
+import { SwipeableDrawerComponent } from "../Drawer/SwipeableDrawerComponent";
 import { CircularProgress, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useMapContext } from "../../Contexts/MapContext";
 import MediaQuery from "react-responsive";
-import { DesktopDrawer } from "../SwipeableDrawer/DesktopDrawer";
+import { DesktopDrawer } from "../Drawer/DesktopDrawer";
 
 export interface InfoState {
 	room: Room | undefined;

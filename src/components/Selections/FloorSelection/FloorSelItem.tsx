@@ -8,6 +8,7 @@ import { useFacultyContext } from "../../../Contexts/FacultyContext";
 import { useNavigate, useParams } from "react-router-dom";
 
 const accordionStyles = (theme: Theme) => ({
+	borderBottom: "1px solid gray !important",
 	'& .MuiAccordionSummary-expandIconWrapper': {
 		color: theme.palette.text.primary,
 	}

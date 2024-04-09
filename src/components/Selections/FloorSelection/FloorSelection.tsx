@@ -45,6 +45,7 @@ function FloorSelection() {
 	const [floors, setFloors] = useState<FetchedFloor[]>([]);
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [error, setError] = useState(false);
 	const navigate = useNavigate();
 	const { floor } = useParams();
 	const {
@@ -75,7 +76,7 @@ function FloorSelection() {
 			.then(data => {
 				setFloors(data)
 			})
-			.catch(error => console.log("Fetching floors failed: ", error))
+			.catch(error => setError(true))
 			.finally(() => setIsLoading(false));
 	}, [selectedBuildingId]);
 
@@ -137,27 +138,29 @@ function FloorSelection() {
 				<Box display="flex"
 				     flexDirection="column"
 				     justifyContent="flex-start"
-				     height="100%"
 				     maxWidth="1440px"
 				     pb={ 4 }
-				     borderTop="2px solid gray"
 				     color={ theme.palette.text.primary }>
-					{ floors.length > 0 && !isLoading? (
+					{error ? (
+						<Box width="100%" height="80%" mt={5} display="flex" justifyContent="center" alignItems="center">
+							<Typography variant="h6">No data available!</Typography>
+						</Box>
+					) : floors.length > 0 && !isLoading ? (
 						floors
 							.sort((a: FetchedFloor, b: FetchedFloor) => a.floor_number - b.floor_number)
 							.map((floor: FetchedFloor) => (
-								<Box key={ floor.floor_id }>
-									<FloorSelItem floor={ floor }
-									              setExpanded={ setExpanded }
-									              expanded={ expanded }
-									              handleRoomClick={ handleRoomClick } />
+								<Box key={floor.floor_id}>
+									<FloorSelItem floor={floor}
+									              setExpanded={setExpanded}
+									              expanded={expanded}
+									              handleRoomClick={handleRoomClick} />
 								</Box>
 							))
 					) : (
 						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
-							<CircularProgress thickness={ 3 } size="5rem" />
+							<CircularProgress thickness={3} size="5rem" />
 						</Box>
-					) }
+					)}
 				</Box>
 			</Box>
 			<MapButton />

@@ -1,14 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-	Paper,
-	TextField,
-	Typography,
-	InputAdornment,
-	CircularProgress,
-	debounce,
-	useTheme,
-	Button
-} from "@mui/material";
+import { Paper, TextField, Typography, InputAdornment, CircularProgress, debounce, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useQuery } from "react-query";
 import SearchIcon from "@mui/icons-material/Search";
@@ -24,6 +15,7 @@ import { useMapContext } from "../../Contexts/MapContext";
 import { RoomNames } from "../SearchComponent/SearchComponent";
 import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import TeacherCard from "./TeacherCard";
+import MapButton from "../MapButton";
 
 interface TeacherRoomsInter extends RoomNames {
 	email: string | null;
@@ -184,7 +176,7 @@ function TeacherRooms() {
 
 
 	if (loginError) {
-		return <Typography>Failed to login. Try refreshing the page!</Typography>;
+		return <Typography>Chyba v přihlašování. Zkuste stránku znovu načíst!</Typography>;
 	}
 
 	return (
@@ -193,7 +185,7 @@ function TeacherRooms() {
 				<TextField
 					id="search-bar"
 					className="text"
-					label="Enter a teacher's name..."
+					label="Zadej jméno vyučujícího..."
 					variant="filled"
 					// placeholder="Search..."
 					size="medium"
@@ -225,8 +217,7 @@ function TeacherRooms() {
 								            pl: 1,
 								            color: "gray",
 								            display: previouslySearchedTeachers.length > 0? "block" : "none"
-							            } }>Previously
-								searched:</Typography>
+							            } }>Naposledy vyhledáno:</Typography>
 							{
 								[...previouslySearchedTeachers].reverse().map(({
 									                                               room_id,
@@ -287,23 +278,7 @@ function TeacherRooms() {
 							</Paper>
 						)
 				}
-				<Button variant="contained"
-				        onClick={ handleGoToMap }
-				        sx={ {
-					        position: "fixed",
-					        bottom: 0,
-					        left: "50%",
-					        transform: 'translateX(-50%)',
-					        width: "100%",
-					        maxWidth: "1440px",
-					        height: "5em"
-				        } }>
-					<Typography variant="h5" sx={ {
-						display: "flex",
-						alignItems: "center"
-					} }
-					>Go to map</Typography>
-				</Button>
+				<MapButton />
 			</Box>
 		</Box>
 	);

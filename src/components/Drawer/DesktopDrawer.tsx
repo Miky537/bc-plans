@@ -135,7 +135,7 @@ export function DesktopDrawer({
 			transitionDuration={ { enter: 750, exit: 200 } }
 			sx={ mergeStylesWithTheme(theme) }
 		>
-			<Box display="flex" gap="1%" flexDirection="column" height="100%" minHeight="47em" position="relative" overflow="auto">
+			<Box display="flex" gap="1%" flexDirection="column" height="100%" minHeight="50em" position="relative" overflow="auto">
 				{ isLoading || photoUrl === ""?
 					<Box sx={ {
 						display: 'flex',
@@ -154,7 +154,7 @@ export function DesktopDrawer({
 							     flexDirection="column"
 							     alignItems="center">
 								<NoPhotographyOutlinedIcon />
-								<Typography>No photo yet!</Typography>
+								<Typography>Zatím žádná fotka!</Typography>
 							</Box>
 						}
 					</Box>
@@ -204,19 +204,17 @@ export function DesktopDrawer({
 				<Box pb={ 4 }>
 					<DrawerListItem text={ roomNameLong } variant="h5" />
 				</Box>
-				<DrawerListItem text={ roomCapacity } desc="Number of seats:" />
-				<DrawerListItem text={ faculty as string } desc="Faculty:" />
-				<DrawerListItem text={ buildingName } desc="Building:" />
-				<DrawerListItem text={ floorNumber } desc="Floor:" />
-				<DrawerListItem text={ arealName } desc="Areal:" />
-				<DrawerListItem text={ description } desc="Popis:" />
-
+				<DrawerListItem text={ roomCapacity } desc="Počet míst na sezení:" />
+				<DrawerListItem text={ faculty as string } desc="Fakulta:" />
+				<DrawerListItem text={ buildingName } desc="Budova:" />
+				<DrawerListItem text={ floorNumber } desc="Podlaží:" />
+				<DrawerListItem text={ arealName } desc="Areál:" />
 				<Button sx={ { position: "absolute", bottom: 35, width: "100%", height: 50 } }
 				        variant="contained"
 				        onClick={ () => {
 					        window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(address) }`, '_blank');
 				        } }>
-					<Typography>Navigate</Typography>
+					<Typography>Navigovat</Typography>
 				</Button>
 			</Box>
 		</Drawer>

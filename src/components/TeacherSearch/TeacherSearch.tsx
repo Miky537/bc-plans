@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Main from "../Main/Main";
 import Box from "@mui/material/Box";
 import { Tab, Tabs, Paper } from "@mui/material";
 import FacultySelection from "../Selections/FacultySelection/FacultySelection";
 import TeacherRooms from "./TeacherRooms";
 import TabPanel from "./TabPanel";
-import { TabStyles } from "./styles";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function TeacherSearch() {
@@ -30,27 +28,30 @@ function TeacherSearch() {
 	}, [currentPath]);
 
 	return (
-		<Main>
-			<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-				<Box sx={{ borderBottom: 1, borderColor: 'divider', position: "sticky", top: 0, zIndex: 1100 }}>
-					<Paper square>
-						<Tabs value={value} onChange={handleChange} variant="fullWidth" sx={{ maxWidth: "900px", margin: "auto" }}>
-							<Tab label="Faculty selection" value={0} />
-							<Tab label="Teachers' offices" value={1} />
-						</Tabs>
-					</Paper>
-				</Box>
-				<Box sx={{ flexGrow: 1, overflowY: 'auto' }}> {/* This Box becomes the scroll container */}
-					<TabPanel value={value} index={0}>
-						<FacultySelection />
-					</TabPanel>
-					<TabPanel value={value} index={1}>
-						<TeacherRooms />
-					</TabPanel>
-				</Box>
-			</Box>
 
-		</Main>
+		<Box sx={ { display: 'flex', flexDirection: 'column', height: '100%' } }>
+			<Box sx={ { borderBottom: 1, borderColor: 'divider', position: "sticky", top: 0, zIndex: 1100 } }>
+				<Paper square sx={{bgcolor: "#262626"}}>
+					<Tabs value={ value }
+					      onChange={ handleChange }
+					      variant="fullWidth"
+					      sx={ { maxWidth: "900px", margin: "auto", height: "100%" } }>
+						<Tab label="Výběr fakulty" value={ 0 } />
+						<Tab label="Kanceláře vyučujících" value={ 1 } />
+					</Tabs>
+				</Paper>
+			</Box>
+			<Box sx={ { flexGrow: 1, overflowY: 'auto' } }> {/* This Box becomes the scroll container */ }
+				<TabPanel value={ value } index={ 0 }>
+					<FacultySelection />
+				</TabPanel>
+				<TabPanel value={ value } index={ 1 }>
+					<TeacherRooms />
+				</TabPanel>
+			</Box>
+		</Box>
+
+
 	);
 }
 

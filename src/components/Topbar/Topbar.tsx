@@ -52,11 +52,11 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 
 	useEffect(() => {
 		if (isOnFavPlacesPage) {
-			setDisplayTitle("Favourite places");
+			setDisplayTitle("Oblíbená místa");
 		} else if (isOnFacultyPage) {
-			setDisplayTitle("Select faculty");
+			setDisplayTitle("");
 		} else if (isOnTeacherPage) {
-			setDisplayTitle("Teacher search");
+			setDisplayTitle("");
 		} else {
 			setDisplayTitle("");
 		}
@@ -115,15 +115,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 		"USI": <UsiLogo style={ svgStyle } />
 	};
 
-	const handleMapIconClick = () => {
-		if (!selectedFaculty)
-			setZoom(12);
-		if (selectedFaculty === undefined) {
-			navigate(`/map`)
-		} else {
-			navigate(`/map/${ selectedFaculty }`)
-		}
-	}
+
 	useEffect(() => {
 		if (!isFacultyType(selectedFaculty)) {
 			setSelectedFaculty(undefined);

@@ -177,7 +177,7 @@ export function SearchComponent({
 				<>
 					<InputBase
 						autoFocus
-						placeholder="Type name of the room.."
+						placeholder="Název místnosti.."
 						inputProps={ { "aria-label": "search" } }
 						onBlur={ handleCollapse }
 						onChange={ handleSearch }

@@ -234,12 +234,12 @@ export function SwipeableDrawerComponent({
 			     position="relative"
 			     overflow="hidden"
 			     sx={ { mt: { xs: "3em", sm: "4em" } } }>
-				<DrawerListItem text={ room_info.nazev } desc="Room name:" />
-				<DrawerListItem text={ room_info.pocet_mist } desc="Number of seats:" />
-				<DrawerListItem text={ faculty as string } desc="Faculty:" />
-				<DrawerListItem text={ buildingName } desc="Building:" />
-				<DrawerListItem text={ floorNumber } desc="Floor:" />
-				<DrawerListItem text={ arealName } variant="body1" desc="Areal:" />
+				<DrawerListItem text={ room_info.nazev } desc="Název místnosti:" />
+				<DrawerListItem text={ room_info.pocet_mist } desc="Počet míst na sezení:" />
+				<DrawerListItem text={ faculty as string } desc="Fakulta:" />
+				<DrawerListItem text={ buildingName } desc="Budova:" />
+				<DrawerListItem text={ floorNumber } desc="Podlaží:" />
+				<DrawerListItem text={ arealName } variant="body1" desc="Areál:" />
 			</Box>
 			<Box zIndex="-1"
 			     width="90%"
@@ -266,8 +266,8 @@ export function SwipeableDrawerComponent({
 						     flexDirection="column"
 						     alignItems="center">
 							<NoPhotographyOutlinedIcon />
-							<Typography>No photo yet!</Typography>
-						</Box> : "Loading.." }</Box>
+							<Typography>Zatím žádná fotka!</Typography>
+						</Box> : "Načítání.." }</Box>
 					:
 					<Box height="fit-content"
 					     maxHeight="25em"

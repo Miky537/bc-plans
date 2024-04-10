@@ -26,7 +26,7 @@ export default function MapButton() {
 			<Typography variant="h5" sx={ {
 				display: "flex",
 				alignItems: "center"
-			} }>Go to map</Typography>
+			} }>Mapa</Typography>
 		</Button>
 	)
 }

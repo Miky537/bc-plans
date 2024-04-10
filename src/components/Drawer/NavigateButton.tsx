@@ -10,7 +10,7 @@ export default function NavigateButton({ address }: { address: string }) {
 		        onClick={ () => {
 			        window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(address) }`, '_blank');
 		        } }>
-			<Typography>Navigate</Typography>
+			<Typography>Navigovat</Typography>
 		</Button>
 	)
 }

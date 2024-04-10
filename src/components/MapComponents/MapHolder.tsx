@@ -96,7 +96,7 @@ const MapHolder = () => {
 			     borderRadius="20px"
 			     justifyContent="space-around"
 			     zIndex={ 100 }>
-				<Typography>Loading..</Typography>
+				<Typography>Načítání..</Typography>
 				<CircularProgress size={ 27 } thickness={ 5 } />
 			</Box>
 			<Box width="60%"
@@ -116,7 +116,7 @@ const MapHolder = () => {
 			     borderRadius="20px"
 			     justifyContent="space-around"
 			     zIndex={ 100 }>
-				<Typography>Faculty is yet to be added!</Typography>
+				<Typography>Fakulta ještě není přidána!</Typography>
 			</Box>
 		</Box>
 	);

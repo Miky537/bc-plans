@@ -753,18 +753,18 @@ const MapComponent = ({
 					<Typography variant="body1">{ dialogData?.address }</Typography>
 				</DialogContent>
 				<DialogActions>
-					<Button variant="outlined" onClick={ () => setIsDialogOpen(false) }>Cancel</Button>
+					<Button variant="outlined" onClick={ () => setIsDialogOpen(false) }>Zavřít</Button>
 					<Button variant="contained" onClick={ () => {
 						window.open(`https://www.google.com/maps/dir/?api=1&destination=${ encodeURIComponent(dialogData?.address) }`, '_blank');
 						setIsDialogOpen(false);
-					} }><Typography>Navigate</Typography></Button>
+					} }><Typography>Navigovat</Typography></Button>
 				</DialogActions>
 			</Dialog>
 
 			<Dialog open={ isRoomDialogOpen } className="room-dialog"
 			        onClose={ handleCloseRoomDialog } sx={ dialogStyles }>
 				<DialogContent sx={ { margin: 0, display: "flex", alignItems: "center" } }>
-					<Typography variant="h5" align="center" pt={ 2 }>Room is yet to be added!</Typography>
+					<Typography variant="h5" align="center" pt={ 2 }>Místnost ještě není přidána na mapu!</Typography>
 				</DialogContent>
 			</Dialog>
 		</>

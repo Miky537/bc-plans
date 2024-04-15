@@ -34,15 +34,14 @@ function FacultyItem({ name, Image }: FacultyItemProps) {
 					maxWidth: "10em",
 					maxHeight: "10em",
 				} }
-				borderRadius="50%"
-				bgcolor="#DEDEDE"
+				borderRadius="20px"
+				border="1px solid #384369"
+				bgcolor="#24293b"
 				display="flex"
 				justifyContent="center"
 				alignItems="center" overflow="hidden">
 				{ Image? <Image style={ { width: "fit" } } /> : null }
 			</Box>
-
-			<Typography>{ name?.toString() }</Typography>
 		</Box>
 	);
 }

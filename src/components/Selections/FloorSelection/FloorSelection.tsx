@@ -44,7 +44,7 @@ function FloorSelection() {
 	const theme = useTheme();
 	const [floors, setFloors] = useState<FetchedFloor[]>([]);
 	const [expanded, setExpanded] = useState<string | false>(false);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState(false);
 	const navigate = useNavigate();
 	const { floor } = useParams();
@@ -143,7 +143,7 @@ function FloorSelection() {
 				     color={ theme.palette.text.primary }>
 					{error ? (
 						<Box width="100%" height="80%" mt={5} display="flex" justifyContent="center" alignItems="center">
-							<Typography variant="h6">No data available!</Typography>
+							<Typography variant="h6">Nebyla nelezna požadovaná podlaží!</Typography>
 						</Box>
 					) : floors.length > 0 && !isLoading ? (
 						floors
@@ -157,7 +157,7 @@ function FloorSelection() {
 								</Box>
 							))
 					) : (
-						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center" pt={5}>
 							<CircularProgress thickness={3} size="5rem" />
 						</Box>
 					)}

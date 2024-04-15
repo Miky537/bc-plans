@@ -145,7 +145,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 			<Box>
 				{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage?
 					<FormControl sx={ FormControlLabelStyles }>
-						<InputLabel>Select faculty</InputLabel>
+						<InputLabel>Výběr fakulty</InputLabel>
 						<Select
 							value={ selectedFaculty? selectedFaculty : "" }
 							className="faculty-select-topbar"

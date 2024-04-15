@@ -28,6 +28,10 @@
     justify-content: flex-start!important;
 }
 
+html {
+    background-color: #1B2228;
+}
+
 .MuiList-root.MuiMenu-list {
     background-color: #40444f !important;
 }

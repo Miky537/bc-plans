@@ -189,7 +189,7 @@ export function SwipeableDrawerComponent({
 			open={ isDrawerOpen }
 			onClose={ handleCloseDrawer }
 			onOpen={ onOpen }
-			transitionDuration={ { enter: 500, exit: 200 } }
+			transitionDuration={ { enter: 750, exit: 200 } }
 			sx={ drawerStyles }
 		>
 			<Box display="flex"

@@ -166,14 +166,6 @@ function TeacherRooms() {
 			}
 		});
 	}
-	const handleGoToMap = () => {
-		if (selectedFaculty) {
-			navigate(`/map/${ selectedFaculty }`);
-		} else {
-			navigate(`/map`);
-		}
-	}
-
 
 	if (loginError) {
 		return <Typography>Chyba v přihlašování. Zkuste stránku znovu načíst!</Typography>;

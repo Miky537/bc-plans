@@ -17,7 +17,7 @@ function BuildingSelection() {
 	const { palette } = useTheme();
 	const [buildings, setBuildings] = useState([]);
 	const navigate = useNavigate();
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const {
 		selectedFaculty,
 		setSelectedBuildingId,
@@ -75,10 +75,10 @@ function BuildingSelection() {
 				<Box display="flex" flexDirection="column" justifyContent="flex-start" width="100%" margin="auto"
 				     color={ palette.text.primary } borderTop="2px solid gray" overflow="auto">
 					{ isLoading? (
-						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center">
+						<Box width="100%" height="80%" display="flex" justifyContent="center" alignItems="center" pt={5}>
 							<CircularProgress thickness={ 3 } size="5rem" />
 						</Box>
-					) : buildings.length > 0? (
+					) : buildings.length > 0 && !isLoading? (
 						buildings
 							.filter((building: BuildingSelectionInt) => building.building_id !== 39)
 							.sort((a: BuildingSelectionInt, b: BuildingSelectionInt) => a.name.localeCompare(b.name))
@@ -97,7 +97,7 @@ function BuildingSelection() {
 						     pt={ 5 }
 						     justifyContent="center"
 						     alignItems="center">
-							<Typography variant="h4">No buildings available</Typography>
+							<Typography variant="h4" textAlign="center">Nebyly nalezeny žádné budovy!</Typography>
 						</Box>
 					)
 					}

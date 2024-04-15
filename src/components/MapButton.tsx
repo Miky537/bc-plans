@@ -21,7 +21,9 @@ export default function MapButton() {
 			        transform: 'translateX(-50%)',
 			        width: "100%",
 			        maxWidth: "1440px",
-			        height: "5em"
+			        height: "5em",
+			        borderBottomLeftRadius: "0px",
+			        borderBottomRightRadius: "0px",
 		        } }>
 			<Typography variant="h5" sx={ {
 				display: "flex",

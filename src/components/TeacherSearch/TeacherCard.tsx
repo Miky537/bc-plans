@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
-import HistoryIcon from "@mui/icons-material/History";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 interface TeacherCardProps {
 	isSearchedItem: boolean;
@@ -42,6 +42,7 @@ function TeacherCard({
 		     borderRadius="10px"
 		     onClick={ () => handleTeacherTabClick(room_id, email, fullTeacherName, room_name, faculty) }
 		>
+			<LocationOnIcon sx={{position: "absolute", right: "0.5em", top:"0.4em", borderRadius:"50%"}} />
 			<Box display="flex"
 			     width="90%"
 			     alignItems="center"

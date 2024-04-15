@@ -95,7 +95,7 @@ const MapHolder = () => {
 			     display={ areFeaturesLoading && selectedFaculty !== undefined? "flex" : "none" }
 			     borderRadius="20px"
 			     justifyContent="space-around"
-			     zIndex={ 100 }>
+			     zIndex={ 0 }>
 				<Typography>Načítání..</Typography>
 				<CircularProgress size={ 27 } thickness={ 5 } />
 			</Box>

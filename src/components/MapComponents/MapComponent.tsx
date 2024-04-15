@@ -15,7 +15,7 @@ import {
 	displayPinsWhenZoomChange,
 	getFacultyCoordinates
 } from "./MapFunctions";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import Track from "@arcgis/core/widgets/Track";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
@@ -27,7 +27,6 @@ import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import polylabel from "polylabel";
 import Point from "@arcgis/core/geometry/Point";
 import { Dialog, DialogContent, DialogActions, Button, Typography, Divider } from "@mui/material";
-import { DividerStyles } from "../TeacherSearch/styles";
 import { RoomIdWithType } from "./types";
 import { dialogStyles } from "./styles";
 
@@ -58,6 +57,7 @@ const MapComponent = ({
                       }: MapComponentProps) => {
 	const mapDiv = useRef<HTMLDivElement | null>(null);
 	const featureLayersRef = useRef<FeatureLayer[]>([]);
+	const navigate = useNavigate()
 	const { faculty, building, floor, roomName } = useParams();
 	const {
 		setSelectedRoomId,
@@ -83,6 +83,7 @@ const MapComponent = ({
 
 	const location = useLocation()
 
+
 	const {
 		centerCoordinates,
 		setIsMapLoaded,
@@ -96,6 +97,11 @@ const MapComponent = ({
 		setZoom,
 		setDoesRoomExist
 	} = useMapContext();
+
+	const handleItemClick = (clickedFaculty: string) => {
+		setZoom(18);
+		setActivateAnimation(true)
+	}
 
 	useEffect(() => {
 		mapViewRef.current?.map.add(featureGraphicsLayer);
@@ -206,6 +212,9 @@ const MapComponent = ({
 								faculty: clickedGraphic.attributes.faculty,
 								address: clickedGraphic.attributes.address,
 							});
+							// setArePinsVisible(false);
+							navigate(`/map/${ clickedGraphic.attributes.faculty }`);
+							handleItemClick(clickedGraphic.attributes.faculty);
 							setIsDialogOpen(true);
 							return;
 						}
@@ -676,7 +685,8 @@ const MapComponent = ({
 	useEffect(() => {
 		if (activateAnimation) {
 			const arr = [centerCoordinates.lat, centerCoordinates.lng]
-			mapViewRef.current?.goTo({
+			if (!mapViewRef.current) return;
+			mapViewRef.current!.goTo({
 				target: arr,
 				zoom: zoom
 			}, { duration: 500, easing: "ease-out" })
@@ -744,12 +754,16 @@ const MapComponent = ({
 		<>
 			<div ref={ mapDiv } id="mapDiv" />
 			<Dialog open={ isDialogOpen } onClose={ handleClose }>
-				<Typography variant="h5" align="center" pt={ 2 }>Navigate to faculty</Typography>
+				<Typography variant="h5" align="center" pt={ 2 }>Navigovat k fakultě</Typography>
 				<DialogContent sx={ { pl: 2 } }>
-					<Typography color="GrayText" variant="body2">Faculty</Typography>
+					<Typography color="GrayText" variant="body2">Fakulta</Typography>
 					<Typography variant="body1">{ dialogData?.faculty }</Typography>
-					<Divider sx={ { mb: 1, pt: 1, ...DividerStyles } } />
-					<Typography color="GrayText" variant="body2">Address</Typography>
+					<Divider sx={ {
+						mb: 1, pt: 1, opacity: 0.2,
+						borderColor: "#FFFFFF",
+						maxWidth: "900px",
+					} } />
+					<Typography color="GrayText" variant="body2">Adresa</Typography>
 					<Typography variant="body1">{ dialogData?.address }</Typography>
 				</DialogContent>
 				<DialogActions>

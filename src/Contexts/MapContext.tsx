@@ -39,8 +39,8 @@ export const useMapContext = () => {
 
 export const MapProvider = ({children} : { children: React.ReactNode }) => {
 	const [centerCoordinates, setCenterCoordinates] = useState<Coordinates>({
-		lat: 16.603375432788052,
-		lng: 49.20174147400288,
+		lat: 16.593311784946575,
+		lng: 49.19978208549544,
 	});
 
 	const [isMapVisible, setMapVisibility] = useState<boolean>(true);

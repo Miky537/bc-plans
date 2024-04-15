@@ -216,6 +216,7 @@ const MapComponent = ({
 							navigate(`/map/${ clickedGraphic.attributes.faculty }`);
 							handleItemClick(clickedGraphic.attributes.faculty);
 							setIsDialogOpen(true);
+							setActivateAnimation(true);
 							return;
 						}
 
@@ -255,11 +256,11 @@ const MapComponent = ({
 				}
 			}
 		};
-	}, [centerCoordinates]);
+	}, []);
 
 	useEffect(() => {
 		const zoomWatch = mapViewRef.current?.watch("zoom", (zoom) => {
-			if (zoom > 16 && allFeatures.length > 0) {
+			if (zoom > 16) {
 				debouncedDisplayRoomWhenZoomChange();
 			} else {
 				debouncedDisplayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
@@ -724,14 +725,56 @@ const MapComponent = ({
 		} else if (faculty) {
 			setSelectedFaculty(faculty as FacultyType)
 			setCenterCoordinates(getFacultyCoordinates(faculty as FacultyType));
+			setArePinsVisible(false);
+
+
+			if (!mapViewRef.current) {
+				return;
+			}
+			mapViewRef.current?.when(() => {
+				// Now that the mapView is fully loaded, perform goTo
+				const centerArr = getFacultyCoordinates(faculty as FacultyType);
+				const arr = [centerArr.lat, centerArr.lng]
+				mapViewRef.current?.goTo({
+					target: arr,
+					zoom: zoom
+				}, {
+					duration: 500,
+					easing: "ease-out"
+				})
+					.then(() => {
+						setArePinsVisible(false)
+						PinsGraphicsLayerRef.current?.graphics.removeAll();
+					})
+					.catch(err => console.error("Initial navigation failed:", err));
+			});
 		} else if (location.pathname === "/map" || location.pathname === "/" || location.pathname === "/map/") {
 			setCenterCoordinates({ lat: 16.58718904843347, lng: 49.217963479239316 });
 			setZoom(13);
+
 			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+			if (!mapViewRef.current) {
+				return;
+			}
+
+			mapViewRef.current?.when(() => {
+				const arr = [16.58718904843347, 49.217963479239316]
+				mapViewRef.current?.goTo({
+					target: arr,
+					zoom: 12,
+				}, {
+					duration: 500,
+					easing: "ease-out"
+				})
+					.then(() => setArePinsVisible(true))
+					.catch(err => console.error("Initial navigation failed:", err));
+			});
+
 		} else {
 			return;
 		}
 	}, [faculty, building, floor, roomName]);
+
 	useEffect(() => {
 		if (!mapViewRef.current || !PinsGraphicsLayerRef.current) {
 			return;

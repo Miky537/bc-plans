@@ -17,9 +17,11 @@ export default function SearchedItem({handleRoomSearchClick, room}: SearchedItem
 		<Box sx={ searchBoxStyle }
 		     onClick={ (event) => handleRoomSearchClick(room, event) }>
 			<HistoryIcon color="info" />
-			<Typography overflow="hidden" whiteSpace="nowrap">
-				{ room.room_name } - Podlaží: { room.floor_number } -
-				Fakulta: { room.faculty }
+			<Typography sx={{display: "flex", alignItems: "center"}}>
+				<Typography variant="body1">{room.room_name}&nbsp;-&nbsp;</Typography>
+				<Typography variant="body2"> podlaží {room.floor_number}&nbsp;-&nbsp;</Typography>
+				<Typography variant="body2"> {room.building_name}&nbsp;-&nbsp;</Typography>
+				<Typography variant="body2"> {room.faculty}</Typography>
 			</Typography>
 		</Box>
 	)

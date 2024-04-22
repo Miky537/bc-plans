@@ -68,7 +68,9 @@ const RoomSelectionItem = ({
 		     alignItems="center"
 		     justifyContent="space-between"
 		     borderTop="1px solid gray"
-		     py={ 1 }>
+		     py={ 1 }
+			sx={{cursor: "pointer"}}
+		>
 			<Typography variant="h6"
 			            width="100%"
 			            onClick={ () => handleRoomClick(roomName, roomId) }>{ roomName }

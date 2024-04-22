@@ -29,7 +29,7 @@ function TeacherSearch() {
 
 	return (
 
-		<Box sx={ { display: 'flex', flexDirection: 'column', height: '100%' } }>
+		<Box sx={ { display: 'flex', flexDirection: 'column', height: '100vh' } }>
 			<Box sx={ { borderBottom: 1, borderColor: 'divider', position: "sticky", top: 0, zIndex: 1100 } }>
 				<Paper square sx={{bgcolor: "#262626"}}>
 					<Tabs value={ value }

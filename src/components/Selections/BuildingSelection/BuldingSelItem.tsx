@@ -18,7 +18,7 @@ export default function BuildingSelItem({ handleBuildingClick, buildingId,buildi
 		     pb="0.7em"
 		     bgcolor={ "background.paper" }
 		     borderBottom="1px solid white"
-		     onClick={ () => handleBuildingClick(buildingId, buildingName) }>
+		     onClick={ () => handleBuildingClick(buildingId, buildingName) } sx={{cursor: "pointer"}}>
 			<Typography variant="h5" ml="0.7em">{ buildingName }</Typography>
 		</Box>
 	)

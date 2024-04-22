@@ -20,6 +20,7 @@ export interface RoomNames {
 	room_name: string | null;
 	floor_number: number;
 	faculty: FacultyType;
+	building_name: string;
 }
 
 interface SearchComponentProps {
@@ -73,7 +74,7 @@ export function SearchComponent({
 
 			return result.item
 		}) : [];
-		setFilteredRooms(result.slice(0, 5)); // Take the top 5 results
+		setFilteredRooms(result.slice(0, 9)); // Take the top 5 results
 	}, [query, searchRooms]);
 
 	const handleExpand = () => {
@@ -188,8 +189,8 @@ export function SearchComponent({
 							top: "100%",
 							color: "white",
 							transition: "max-height 1s ease-out",
-							overflow: "hidden",
-							maxHeight: isExpanded? "300px" : "0",
+							overflow: "auto",
+							maxHeight: isExpanded? "50vh" : "0",
 							width: "100%",
 							borderBottomLeftRadius: 10,
 							borderBottomRightRadius: 10,
@@ -200,8 +201,12 @@ export function SearchComponent({
 									<Box sx={ searchBoxStyle }
 									     onClick={ (event) => handleRoomSearchClick(room, event) }>
 										<PlaceIcon color="info" />
-										<Typography>{ room.room_name } - Podlaží: { room.floor_number } -
-											Fakulta: { room.faculty }</Typography>
+										<Typography sx={{display: "flex", alignItems: "center"}}>
+											<Typography variant="body1">{room.room_name}&nbsp;-&nbsp;</Typography>
+											<Typography variant="body2"> podlaží {room.floor_number}&nbsp;-&nbsp;</Typography>
+											<Typography variant="body2"> {room.building_name}&nbsp;-&nbsp;</Typography>
+											<Typography variant="body2"> {room.faculty}</Typography>
+										</Typography>
 									</Box>
 									<Divider flexItem
 									         variant="middle"

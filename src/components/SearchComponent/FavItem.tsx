@@ -18,9 +18,11 @@ export default function FavItem({room, handleFavouriteRoomClick}: FavItemProps) 
 		<Box sx={ searchBoxStyle }
 		     onClick={ (event) => handleFavouriteRoomClick(room, event) }>
 			<StarIcon color="info" />
-			<Typography overflow="hidden" whiteSpace="nowrap">
-				{ room.roomName } - Podlaží: { room.floorNumber } -
-				Fakulta: { room.faculty }
+			<Typography sx={{display: "flex", alignItems: "center"}}>
+				<Typography variant="body1">{room.roomName}&nbsp;-&nbsp;</Typography>
+				<Typography variant="body2"> podlaží {room.floorNumber}&nbsp;-&nbsp;</Typography>
+				<Typography variant="body2"> {room.buildingName}&nbsp;-&nbsp;</Typography>
+				<Typography variant="body2"> {room.faculty}</Typography>
 			</Typography>
 		</Box>
 	)

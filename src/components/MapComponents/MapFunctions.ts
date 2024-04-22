@@ -11,6 +11,7 @@ import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import { facultyInfo } from "../../FacultyLogos/constants";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import { Coordinates } from "./types";
+import { envelope } from "@turf/turf";
 
 
 export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLevel: number) => {
@@ -64,7 +65,7 @@ export const addBoundingBox = (layer: FeatureLayer, mapViewRef: any, minZoomLeve
 		console.error("Failed to query features:", err);
 	});
 };
-export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, longitude: number, data: any, faculty: FacultyType) => {
+export const addPinMarkerWithSvg = (mapView: GraphicsLayer, logosLayer: GraphicsLayer, latitude: number, longitude: number, data: any, faculty: FacultyType) => {
 	if (faculty === "USI") return;
 	const height = 99.189;
 	const ratio = data.width / height;
@@ -77,7 +78,7 @@ export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, lo
 
 	// Pin symbol
 	const pinSymbol = new PictureMarkerSymbol({
-		url: `${ process.env.REACT_APP_APP_URL }/Google_Maps_pin.svg`,
+		url: `${process.env.REACT_APP_APP_URL}/Google_Maps_pin.svg`,
 		width: "20px",
 		height: "35px",
 	});
@@ -123,10 +124,10 @@ export const addPinMarkerWithSvg = (mapView: GraphicsLayer, latitude: number, lo
 			symbol: usiSvgSymbol
 		});
 
-		mapView.graphics.add(usiSvgGraphic);
+		logosLayer.graphics.add(usiSvgGraphic);
 
 	}
-	mapView.graphics.add(svgGraphic);
+	logosLayer.graphics.add(svgGraphic);
 };
 
 export const adjustMapHeight = () => {
@@ -240,16 +241,16 @@ export function getRoomCenter(allFeatures: any, RoomID: number) {
 	}
 }
 
-export const displayPinsWhenZoomChange = (mapView: GraphicsLayer | null, RoomHighlightGraphicsLayerRef: any,
+export const displayPinsWhenZoomChange = (mapView: GraphicsLayer | null, logosLayer: GraphicsLayer | null, RoomHighlightGraphicsLayerRef: any,
                                           FeaturesGraphicsLayerRef: any, setArePinsVisible: any) => {
-	if (!mapView) return;
+	if (!mapView || !logosLayer) return;
 	setArePinsVisible(true);
 	FeaturesGraphicsLayerRef.current?.graphics.removeAll()
 	Object.entries(facultyInfo).forEach(([faculty, data]) => {
 		if (faculty === "USI") return;//FCH and USI are on the same coordinates
 		const coordinates: Coordinates = getFacultyCoordinates(faculty as FacultyType);
 		if (coordinates) {
-			addPinMarkerWithSvg(mapView, coordinates.lat, coordinates.lng, data, faculty as FacultyType);
+			addPinMarkerWithSvg(mapView, logosLayer, coordinates.lat, coordinates.lng, data, faculty as FacultyType);
 		} else {
 			console.warn(`No coordinates found for ${ faculty }`);
 		}

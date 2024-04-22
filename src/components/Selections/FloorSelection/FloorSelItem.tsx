@@ -66,6 +66,7 @@ export default function FloorSelItem({ floor, setExpanded, expanded, handleRoomC
 										roomName={ room.room_number }
 										roomId={ room.room_id }
 										floorNumber={ floor.floor_number }
+										fullRoomName={room.name}
 									/>
 								</Box>
 							);

@@ -132,16 +132,6 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 
 	return (
 		<div className="Topbar" id="topbar">
-			<IconButton sx={ {
-				flexDirection: "column",
-				position: "absolute",
-				left: 0,
-				display: !isOnFacultyPage && !isOnTeacherPage? "flex" : "none"
-			} }
-			            onClick={ goBack }>
-				<WestIcon sx={ { color: "white" } } />
-			</IconButton>
-
 			<Box>
 				{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage?
 					<FormControl sx={ FormControlLabelStyles }>

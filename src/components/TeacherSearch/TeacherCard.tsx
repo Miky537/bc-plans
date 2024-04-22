@@ -1,6 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import { Typography } from "@mui/material";
+import { Typography, useTheme } from "@mui/material";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import { FacultyType } from "../Selections/FacultySelection/FacultySelection";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -26,7 +26,7 @@ function TeacherCard({
 	                     faculty,
 	                     email
                      }: TeacherCardProps) {
-
+	const theme = useTheme()
 
 	return (
 		<Box width="90%"
@@ -42,14 +42,22 @@ function TeacherCard({
 		     borderRadius="10px"
 		     onClick={ () => handleTeacherTabClick(room_id, email, fullTeacherName, room_name, faculty) }
 		>
-			<LocationOnIcon sx={{position: "absolute", right: "0.5em", top:"0.4em", borderRadius:"50%"}} />
+			<LocationOnIcon sx={ {
+				position: "absolute",
+				right: "0.5em",
+				top: "0.4em",
+				borderRadius: "50%",
+				color: room_name? "" : theme.palette.text.disabled
+			} } />
 			<Box display="flex"
 			     width="90%"
 			     alignItems="center"
 			     justifyContent="flex-start"
 			     gap={ 1.5 }>
-				<AccountBoxIcon />
-				<Typography variant="h6" fontWeight={600}>
+				<AccountBoxIcon sx={ { color: room_name? "" : theme.palette.text.disabled } } />
+				<Typography variant="h6"
+				            fontWeight={ 600 }
+				            sx={ { width: "80%", color: room_name? "" : theme.palette.text.disabled } }>
 					{ fullTeacherName }
 				</Typography>
 			</Box>
@@ -64,7 +72,8 @@ function TeacherCard({
 				     margin="auto"
 				>
 					<Box width="100%" display="flex" justifyContent="flex-end">
-						<Typography variant="h5" sx={ { textAlign: 'center' } }>
+						<Typography variant="h5"
+						            sx={ { textAlign: 'center', color: room_name? "" : theme.palette.text.disabled } }>
 							{ room_name }
 						</Typography>
 					</Box>
@@ -77,19 +86,22 @@ function TeacherCard({
 				     width="100%"
 				     margin="auto">
 					<Box width="50%" display="flex" justifyContent="flex-start">
-						<Typography variant="body2">
+						<Typography variant="body2" sx={ { color: room_name? "" : theme.palette.text.disabled } }>
 							{ email }
 						</Typography>
 					</Box>
 					<Box width="50%" display="flex" justifyContent="flex-start">
 						<Typography variant="body2"
-						            sx={ { textAlign: 'center', textOverflow: "ellipsis" } }>
+						            sx={ {
+							            textAlign: 'center',
+							            textOverflow: "ellipsis",
+							            color: room_name? "" : theme.palette.text.disabled
+						            } }>
 							{ faculty }
 						</Typography>
 					</Box>
 				</Box>
 			</Box>
-
 		</Box>
 	);
 }

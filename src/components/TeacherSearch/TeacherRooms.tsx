@@ -140,7 +140,8 @@ function TeacherRooms() {
 				faculty: data.building_info.zkratka_prezentacni.split(' ')[0] as FacultyType,
 				email: email,
 				fullTeacherName: fullTeacherName,
-				teacherFaculty: teacherFaculty
+				teacherFaculty: teacherFaculty,
+				building_name: "s",
 			};
 			checkTeacher(template);
 			setAreFeaturesLoading(true);
@@ -168,12 +169,16 @@ function TeacherRooms() {
 	}
 
 	if (loginError) {
-		return <Typography>Chyba v přihlašování. Zkuste stránku znovu načíst!</Typography>;
+		return (
+			<Box display="flex" justifyContent="center">
+				<Typography>Chyba v přihlašování. Zkuste stránku znovu načíst!</Typography>
+			</Box>
+		);
 	}
 
 	return (
-		<Box height="100vh">
-			<Box sx={ { margin: "auto", maxWidth: "900px" } }>
+		<Box height="100%">
+			<Box sx={ { margin: "auto", maxWidth: "900px", mb: 10 } }>
 				<TextField
 					id="search-bar"
 					className="text"

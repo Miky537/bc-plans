@@ -20,6 +20,7 @@ interface RoomSelectionItemProps {
 	floorNumber: number;
 	buildingName: string;
 	handleRoomClick: (roomName: string | null, roomId: number) => Promise<void>;
+	fullRoomName: string | null;
 }
 
 const RoomSelectionItem = ({
@@ -28,7 +29,8 @@ const RoomSelectionItem = ({
 	                           floorName,
 	                           buildingName,
 	                           floorNumber,
-	                           handleRoomClick
+	                           handleRoomClick,
+	                           fullRoomName
                            }: RoomSelectionItemProps) => {
 	const [isFav, setIsFav] = useState<boolean>(false);
 	const { selectedFaculty: faculty } = useFacultyContext();
@@ -69,7 +71,9 @@ const RoomSelectionItem = ({
 		     py={ 1 }>
 			<Typography variant="h6"
 			            width="100%"
-			            onClick={ () => handleRoomClick(roomName, roomId) }>{ roomName }</Typography>
+			            onClick={ () => handleRoomClick(roomName, roomId) }>{ roomName }
+				<Typography variant="body1" sx={ { color: "gray" } }>{ fullRoomName }</Typography>
+			</Typography>
 			<FavIconButton roomName={ roomName }
 			               roomId={ roomId }
 			               floorName={ floorName }

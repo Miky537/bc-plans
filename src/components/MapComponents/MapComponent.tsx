@@ -7,6 +7,14 @@ import '@arcgis/core/assets/esri/themes/dark/main.css';
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import { typeToColorMapping, iconProps, layerConfigs } from "./constants";
+import EntranceIcon from './icons/EntranceIcon.svg';
+import ElevatorIcon from './icons/ElevatorIcon.svg';
+import ManIcon from './icons/ManIcon.svg';
+import WomanIcon from './icons/WomanIcon.svg';
+import WCIcon from './icons/WCIcon.svg';
+import StairsIcon from './icons/StairsIcon.svg';
+import WheelChairIcon from './icons/WheelchairIcon.svg';
+
 import { useMapContext } from "../../Contexts/MapContext";
 import {
 	adjustMapHeight,
@@ -72,6 +80,7 @@ const MapComponent = ({
 	const RoomHighlightGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const LabelsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 	const PinsGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
+	const LogosGraphicsLayerRef = useRef<GraphicsLayer | null>(null);
 
 	const [featureGraphicsLayer] = useState(new GraphicsLayer());
 	const abortControllerRef = useRef<AbortController | null>(null);
@@ -148,10 +157,16 @@ const MapComponent = ({
 		const roomHighlightGraphicsLayer = new GraphicsLayer();
 		const labelsGraphicsLayer = new GraphicsLayer();
 		const iconsGraphicsLayer = new GraphicsLayer();
-		const pinsGraphicsLayer = new GraphicsLayer();
+		// const pinsGraphicsLayer = new GraphicsLayer();
 
-		mapView.map.add(pinsGraphicsLayer);
-		PinsGraphicsLayerRef.current = pinsGraphicsLayer;
+		const pinLayer = new GraphicsLayer();
+		const logoLayer = new GraphicsLayer();
+		mapView.map.addMany([pinLayer, logoLayer]);
+		PinsGraphicsLayerRef.current = pinLayer;
+		LogosGraphicsLayerRef.current = logoLayer;
+
+		// mapView.map.add(pinsGraphicsLayer);
+		// PinsGraphicsLayerRef.current = pinsGraphicsLayer;
 
 		mapView.map.add(featureGraphicsLayer);
 		FeaturesGraphicsLayerRef.current = featureGraphicsLayer;
@@ -263,7 +278,7 @@ const MapComponent = ({
 			if (zoom > 16) {
 				debouncedDisplayRoomWhenZoomChange();
 			} else {
-				debouncedDisplayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+				debouncedDisplayPinsWhenZoomChange(PinsGraphicsLayerRef.current, LogosGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
 			}
 		});
 		return () => {
@@ -303,6 +318,7 @@ const MapComponent = ({
 		}
 		setArePinsVisible(false);
 		PinsGraphicsLayerRef.current?.graphics.removeAll();
+		LogosGraphicsLayerRef.current?.graphics.removeAll();
 		fetchCurrentFloorRooms().then((rooms) => {
 			rooms.forEach((room: RoomIdWithType) => {
 				const color = typeToColorMapping[room.roomType] || typeToColorMapping["Default"];
@@ -458,28 +474,28 @@ const MapComponent = ({
 
 				switch (room.roomType) {
 					case 35:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WomanIcon.svg`;
+						excludedRoomIconURL = WomanIcon;
 						break;
 					case 26:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WheelchairIcon.svg`;
+						excludedRoomIconURL = WheelChairIcon;
 						break;
 					case 36:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/ManIcon.svg`;
+						excludedRoomIconURL = ManIcon;
 						break;
 					case 87:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/ElevatorIcon.svg`;
+						excludedRoomIconURL = ElevatorIcon;
 						break;
 					case 88:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/WCIcon.svg`;
+						excludedRoomIconURL = WCIcon;
 						break;
 					case 81:
 					case 159:
 					case 177:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/StairsIcon.svg`;
+						excludedRoomIconURL = StairsIcon;
 						break;
 					case 13:
 					case 140:
-						excludedRoomIconURL = `${ process.env.REACT_APP_APP_URL }/icons/EntranceIcon.svg`;
+						excludedRoomIconURL = EntranceIcon;
 						break;
 					default:
 						excludedRoomIconURL = ''; // Default or 'none' indicating no icon should be added
@@ -745,6 +761,7 @@ const MapComponent = ({
 					.then(() => {
 						setArePinsVisible(false)
 						PinsGraphicsLayerRef.current?.graphics.removeAll();
+						LogosGraphicsLayerRef.current?.graphics.removeAll();
 					})
 					.catch(err => console.error("Initial navigation failed:", err));
 			});
@@ -752,7 +769,7 @@ const MapComponent = ({
 			setCenterCoordinates({ lat: 16.58718904843347, lng: 49.217963479239316 });
 			setZoom(13);
 
-			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, LogosGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
 			if (!mapViewRef.current) {
 				return;
 			}
@@ -776,11 +793,11 @@ const MapComponent = ({
 	}, [faculty, building, floor, roomName]);
 
 	useEffect(() => {
-		if (!mapViewRef.current || !PinsGraphicsLayerRef.current) {
+		if (!mapViewRef.current || !PinsGraphicsLayerRef.current || !LogosGraphicsLayerRef.current) {
 			return;
 		}
 		if (location.pathname === "/map" || location.pathname === "/" || location.pathname === "/map/") {
-			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
+			displayPinsWhenZoomChange(PinsGraphicsLayerRef.current, LogosGraphicsLayerRef.current, RoomHighlightGraphicsLayerRef, FeaturesGraphicsLayerRef, setArePinsVisible);
 		}
 	}, [location.pathname, mapViewRef.current, PinsGraphicsLayerRef.current]);
 

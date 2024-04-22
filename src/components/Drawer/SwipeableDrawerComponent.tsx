@@ -215,15 +215,6 @@ export function SwipeableDrawerComponent({
 				</Box>
 				<MoveButton toggleDrawerHeight={ toggleDrawerHeight } drawerHeight={ drawerHeight } />
 			</Box>
-
-			<Box position="absolute"
-			     top="1em"
-			     left="25%"
-			     borderTop="5px solid #ABABAB"
-			     height="1px"
-			     width="50%"
-			     display="flex"
-			/>
 			<Box display="flex"
 			     ref={ contentRef }
 			     minHeight="fit-content"

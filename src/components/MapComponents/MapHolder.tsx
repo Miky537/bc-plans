@@ -10,6 +10,9 @@ import Box from "@mui/material/Box";
 import { useMapContext } from "../../Contexts/MapContext";
 import MediaQuery from "react-responsive";
 import { DesktopDrawer } from "../Drawer/DesktopDrawer";
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import IconButton from "@mui/material/IconButton";
+import { useNavigate } from "react-router-dom";
 
 export interface InfoState {
 	room: Room | undefined;
@@ -23,7 +26,7 @@ const MapHolder = () => {
 	const [areFeaturesEmpty, setAreFeaturesEmpty] = useState(false);
 	const { selectedFaculty, setAreFeaturesLoading, areFeaturesLoading } = useFacultyContext();
 	const { arePinsVisible } = useMapContext();
-
+	const navigate = useNavigate()
 	const {
 		selectedRoomId,
 		setSelectedRoomId,
@@ -45,6 +48,10 @@ const MapHolder = () => {
 		selectedRoomIdRef.current = selectedRoomId;
 	}, [selectedRoomId]);
 
+	const handleTeacherSearchClick = () => {
+		navigate("/teacher")
+	}
+
 	return (
 		<Box className="Map-Holder">
 
@@ -53,6 +60,22 @@ const MapHolder = () => {
 			                 setIsDrawerOpen={ setIsDrawerOpen }
 			                 setAreFeaturesLoading={ setAreFeaturesLoading }
 			/>
+
+			<Box position="absolute"
+			     left="0.5em"
+			     top="8em"
+			     width="3em"
+			     height="3em"
+			     display="flex"
+			     alignItems="center"
+			     justifyContent="center"
+			     zIndex={ 1 }
+			     bgcolor="background.paper"
+			     borderRadius="50%">
+				<IconButton sx={ { color: "white", padding: 0 } } onClick={handleTeacherSearchClick}>
+					<PersonSearchIcon fontSize="large" />
+				</IconButton>
+			</Box>
 
 			<Box display={ areFeaturesLoading || (areFeaturesEmpty && !areFeaturesLoading) || arePinsVisible? "none" : "block" }>
 				<FloorHolder />

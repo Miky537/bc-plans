@@ -7,7 +7,7 @@ import TabPanel from "./TabPanel";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function TeacherSearch() {
-	const [value, setValue] = useState(0);
+	const [value, setValue] = useState(1);
 	const navigate = useNavigate();
 	const location = useLocation();
 	const currentPath = location.pathname;

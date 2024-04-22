@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import { Button, Divider, Typography } from "@mui/material";
 import { useMapContext } from "../../Contexts/MapContext";
@@ -13,10 +13,22 @@ const FloorButtonStyles = {
 const FloorHolder = () => {
 	const { setFloors, floors } = useMapContext();
 	const { selectedFaculty, selectedFloorNumber, setSelectedFloorNumber } = useFacultyContext();
+	const containerRef = useRef<HTMLDivElement | null>(null);
+	const selectedFloorRef = useRef<HTMLButtonElement | null>(null);
 
 	const handleButtonClick = (floor: number) => {
 		setSelectedFloorNumber(floor)
 	}
+
+	useEffect(() => {
+		// When floors are updated, check if the selected floor button needs to be scrolled into view
+		if (selectedFloorRef.current) {
+			selectedFloorRef.current!.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center', // Scroll to make the button centered in the container
+			});
+		}
+	}, [floors, selectedFloorNumber]);
 
 	useEffect(() => {
 		const fetchFloors = async() => {
@@ -39,22 +51,25 @@ const FloorHolder = () => {
 	}, [selectedFaculty, setFloors]);
 
 	return (
-		<Box zIndex="2"
+		<Box ref={ containerRef }
+		     id="Floor-Holder"
+		     zIndex="2"
 		     gap="0.2em"
 		     borderRadius="3px"
 		     display={ floors.length === 0? "none" : "flex" }
-		     flexDirection="column"
+		     flexDirection="column-reverse"
 		     position="absolute"
 		     top="4em"
 		     right="1em"
 		     boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
 		     bgcolor="#DBDBDB"
-		     // maxHeight="18.5em"
 		     sx={ { maxHeight: { xs: "18.5em", md: "30em" } } }
 		     overflow="auto">
 			{ floors.map((floor: number, index: number) => (
 				<React.Fragment key={ floor }>
-					<Button className="FloorButton" onClick={ () => handleButtonClick(floor) }
+					<Button ref={ selectedFloorNumber === floor? selectedFloorRef : null }
+					        className="FloorButton"
+					        onClick={ () => handleButtonClick(floor) }
 					        sx={ {
 						        display: "flex",
 						        justifyContent: "center",

@@ -279,7 +279,7 @@ export const typeToColorMapping: ColorMapping = {
 };
 
 export const iconProps = {
-	width: "25px",
+	width: "24px",
 	height: "25px"
 };
 

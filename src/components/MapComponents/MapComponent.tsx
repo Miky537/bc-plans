@@ -403,7 +403,6 @@ const MapComponent = ({
 			// Convert ArcGIS Polygon geometry to a format compatible with polylabel
 			const polygon = feature.geometry.rings.map((ring: number[][]) => ring.map((point) => [point[0], point[1]]));
 
-			// Use polylabel to find the pole of inaccessibility (optimal label position)
 			const [x, y] = polylabel(polygon, 1.0);
 
 			const labelSymbol = new TextSymbol({
@@ -468,10 +467,18 @@ const MapComponent = ({
 		iconsGraphicsLayer.removeAll();
 		roomsToAddIcons.forEach(room => {
 			if (room.RoomID === 1308) return;
-			const roomCenter = getRoomCenter(allFeatures, room.RoomID);
-			if (roomCenter) {
-				let excludedRoomIconURL;
+			const roomPolygon = allFeatures.find((feature: any) => feature.attributes.RoomID === room.RoomID)?.geometry;
+			if (roomPolygon) {
+				const polygon = roomPolygon.rings.map((ring: number[][]) => ring.map((point) => [point[0], point[1]]));
 
+				const [x, y] = polylabel(polygon, 1.0);
+				const roomCenter = new Point({
+					x: x,
+					y: y,
+					spatialReference: roomPolygon.spatialReference
+				});
+
+				let excludedRoomIconURL;
 				switch (room.roomType) {
 					case 35:
 						excludedRoomIconURL = WomanIcon;
@@ -498,7 +505,7 @@ const MapComponent = ({
 						excludedRoomIconURL = EntranceIcon;
 						break;
 					default:
-						excludedRoomIconURL = ''; // Default or 'none' indicating no icon should be added
+						excludedRoomIconURL = '';
 						break;
 				}
 

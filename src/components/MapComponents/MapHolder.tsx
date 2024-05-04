@@ -11,6 +11,7 @@ import { useMapContext } from "../../Contexts/MapContext";
 import MediaQuery from "react-responsive";
 import { DesktopDrawer } from "../Drawer/DesktopDrawer";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import BusinessIcon from '@mui/icons-material/Business';
 import IconButton from "@mui/material/IconButton";
 import { useNavigate } from "react-router-dom";
 
@@ -18,6 +19,20 @@ export interface InfoState {
 	room: Room | undefined;
 	floor: Floor | undefined;
 	building: Building | undefined;
+}
+
+const boxStyles = {
+	position: "absolute",
+	left: "0.5em",
+	top: "10em",
+	width: "3em",
+	height: "3em",
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+	zIndex: 1,
+	bgcolor: "background.paper",
+	borderRadius: "50%",
 }
 
 const MapHolder = () => {
@@ -51,6 +66,10 @@ const MapHolder = () => {
 	const handleTeacherSearchClick = () => {
 		navigate("/teacher")
 	}
+	const handleBuildingIconClick = () => {
+		navigate("/faculty")
+	}
+
 
 	return (
 		<Box className="Map-Holder">
@@ -61,19 +80,15 @@ const MapHolder = () => {
 			                 setAreFeaturesLoading={ setAreFeaturesLoading }
 			/>
 
-			<Box position="absolute"
-			     left="0.5em"
-			     top="8em"
-			     width="3em"
-			     height="3em"
-			     display="flex"
-			     alignItems="center"
-			     justifyContent="center"
-			     zIndex={ 1 }
-			     bgcolor="background.paper"
-			     borderRadius="50%">
+			<Box sx={{...boxStyles, top: "8em"}}>
 				<IconButton sx={ { color: "white", padding: 0 } } onClick={handleTeacherSearchClick}>
 					<PersonSearchIcon fontSize="large" />
+				</IconButton>
+			</Box>
+
+			<Box sx={{...boxStyles, top: "12em"}}>
+				<IconButton sx={ { color: "white", padding: 0 } } onClick={handleBuildingIconClick}>
+					<BusinessIcon fontSize="large" />
 				</IconButton>
 			</Box>
 

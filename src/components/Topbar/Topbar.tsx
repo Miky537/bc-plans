@@ -21,6 +21,7 @@ import { getFacultyCoordinates, convertPathToFacultyType } from "../MapComponent
 import { useFacultyContext } from "../../Contexts/FacultyContext";
 import { SelectStyles, FormControlLabelStyles, svgStyle } from "./styles";
 import { TopbarProps, FacultyIcons, Faculties } from "./types";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 export function isFacultyType(value: any): value is FacultyType {
@@ -132,37 +133,45 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 
 	return (
 		<div className="Topbar" id="topbar">
-			<Box>
-				{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage?
-					<FormControl sx={ FormControlLabelStyles }>
-						<InputLabel>Výběr fakulty</InputLabel>
-						<Select
-							value={ selectedFaculty? selectedFaculty : "" }
-							className="faculty-select-topbar"
-							onChange={ handleChange }
-							sx={ SelectStyles }
-							disabled={ disabled }
-						>
-							{ Faculties.map((faculty) =>
-								<MenuItem key={ faculty }
-								          onClick={ () => {
-									          handleItemClick(faculty)
-								          } }
-								          value={ faculty }
-								          sx={ {
-									          height: "2em",
-									          padding: 0,
-									          minHeight: "2.5em",
-									          display: "flex",
-									          justifyContent: "flex-start",
-								          } }>
-									{ facultyIcons[faculty] }
-								</MenuItem>
-							) }
-						</Select>
-					</FormControl> :
-					<Typography variant="h5">{ displayTitle }</Typography>
-				}
+			<Box sx={ { display: 'flex', alignItems: 'center'} }>
+				{ !(location.pathname.startsWith('/map') || location.pathname === '/teacher' || location.pathname === '/faculty') && (
+					<IconButton sx={{position: "absolute", left: "1em"}} edge="start" color="inherit" aria-label="menu" onClick={ () => navigate(-1) }>
+						<WestIcon />
+					</IconButton>
+				) }
+				<Box>
+					{ !isOnFacultyPage && !isOnFavPlacesPage && !isOnTeacherPage? (
+						<FormControl sx={ FormControlLabelStyles }>
+							<InputLabel>Výběr fakulty</InputLabel>
+							<Select
+								value={ selectedFaculty || "" }
+								className="faculty-select-topbar"
+								onChange={ handleChange }
+								sx={ SelectStyles }
+								disabled={ disabled }
+							>
+								{ Faculties.map((faculty) =>
+									<MenuItem key={ faculty }
+									          onClick={ () => {
+										          handleItemClick(faculty)
+									          } }
+									          value={ faculty }
+									          sx={ {
+										          height: "2em",
+										          padding: 0,
+										          minHeight: "2.5em",
+										          display: "flex",
+										          justifyContent: "flex-start",
+									          } }>
+										{ facultyIcons[faculty] }
+									</MenuItem>
+								) }
+							</Select>
+						</FormControl>
+					) : (
+						<Typography variant="h5">{ displayTitle }</Typography>
+					) }
+				</Box>
 			</Box>
 		</div>
 	);

@@ -30,7 +30,6 @@ function TeacherRooms() {
 	const [roomId, setRoomId] = useState<number | null>(null);
 	const [isWriting, setIsWriting] = useState(false);
 	const [previouslySearchedTeachers, setPreviouslySearchedTeachers] = useState<TeacherRoomsInter[]>([]);
-	const theme = useTheme();
 	const navigate = useNavigate();
 	const {
 		setSelectedFloorNumber,
@@ -40,7 +39,6 @@ function TeacherRooms() {
 		setSelectedFloor,
 		setRoomData,
 		setAreFeaturesLoading,
-		selectedFaculty,
 	} = useFacultyContext();
 	const { setDoesRoomExist } = useMapContext();
 
@@ -170,7 +168,7 @@ function TeacherRooms() {
 
 	if (loginError) {
 		return (
-			<Box display="flex" justifyContent="center">
+			<Box display="flex" justifyContent="center" maxWidth="50%">
 				<Typography>Chyba v přihlašování. Zkuste stránku znovu načíst!</Typography>
 			</Box>
 		);
@@ -269,6 +267,7 @@ function TeacherRooms() {
 										             room_name={ mistnost }
 										             room_id={ mistnost_id as number }
 										             handleTeacherTabClick={ handleTeacherTabClick }
+										             isLast={ index === teachers.length - 1 }
 										/>
 									</React.Fragment>
 								)) }

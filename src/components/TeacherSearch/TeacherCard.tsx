@@ -15,6 +15,7 @@ interface TeacherCardProps {
 	handleTeacherTabClick: (room_id: number, email: string | null,
 	                        fullTeacherName: string | null, teacherRoomName: string | null,
 	                        teacherFaculty: string | null | FacultyType) => void;
+	isLast?: boolean;
 }
 
 function TeacherCard({
@@ -24,7 +25,8 @@ function TeacherCard({
 	                     fullTeacherName,
 	                     room_name,
 	                     faculty,
-	                     email
+	                     email,
+	isLast
                      }: TeacherCardProps) {
 	const theme = useTheme()
 
@@ -38,6 +40,8 @@ function TeacherCard({
 		     justifyContent="flex-start"
 		     py={ 1.5 }
 		     m={ 1 }
+		     sx={{ cursor: room_name? "pointer": "default"}}
+		     mb={ isLast? "6em" : 1 }
 		     bgcolor="#222831"
 		     borderRadius="10px"
 		     onClick={ () => handleTeacherTabClick(room_id, email, fullTeacherName, room_name, faculty) }

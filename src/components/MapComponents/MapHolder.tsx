@@ -70,7 +70,6 @@ const MapHolder = () => {
 		navigate("/faculty")
 	}
 
-
 	return (
 		<Box className="Map-Holder">
 

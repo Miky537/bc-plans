@@ -134,7 +134,7 @@ export function Topbar({ goBack, disabled }: TopbarProps) {
 	return (
 		<div className="Topbar" id="topbar">
 			<Box sx={ { display: 'flex', alignItems: 'center'} }>
-				{ !(location.pathname.startsWith('/map') || location.pathname === '/teacher' || location.pathname === '/faculty') && (
+				{ !(location.pathname === "/" || location.pathname.startsWith('/map') || location.pathname === '/teacher' || location.pathname === '/faculty') && (
 					<IconButton sx={{position: "absolute", left: "1em"}} edge="start" color="inherit" aria-label="menu" onClick={ () => navigate(-1) }>
 						<WestIcon />
 					</IconButton>

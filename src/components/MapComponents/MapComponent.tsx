@@ -185,6 +185,7 @@ const MapComponent = ({
 		const LocationWidget = new Track({
 			view: mapView,
 			icon: "", //adding custom icon in index.css
+			scale: 700,
 			rotationEnabled: false, // Disable the rotation of the view
 			goToLocationEnabled: true, // automatically moves the view to the user's location
 			geolocationOptions: {
@@ -671,7 +672,7 @@ const MapComponent = ({
 
 			abortControllerRef.current = new AbortController();
 			if (roomFeature.geometry.extent) {
-
+				console.log("Zooming to room extent");
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
 					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }

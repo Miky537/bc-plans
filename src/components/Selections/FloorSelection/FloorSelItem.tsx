@@ -56,7 +56,10 @@ export default function FloorSelItem({ floor, setExpanded, expanded, handleRoomC
 			<AccordionDetails>
 				<Box>
 					{
-						floor.rooms?.map((room: FetchedFloorRoomType) => {
+						floor.rooms!.sort((a: FetchedFloorRoomType, b: FetchedFloorRoomType) => {
+							// Use localeCompare to sort strings lexicographically
+							return (a.room_number || "").localeCompare(b.room_number || "");
+						}).map((room: FetchedFloorRoomType) => {
 							return (
 								<Box key={ room.room_id }>
 									<RoomItem
@@ -73,6 +76,7 @@ export default function FloorSelItem({ floor, setExpanded, expanded, handleRoomC
 						})
 					}
 				</Box>
+
 			</AccordionDetails>
 		</Accordion>
 	)

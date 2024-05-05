@@ -1,6 +1,7 @@
 export const searchBoxStyle = {
 	display: "flex",
 	override: "hidden",
+	overflow: "hidden",
 	alignItems: "center",
 	padding: "10px",
 	color: "white",

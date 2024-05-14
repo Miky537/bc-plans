@@ -31,7 +31,7 @@ export function SwipeableDrawerComponent({
 	const { selectedFaculty, selectedRoomId } = useFacultyContext()
 	const { updateLastUsed, isLoading: authIsLoading, loginSuccess } = useAuthContext()
 	const contentRef = useRef<HTMLDivElement | null>(null);
-	const imageRef = useRef<HTMLDivElement | null>(null);
+	const imageRef = useRef<HTMLImageElement | null>(null);
 
 	const { loginMutate } = useAuthToken()
 	const faculty = selectedFaculty as FacultyType;
@@ -45,55 +45,52 @@ export function SwipeableDrawerComponent({
 	const [isError, setIsError] = useState(false);
 	const theme = useTheme();
 	const [drawerHeight, setDrawerHeight] = useState('14em');
+	const [expanded, setExpanded] = useState(false);
 
 	const calculateExpandedHeight = () => {
 		const contentHeight = contentRef.current?.offsetHeight || 0;
 		const imageHeightFromRef = imageRef.current?.offsetHeight || 0;
-		if (imageRef.current && "offsetHeight" in imageRef.current) {
-			const totalHeight: string = `${ contentHeight + imageHeightFromRef + 70 }px`;
-			return totalHeight;
-		} else {
-			return "25em"
-		}
+		const totalHeight: string = `${contentHeight + imageHeightFromRef + 70}px`;
+		return totalHeight;
 	};
 
-
-	useEffect(() => {
-		const getRoomPhoto = async(roomId: number) => {
-			setIsError(false);
-			setIsLoading(true);
-			let token = sessionStorage.getItem('sessionToken');
-			const headers: HeadersInit = {};
+	const getRoomPhoto = async (roomId: number) => {
+		setIsError(false);
+		setIsLoading(true);
+		let token = sessionStorage.getItem('sessionToken');
+		const headers: HeadersInit = {};
+		if (token) {
+			headers['Authorization'] = token;
+		} else {
+			loginMutate();
+			token = sessionStorage.getItem('sessionToken');
 			if (token) {
 				headers['Authorization'] = token;
 			} else {
-				loginMutate();
-				token = sessionStorage.getItem('sessionToken');
-				if (token) {
-					headers['Authorization'] = token;
-				} else {
-					return "";
-				}
-			}
-			const response = await fetch(`${ process.env.REACT_APP_BACKEND_URL }/api/photo/${ roomId }`, {
-				method: 'GET',
-				headers: headers,
-			});
-
-			if (!response.ok) {
-				loginMutate();
 				return "";
 			}
-			if (response.status === 204) {
-				return "";
-			}
-			// Convert the response to a blob if you're working with binary data
-			const imageBlob = await response.blob();
+		}
+		const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/photo/${roomId}`, {
+			method: 'GET',
+			headers: headers,
+		});
 
-			// Create a local URL for the blob to be used in an <img> element
-			const imageObjectURL = URL.createObjectURL(imageBlob);
-			return imageObjectURL;
-		};
+		if (!response.ok) {
+			loginMutate();
+			return "";
+		}
+		if (response.status === 204) {
+			return "";
+		}
+		// Convert the response to a blob if you're working with binary data
+		const imageBlob = await response.blob();
+
+		// Create a local URL for the blob to be used in an <img> element
+		const imageObjectURL = URL.createObjectURL(imageBlob);
+		return imageObjectURL;
+	};
+
+	useEffect(() => {
 		if (loginSuccess && selectedRoomId) {
 			updateLastUsed();
 			setPhoto("");
@@ -118,18 +115,28 @@ export function SwipeableDrawerComponent({
 
 	}, [selectedRoomId, loginSuccess]);
 
-	const toggleDrawerHeight = () => {
-		const newHeight = drawerHeight === '14em'? calculateExpandedHeight() : '14em';
-		setDrawerHeight(newHeight);
+	const handleImageLoad = () => {
+		if (expanded) {
+			setDrawerHeight(calculateExpandedHeight());
+		}
 	};
+
+	const toggleDrawerHeight = () => {
+		const newHeight = drawerHeight === '14em' ? calculateExpandedHeight() : '14em';
+		setDrawerHeight(newHeight);
+		setExpanded(!expanded);
+	};
+
 	useEffect(() => {
 		if (!isDrawerOpen) {
 			setDrawerHeight('14em');
+			setExpanded(false);
 		}
 	}, [isDrawerOpen]);
 
 	const handleCloseDrawer = () => {
 		setDrawerHeight('14em');
+		setExpanded(false);
 		onClose();
 	};
 
@@ -137,7 +144,7 @@ export function SwipeableDrawerComponent({
 		const storageKey = 'favoriteRooms';
 
 		const favoriteRoomsString = localStorage.getItem(storageKey);
-		let favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
+		let favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString ? JSON.parse(favoriteRoomsString) : [];
 
 		const index = favoriteRooms.findIndex(room => room.roomId === roomToToggle.roomId);
 
@@ -153,12 +160,11 @@ export function SwipeableDrawerComponent({
 		localStorage.setItem(storageKey, JSON.stringify(favoriteRooms));
 	};
 
-
 	useEffect(() => {
 		setIsFav(false);
 		const storageKey = 'favoriteRooms';
 		const favoriteRoomsString = localStorage.getItem(storageKey);
-		const favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString? JSON.parse(favoriteRoomsString) : [];
+		const favoriteRooms: FavouritePlacesLocalStorage[] = favoriteRoomsString ? JSON.parse(favoriteRoomsString) : [];
 		const isFavorite = favoriteRooms.some(room => room.roomId === roomId);
 		setIsFav(isFavorite);
 	}, [roomId, isDrawerOpen]);
@@ -176,47 +182,47 @@ export function SwipeableDrawerComponent({
 			pb: { xs: "3em", sm: "6.5em" },
 			backgroundColor: theme.palette.background.default,
 			transition: ({ transitions }: Theme) =>
-				`${ transitions.create(['height', 'transform'], {
+				`${transitions.create(['height', 'transform'], {
 					duration: transitions.duration.leavingScreen,
 					easing: transitions.easing.sharp,
-				}) } !important`,
+				})} !important`,
 		},
 	};
 
 	return (
 		<SwipeableDrawer
 			anchor="bottom"
-			open={ isDrawerOpen }
-			onClose={ handleCloseDrawer }
-			onOpen={ onOpen }
-			transitionDuration={ { enter: 750, exit: 200 } }
-			sx={ drawerStyles }
+			open={isDrawerOpen}
+			onClose={handleCloseDrawer}
+			onOpen={onOpen}
+			transitionDuration={{ enter: 750, exit: 200 }}
+			sx={drawerStyles}
 		>
 			<Box display="flex"
 			     position="absolute"
-			     sx={ { top: { xs: "1.2em", sm: "2em" } } }
-			     left={ 0 }
+			     sx={{ top: { xs: "1.2em", sm: "2em" } }}
+			     left={0}
 			     width="100%"
-			     gap={ 8 }
+			     gap={8}
 			     height="fit-content"
 			     alignItems="center"
 			     justifyContent="space-around"
 			>
-				<FavIconButton toggleFavoriteRoom={ toggleFavoriteRoom }
-				               isFav={ isFav }
-				               roomName={ roomName }
-				               roomId={ roomId }
-				               floorName={ floorName }
-				               floorNumber={ floorNumber }
-				               buildingName={ buildingName }
-				               faculty={ faculty } />
+				<FavIconButton toggleFavoriteRoom={toggleFavoriteRoom}
+				               isFav={isFav}
+				               roomName={roomName}
+				               roomId={roomId}
+				               floorName={floorName}
+				               floorNumber={floorNumber}
+				               buildingName={buildingName}
+				               faculty={faculty} />
 				<Box height="fit-content">
-					<Typography variant="h4" fontWeight="bolder">{ room_info.cislo }</Typography>
+					<Typography variant="h4" fontWeight="bolder">{room_info.cislo}</Typography>
 				</Box>
-				<MoveButton toggleDrawerHeight={ toggleDrawerHeight } drawerHeight={ drawerHeight } />
+				<MoveButton toggleDrawerHeight={toggleDrawerHeight} drawerHeight={drawerHeight} />
 			</Box>
 			<Box display="flex"
-			     ref={ contentRef }
+			     ref={contentRef}
 			     minHeight="fit-content"
 			     gap="0.3em"
 			     width="95%"
@@ -224,20 +230,20 @@ export function SwipeableDrawerComponent({
 			     minWidth="fit-content"
 			     position="relative"
 			     overflow="hidden"
-			     sx={ { mt: { xs: "3em", sm: "4em" } } }>
-				<DrawerListItem text={ room_info.nazev } desc="Název místnosti:" />
-				<DrawerListItem text={ room_info.pocet_mist } desc="Počet míst na sezení:" />
-				<DrawerListItem text={ faculty as string } desc="Fakulta:" />
-				<DrawerListItem text={ buildingName } desc="Budova:" />
-				<DrawerListItem text={ floorNumber } desc="Podlaží:" />
-				<DrawerListItem text={ arealName } variant="body1" desc="Areál:" />
+			     sx={{ mt: { xs: "3em", sm: "4em" } }}>
+				<DrawerListItem text={room_info.nazev} desc="Název místnosti:" />
+				<DrawerListItem text={room_info.pocet_mist} desc="Počet míst na sezení:" />
+				<DrawerListItem text={faculty as string} desc="Fakulta:" />
+				<DrawerListItem text={buildingName} desc="Budova:" />
+				<DrawerListItem text={floorNumber} desc="Podlaží:" />
+				<DrawerListItem text={arealName} variant="body1" desc="Areál:" />
 			</Box>
 			<Box zIndex="-1"
 			     width="90%"
-			     ref={ imageRef }
+			     ref={imageRef}
 			     position="absolute"
-			     sx={ { bottom: drawerHeight === "14em"? "0em" : "3em", transition: "all 0.15s ease" } }>
-				{ isLoading || isError? <Box sx={ {
+			     sx={{ bottom: drawerHeight === "14em" ? "0em" : "3em", transition: "all 0.15s ease" }}>
+				{isLoading || isError ? <Box sx={{
 						display: "flex",
 						color: 'black',
 						alignItems: 'center',
@@ -249,44 +255,43 @@ export function SwipeableDrawerComponent({
 						maxHeight: '45dvh',
 						cursor: 'pointer',
 						overflow: 'hidden',
-						opacity: drawerHeight === "14em"? 0 : 1,
+						opacity: drawerHeight === "14em" ? 0 : 1,
 						transition: 'opacity 0.3s',
-					} }>{ isError?
+					}}>{isError ?
 						<Box display="flex"
-						     sx={ { opacity: drawerHeight === "14em"? 0 : 1, } }
+						     sx={{ opacity: drawerHeight === "14em" ? 0 : 1, }}
 						     flexDirection="column"
 						     alignItems="center">
 							<NoPhotographyOutlinedIcon />
 							<Typography>Zatím žádná fotka!</Typography>
-						</Box> : "Načítání.." }</Box>
+						</Box> : "Načítání.."}</Box>
 					:
 					<Box height="fit-content"
-					     maxHeight="25em"
+					     maxHeight="20em"
 					     width="100%"
-					     overflow={ drawerHeight === "14em"? "hidden" : "auto" }>
+					     overflow={drawerHeight === "14em" ? "hidden" : "auto"}>
 						<Box
 							display="flex"
 							component="img"
 							className="PhotoBox"
-							src={ photoUrl }
+							src={photoUrl}
 							alt="Detailed View"
-							sx={ {
-								opacity: drawerHeight === "14em"? 0 : 1,
+							onLoad={handleImageLoad}
+							sx={{
+								opacity: drawerHeight === "14em" ? 0 : 1,
 								transition: 'opacity 0.3s',
 								borderRadius: '10px',
 								width: '100%',
 								maxWidth: '100%',
 								objectFit: 'cover',
 								zIndex: 1,
-								height: "auto",
 								cursor: 'pointer',
-							} }
+							}}
 						/>
 					</Box>
-
 				}
 			</Box>
-			<NavigateButton address={ building_info.adresa } />
+			<NavigateButton address={building_info.adresa} />
 		</SwipeableDrawer>
 	)
 }

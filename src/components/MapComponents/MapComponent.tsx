@@ -672,7 +672,7 @@ const MapComponent = ({
 
 			abortControllerRef.current = new AbortController();
 			if (roomFeature.geometry.extent) {
-				console.log("Zooming to room extent");
+				// console.log("Zooming to room extent");
 				mapViewRef.current?.goTo(
 					{ target: roomFeature.geometry.extent.expand(1.5) },
 					{ duration: 1000, easing: "ease-out", signal: abortControllerRef.current!.signal, animate: true }
